@@ -9,3 +9,8 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 /git-sonification-code/nbproject/private/
+
+# Some of the data we're using in this program comes from another person's
+# research, so we're not committing that data into a public repo before that
+# person's research is published
+data/
