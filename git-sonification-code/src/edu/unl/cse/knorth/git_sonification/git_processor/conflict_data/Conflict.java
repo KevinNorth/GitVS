@@ -34,4 +34,10 @@ public class Conflict {
     public String getCommitResolvingConflict() {
         return commitResolvingConflict;
     }
+    
+    @Override
+    public String toString() {
+        return "[Conflict] Introduced: " + commitIntroducingConflict +
+                " | Resolved: " + commitResolvingConflict;
+    }
 }
