@@ -1,7 +1,9 @@
 package edu.unl.cse.knorth.git_sonification;
 
+import edu.unl.cse.knorth.git_sonification.git_processor.GitProcessor;
 import edu.unl.cse.knorth.git_sonification.git_processor.git_caller.GitCaller;
 import edu.unl.cse.knorth.git_sonification.git_processor.git_caller.PartialCommit;
+import edu.unl.cse.knorth.git_sonification.intermediate_data.Commit;
 import java.io.IOException;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -15,13 +17,10 @@ public class Main {
         cal.set(2011, 0, 1);
         Date until = cal.getTime();
                 
-        List<PartialCommit> commits;
-        try(GitCaller gitCaller =
-                new GitCaller("../../voldemort/.git")) {
-            commits = gitCaller.getPartialCommits(since, until);
-        }
+        List<Commit> commits = new GitProcessor().parseGitData(
+                "../../voldemort/.git", "data/conflict_data.dat", since, until);
         
-        for(PartialCommit commit : commits) {
+        for(Commit commit : commits) {
             System.out.println(commit);
         }
     }

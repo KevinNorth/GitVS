@@ -2,8 +2,8 @@ package edu.unl.cse.knorth.git_sonification.intermediate_data;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -13,7 +13,7 @@ import java.util.List;
 public class Commit {
     private String author;
     private boolean introducesConflict;
-    private Calendar timestamp;
+    private Date timestamp;
     private String hash;
     private final List<String> parentHashes;
     private String resolvedConflictHash;
@@ -67,7 +67,7 @@ public class Commit {
      * Gets the date and time that this commit was made on.
      * @return The date and time that this commit was made on.
      */
-    public Calendar getTimestamp() {
+    public Date getTimestamp() {
         return timestamp;
     }
 
@@ -75,7 +75,7 @@ public class Commit {
      * Sets the date and time that this commit was made on.
      * @param timestamp The date and time that this commit was made on.
      */
-    public void setTimestamp(Calendar timestamp) {
+    public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -158,6 +158,14 @@ public class Commit {
      */
     public void setResolvedConflictHash(String resolvedConflictHash) {
         this.resolvedConflictHash = resolvedConflictHash;
+    }
+
+    @Override
+    public String toString() {
+        return "Commit{" + "author=" + author + ", introducesConflict="
+                + introducesConflict + ", timestamp=" + timestamp + ", hash="
+                + hash + ", parentHashes=" + parentHashes
+                + ", resolvedConflictHash=" + resolvedConflictHash + '}';
     }
     
     
