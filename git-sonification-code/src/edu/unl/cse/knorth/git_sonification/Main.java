@@ -10,14 +10,14 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) throws IOException {
         GregorianCalendar cal = new GregorianCalendar();
-        cal.set(2000, 0, 1);
+        cal.set(2010, 0, 1);
         Date since = cal.getTime();
-        cal.set(2001, 0, 1);
+        cal.set(2011, 0, 1);
         Date until = cal.getTime();
-        
+                
         List<PartialCommit> commits;
         try(GitCaller gitCaller =
-                new GitCaller(/* TODO what goes here? */ "")) {
+                new GitCaller("../../voldemort/.git")) {
             commits = gitCaller.getPartialCommits(since, until);
         }
         

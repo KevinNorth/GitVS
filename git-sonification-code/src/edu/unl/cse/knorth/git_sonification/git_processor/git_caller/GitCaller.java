@@ -7,11 +7,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import org.eclipse.jgit.errors.IncorrectObjectTypeException;
+import org.eclipse.jgit.errors.MissingObjectException;
+import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
-import org.eclipse.jgit.revwalk.filter.CommitTimeRevFilter;
-import org.eclipse.jgit.revwalk.filter.RevFilter;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 
 /**
@@ -61,27 +62,71 @@ public class GitCaller implements AutoCloseable, Closeable {
      * <code>sinceDate</code> but before <code>untilDate</code>.
      * @throws IllegalStateException If you try to call this method after
      * previously calling <code>close()</code> on this GitCaller.
+     * @throws IOException If there was a problem reading the master branch of
+     * the repository.
      */
     public List<PartialCommit> getPartialCommits(Date sinceDate, Date untilDate)
+            throws IllegalStateException, IOException
     {
         if(closed) {
             throw new IllegalStateException("Can't call getCommitHashes() on a "
                     + "GitCaller that has been closed.");
         }
-        
-        RevFilter filter = CommitTimeRevFilter.between(sinceDate, untilDate);
-        
+                
         RevWalk walk = new RevWalk(repo);
-        walk.setRevFilter(filter);
         
+        try {
+        Ref head = repo.getRef("refs/heads/master");
+        RevCommit headCommit = walk.parseCommit(head.getObjectId());
+        walk.markStart(headCommit);
+        } catch(MissingObjectException err) {
+            throw new IOException("Couldn't find the HEAD of the master branch",
+                    err);
+        } catch(IncorrectObjectTypeException err) {
+            throw new IOException("Problem getting the HEAD of the master "
+                    + "branch", err);
+        } catch(IOException err) {
+            throw new IOException("Problem getting the HEAD of the master "
+                    + "branch", err);
+        }
+                        
         List<PartialCommit> partialCommits  = new LinkedList<>();
         
         for(RevCommit commit : walk) {
-            PartialCommit partialCommit = getCommitData(commit);
-            partialCommits.add(partialCommit);
+            if(isCommitInDateRange(commit, sinceDate, untilDate)) {
+                PartialCommit partialCommit = getCommitData(commit);
+                partialCommits.add(partialCommit);
+            }
         }
 
+        walk.dispose();
+        
         return partialCommits;
+    }
+    
+    /**
+     * Determines whether the given commit was made in-between the two specified
+     * dates.
+     * @param commit The commit to check
+     * @param since The earliest date the commit can have been made and still be
+     * accepted
+     * @param until The latest date the commit can have been made and still be
+     * accepted
+     * @return <code>true</code> if the date the commit was made on falls in-
+     * between <code>since</code> (inclusively) and <code>until</code>
+     * (exclusively). <code>false</code> otherwise.
+     */
+    private boolean isCommitInDateRange(RevCommit commit, Date since,
+        Date until) {
+        Date commitDate = new Date((long) commit.getCommitTime() * 1000L);
+        
+        if((commitDate.after(since)) && (commitDate.before(until))) {
+            return true;
+        } else if(commitDate.equals(since)) {
+            return true;
+        } else {
+            return false;
+        }
     }
     
     /**
@@ -105,7 +150,7 @@ public class GitCaller implements AutoCloseable, Closeable {
         
         return new PartialCommit(hash, author, date, parentHashes);
     }
-
+    
     /**
      * Allows the resources the GitCaller is using for its reference to a
      * repository to be closed. Once you've called this method, any subsequent
@@ -121,5 +166,19 @@ public class GitCaller implements AutoCloseable, Closeable {
             repo.close();
             closed = true;
         }
+    }
+    
+    /**
+     * Indicates whether this GitCaller has been <code>close()</code>ed, as per
+     * the <code>Closeable</code> and <code>AutoClosable</code> interfaces.
+     * <p/>
+     * If this function returns <code>false</code>, calling
+     * <code>getPartialCommits()</code> will throw an exception. Otherwise, it
+     * is safe to call <code>getPartialCommits()</code>.
+     * @return <code>true</code> if <code>close()</code> has previously bee
+     * called on this <code>GitCaller</code>. <code>false</code> otherwise.
+     */
+    public boolean isClosed() {
+        return closed;
     }
 }
