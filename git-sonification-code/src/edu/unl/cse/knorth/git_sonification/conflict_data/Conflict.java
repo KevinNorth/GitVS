@@ -1,4 +1,4 @@
-package edu.unl.cse.knorth.git_sonification.git_processor.conflict_data;
+package edu.unl.cse.knorth.git_sonification.conflict_data;
 
 /**
  * Keeps track of when a conflict was introduced and then resolved during a git

@@ -1,4 +1,4 @@
-package edu.unl.cse.knorth.git_sonification.git_processor.git_caller;
+package edu.unl.cse.knorth.git_sonification.git_caller;
 
 import java.io.Closeable;
 import java.io.File;
@@ -52,20 +52,14 @@ public class GitCaller implements AutoCloseable, Closeable {
     /**
      * Gets a list of commits that will be processed by the rest of the Git
      * Parser component.
-     * @param sinceDate This method will get information on commits made on or
-     * after this date. (This corresponds to the date that would be used in the
-     * <code>--since</code> flag in the <code>git log</code> command.)
-     * @param untilDate This method will get information on commits made before
-     * (but not on) this date. (This corresponds to the date that would be used
-     * in the <code>--until</code> flag in the <code>git log</code> command.)
-     * @return A list of PartialCommits for all of the commits made on or after
-     * <code>sinceDate</code> but before <code>untilDate</code>.
+     * @return A list of PartialCommits for all of the commits made in this
+     * GitCaller's repository.
      * @throws IllegalStateException If you try to call this method after
      * previously calling <code>close()</code> on this GitCaller.
      * @throws IOException If there was a problem reading the master branch of
      * the repository.
      */
-    public List<PartialCommit> getPartialCommits(Date sinceDate, Date untilDate)
+    public List<PartialCommit> getPartialCommits()
             throws IllegalStateException, IOException
     {
         if(closed) {
@@ -93,42 +87,15 @@ public class GitCaller implements AutoCloseable, Closeable {
         List<PartialCommit> partialCommits  = new LinkedList<>();
         
         for(RevCommit commit : walk) {
-            if(isCommitInDateRange(commit, sinceDate, untilDate)) {
-                PartialCommit partialCommit = getCommitData(commit);
-                partialCommits.add(partialCommit);
-            }
+            PartialCommit partialCommit = getCommitData(commit);
+            partialCommits.add(partialCommit);
         }
 
         walk.dispose();
         
         return partialCommits;
     }
-    
-    /**
-     * Determines whether the given commit was made in-between the two specified
-     * dates.
-     * @param commit The commit to check
-     * @param since The earliest date the commit can have been made and still be
-     * accepted
-     * @param until The latest date the commit can have been made and still be
-     * accepted
-     * @return <code>true</code> if the date the commit was made on falls in-
-     * between <code>since</code> (inclusively) and <code>until</code>
-     * (exclusively). <code>false</code> otherwise.
-     */
-    private boolean isCommitInDateRange(RevCommit commit, Date since,
-        Date until) {
-        Date commitDate = new Date((long) commit.getCommitTime() * 1000L);
         
-        if((commitDate.after(since)) && (commitDate.before(until))) {
-            return true;
-        } else if(commitDate.equals(since)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    
     /**
      * Gets the author, timestamp, and list of parents for the commit associated
      * with the specified hash.
