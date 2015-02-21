@@ -55,6 +55,10 @@ public final class Measure {
     public boolean isDaySeparator() {
         return isDaySeparator;
     }
-    
-    
+
+    @Override
+    public String toString() {
+        return "Measure{" + "author=" + author + ", inConflict=" + inConflict
+                + ", isDaySeparator=" + isDaySeparator + '}';
+    }
 }

@@ -1,6 +1,7 @@
-package edu.unl.cse.knorth.git_sonification.sonifier.audio;
+package edu.unl.cse.knorth.git_sonification.sonifier.audio.per_commit;
 
 import edu.unl.cse.knorth.git_sonification.sonifier.Measure;
+import edu.unl.cse.knorth.git_sonification.sonifier.audio.ClockSpeedController;
 import net.beadsproject.beads.core.AudioContext;
 
 /**

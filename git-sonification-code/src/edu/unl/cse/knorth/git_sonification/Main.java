@@ -6,8 +6,12 @@ import edu.unl.cse.knorth.git_sonification.conflict_data.ConflictDataParser;
 import edu.unl.cse.knorth.git_sonification.git_caller.GitCaller;
 import edu.unl.cse.knorth.git_sonification.git_caller.PartialCommit;
 import edu.unl.cse.knorth.git_sonification.intermediate_data.Commit;
+import edu.unl.cse.knorth.git_sonification.sonifier.Measure;
+import edu.unl.cse.knorth.git_sonification.sonifier.MeasureProducer;
+import edu.unl.cse.knorth.git_sonification.sonifier.audio.per_commit.PerCommitMeasureProducer;
 import java.io.IOException;
 import java.util.List;
+import java.util.Queue;
 import org.joda.time.DateTime;
 
 public class Main {
@@ -31,6 +35,15 @@ public class Main {
         
         for(Commit commit : commits) {
             System.out.println(commit);
+        }
+        
+        System.out.println("\n----------------\n");
+        
+        MeasureProducer measureProducer = new PerCommitMeasureProducer();
+        Queue<Measure> measures = measureProducer.produceMeasures(commits);
+        
+        for(Measure measure : measures) {
+            System.out.println(measure);
         }
     }
 }
