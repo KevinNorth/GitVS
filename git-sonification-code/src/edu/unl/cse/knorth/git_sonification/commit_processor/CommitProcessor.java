@@ -8,7 +8,7 @@ import edu.unl.cse.knorth.git_sonification.intermediate_data.Commit;
 import edu.unl.cse.knorth.git_sonification.intermediate_data.CommitTimestampComparator;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
+import org.joda.time.DateTime;
 import java.util.List;
 
 public class CommitProcessor {
@@ -31,7 +31,7 @@ public class CommitProcessor {
      * <code>until</code> and sorted in ascending order of commit timestamp.
      */
     public List<Commit> processCommits(List<PartialCommit> partialCommits,
-            List<Conflict> conflicts, Date since, Date until) {
+            List<Conflict> conflicts, DateTime since, DateTime until) {
         return processCommits(partialCommits, conflicts,
                 new DateCommitFilter(since, until));
     }

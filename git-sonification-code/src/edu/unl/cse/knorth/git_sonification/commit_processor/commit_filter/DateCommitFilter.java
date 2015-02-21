@@ -1,7 +1,7 @@
 package edu.unl.cse.knorth.git_sonification.commit_processor.commit_filter;
 
 import edu.unl.cse.knorth.git_sonification.git_caller.PartialCommit;
-import java.util.Date;
+import org.joda.time.DateTime;
 
 /**
  * Filters commits based on when they were made, selecting the commits that fall
@@ -9,8 +9,8 @@ import java.util.Date;
  * @author knorth
  */
 public class DateCommitFilter extends CommitFilter {
-    private final Date since;
-    private final Date until;
+    private final DateTime since;
+    private final DateTime until;
 
     /**
      * Creates a DateCommitFilter that selects commits made in-between
@@ -20,7 +20,7 @@ public class DateCommitFilter extends CommitFilter {
      * @param until The latest timestamp that a commit can have been made on and
      * still be selected.
      */
-    public DateCommitFilter(Date since, Date until) {
+    public DateCommitFilter(DateTime since, DateTime until) {
         this.since = since;
         this.until = until;
     }
@@ -35,9 +35,9 @@ public class DateCommitFilter extends CommitFilter {
      */
     @Override
     protected boolean shouldSelectCommit(PartialCommit commit) {
-        Date commitDate = commit.getDatetime();
+        DateTime commitDate = commit.getDatetime();
         
-        if((commitDate.after(since)) && (commitDate.before(until))) {
+        if((commitDate.isAfter(since)) && (commitDate.isBefore(until))) {
             return true;
         } else {
             return false;
@@ -48,7 +48,7 @@ public class DateCommitFilter extends CommitFilter {
      * @return The earliest <code>Date</code> that a commit can have been made
      * on and still be selected by this <code>DateCommitFilter</code>.
      */
-    public Date getSince() {
+    public DateTime getSince() {
         return since;
     }
 
@@ -56,7 +56,7 @@ public class DateCommitFilter extends CommitFilter {
      * @return The latest <code>Date</code> that a commit can have been made
      * on and still be selected by this <code>DateCommitFilter</code>.
      */
-    public Date getUntil() {
+    public DateTime getUntil() {
         return until;
     }
 }

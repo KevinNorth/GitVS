@@ -3,8 +3,8 @@ package edu.unl.cse.knorth.git_sonification.intermediate_data;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
+import org.joda.time.DateTime;
 
 /**
  * Keeps track of all of the information that is needed to correctly sonify a
@@ -13,7 +13,7 @@ import java.util.List;
 public class Commit {
     private String author;
     private boolean introducesConflict;
-    private Date timestamp;
+    private DateTime timestamp;
     private String hash;
     private final List<String> parentHashes;
     private String resolvedConflictHash;
@@ -67,7 +67,7 @@ public class Commit {
      * Gets the date and time that this commit was made on.
      * @return The date and time that this commit was made on.
      */
-    public Date getTimestamp() {
+    public DateTime getTimestamp() {
         return timestamp;
     }
 
@@ -75,7 +75,7 @@ public class Commit {
      * Sets the date and time that this commit was made on.
      * @param timestamp The date and time that this commit was made on.
      */
-    public void setTimestamp(Date timestamp) {
+    public void setTimestamp(DateTime timestamp) {
         this.timestamp = timestamp;
     }
 

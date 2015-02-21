@@ -4,7 +4,6 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
@@ -14,6 +13,7 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+import org.joda.time.DateTime;
 
 /**
  * Interacts with the jGit library to git information from the Voldemort git
@@ -108,7 +108,7 @@ public class GitCaller implements AutoCloseable, Closeable {
         String author = commit.getAuthorIdent().getName();
 
         int secondsSinceEpoch = commit.getCommitTime();
-        Date date = new Date(((long) secondsSinceEpoch) * 1000L);
+        DateTime date = new DateTime(((long) secondsSinceEpoch) * 1000L);
         
         List<String> parentHashes = new ArrayList<>(commit.getParentCount());
         for(RevCommit parent : commit.getParents()) {

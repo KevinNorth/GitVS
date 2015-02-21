@@ -3,8 +3,8 @@ package edu.unl.cse.knorth.git_sonification.git_caller;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
+import org.joda.time.DateTime;
 
 /**
  * A simple POCO that keeps track of the data that the GitCaller obtains for a
@@ -13,7 +13,7 @@ import java.util.List;
 public class PartialCommit {
     private String hash;
     private String author;
-    private Date datetime;
+    private DateTime datetime;
     private final List<String> parentHashes;
     
     public PartialCommit() {
@@ -23,7 +23,7 @@ public class PartialCommit {
         parentHashes = new ArrayList<>();
     }
 
-    public PartialCommit(String hash, String author, Date datetime,
+    public PartialCommit(String hash, String author, DateTime datetime,
             Collection<String> parentHashes) {
         this.hash = hash;
         this.author = author;
@@ -32,7 +32,7 @@ public class PartialCommit {
         this.parentHashes.addAll(parentHashes);
     }
 
-    public PartialCommit(String hash, String author, Date datetime,
+    public PartialCommit(String hash, String author, DateTime datetime,
             String... parentHashes) {
         this.hash = hash;
         this.author = author;
@@ -50,11 +50,11 @@ public class PartialCommit {
         this.author = author;
     }
 
-    public Date getDatetime() {
+    public DateTime getDatetime() {
         return datetime;
     }
 
-    public void setDatetime(Date datetime) {
+    public void setDatetime(DateTime datetime) {
         this.datetime = datetime;
     }
 
