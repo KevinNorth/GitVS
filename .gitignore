@@ -11,6 +11,9 @@
 hs_err_pid*
 /git-sonification-code/nbproject/private/
 
+# Ignore the program's output
+/git-sonification-code/audio/out.wav
+
 # Some of the data we're using in this program comes from another person's
 # research, so we're not committing that data into a public repo before that
 # person's research is published

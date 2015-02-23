@@ -8,6 +8,7 @@ import edu.unl.cse.knorth.git_sonification.git_caller.PartialCommit;
 import edu.unl.cse.knorth.git_sonification.intermediate_data.Commit;
 import edu.unl.cse.knorth.git_sonification.sonifier.Measure;
 import edu.unl.cse.knorth.git_sonification.sonifier.MeasureProducer;
+import edu.unl.cse.knorth.git_sonification.sonifier.Sonifier;
 import edu.unl.cse.knorth.git_sonification.sonifier.audio.per_commit.PerCommitMeasureProducer;
 import java.io.IOException;
 import java.util.List;
@@ -45,5 +46,8 @@ public class Main {
         for(Measure measure : measures) {
             System.out.println(measure);
         }
+        
+        Sonifier sonifier = new Sonifier();
+        sonifier.sonifyCommits(commits, "audio/out.wav");
     }
 }

@@ -4,8 +4,6 @@ import edu.unl.cse.knorth.git_sonification.sonifier.Measure;
 import edu.unl.cse.knorth.git_sonification.sonifier.audio.AudioGenerator;
 import edu.unl.cse.knorth.git_sonification.sonifier.audio.ClockSpeedController;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.core.Bead;
@@ -21,7 +19,9 @@ import net.beadsproject.beads.ugens.RecordToSample;
  * @author knorth
  */
 public class PerCommitAudioGenerator extends AudioGenerator {
-
+    // This speed matches the audio samples' tempo.
+    public float CLOCK_SPEED = 38500F;
+    
     @Override
     public void produceAudio(ConcurrentLinkedQueue<Measure> measures, String filepath) throws IOException {
         final AudioContext ac = new AudioContext();
@@ -30,7 +30,7 @@ public class PerCommitAudioGenerator extends AudioGenerator {
         final RecordToSample recorder = new RecordToSample(ac, outputSample,
                 RecordToSample.Mode.INFINITE);
         final ClockSpeedController clockSpeedController
-                = new ClockSpeedController(ac, 10000);
+                = new ClockSpeedController(ac, CLOCK_SPEED);
 
         final Clock clock = new Clock(ac, clockSpeedController);
         clock.addMessageListener(new Bead() {
@@ -55,8 +55,8 @@ public class PerCommitAudioGenerator extends AudioGenerator {
                 } else {
                     Measure measure = measures.poll();
                     
-                    MeasureSonifier measureSonifier =
-                            new MeasureSonifier();
+                    PerCommitMeasureSonifier measureSonifier =
+                            new PerCommitMeasureSonifier();
                     measureSonifier.sonifyMeasure(ac, measure,
                             clockSpeedController);
                 }
