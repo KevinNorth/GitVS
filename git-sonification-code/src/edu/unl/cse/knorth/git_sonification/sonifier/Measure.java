@@ -5,22 +5,23 @@ package edu.unl.cse.knorth.git_sonification.sonifier;
  */
 public final class Measure {
     private final String author;
-    private final boolean inConflict;
+    private final int numConflicts;
     private final boolean isDaySeparator;
 
     /**
      * @param author The author of the commit to be sonified. If this measure
      * represents a day separator, this parameter will be ignored and can be
      * <code>null</code>.
-     * @param inConflict <code>true</code> if this measure represents a commit
-     * or day separator that is in the middle of at least one conflict.
+     * @param numConflicts The number of conflicts that are present in the
+     * codebase when this measure is sonified. Pass <code>0</code> if there are
+     * no conflicts.
      * <code>false</code> otherwise.
      * @param isDaySeparator <code>true</code> if this measure represents a
      * day separator. <code>false</code> otherwise.
      */
-    public Measure(String author, boolean inConflict, boolean isDaySeparator) {
+    public Measure(String author, int numConflicts, boolean isDaySeparator) {
         this.author = author;
-        this.inConflict = inConflict;
+        this.numConflicts = numConflicts;
         this.isDaySeparator = isDaySeparator;
     }
 
@@ -44,7 +45,17 @@ public final class Measure {
      * <code>false</code> otherwise.
      */
     public boolean isInConflict() {
-        return inConflict;
+        return numConflicts != 0;
+    }
+
+    /**
+     * The number of conflicts that are present in the codebase when this
+     * measure is sonified.
+     * @return The number of conflicts that are present in the codebase when
+     * this measure is sonified. 0 if there are no conflicts.
+     */
+    public int getNumConflicts() {
+        return numConflicts;
     }
 
     /**
@@ -58,7 +69,7 @@ public final class Measure {
 
     @Override
     public String toString() {
-        return "Measure{" + "author=" + author + ", inConflict=" + inConflict
-                + ", isDaySeparator=" + isDaySeparator + '}';
+        return "Measure{" + "author=" + author + ", numConflicts="
+                + numConflicts + ", isDaySeparator=" + isDaySeparator + '}';
     }
 }

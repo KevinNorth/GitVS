@@ -14,13 +14,13 @@ import org.joda.time.LocalDate;
  * used in 
  */
 public class PerCommitMeasureProducer extends MeasureProducer {
+    @Override
     public ConcurrentLinkedQueue<Measure>
         produceMeasures(List<Commit> commits) {
         ConcurrentLinkedQueue<Measure> measures = new ConcurrentLinkedQueue<>();
         List<String> introducedConflictHashes = new LinkedList<>();
         
         Commit previousCommit = null;
-        Measure previousMeasure = null;
         
         for(Commit commit : commits) {
             String author = commit.getAuthor();
@@ -35,13 +35,13 @@ public class PerCommitMeasureProducer extends MeasureProducer {
             }
 
             // Add day separators
-            if(previousCommit != null && previousMeasure != null) {
+            if(previousCommit != null) {
                 int daysSincePreviousCommit =
                     calculateDaysSinceLastCommit(commit, previousCommit);
                 
                 if(daysSincePreviousCommit > 0) {
                     addDaySeparators(measures, daysSincePreviousCommit,
-                            previousMeasure.isInConflict());
+                            introducedConflictHashes.size());
                 }
             }
             
@@ -54,11 +54,11 @@ public class PerCommitMeasureProducer extends MeasureProducer {
                         commit.getResolvedConflictHash());
             }
             
-            Measure measure = new Measure(author, isInConflict, false);
+            Measure measure = new Measure(author,
+                    introducedConflictHashes.size(), false);
             measures.add(measure);
             
             previousCommit = commit;
-            previousMeasure = measure;
         }
         
         return measures;
@@ -72,10 +72,10 @@ public class PerCommitMeasureProducer extends MeasureProducer {
      * occurring in the middle of a conflict. <code>false</code> otherwise.
      */
     private void addDaySeparators(ConcurrentLinkedQueue<Measure> measures,
-            int numberOfSeparators, boolean conflict) {
+            int numberOfSeparators, int numConflicts) {
             
         for(int i = 0; i < numberOfSeparators; i++) {
-            measures.add(new Measure(null, conflict, true));
+            measures.add(new Measure(null, numConflicts, true));
         }            
     }
     

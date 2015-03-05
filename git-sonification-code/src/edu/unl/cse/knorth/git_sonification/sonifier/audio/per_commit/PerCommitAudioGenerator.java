@@ -73,6 +73,6 @@ public class PerCommitAudioGenerator extends AudioGenerator {
         // Necessary to have clock produce sound
         ac.out.addDependent(clock);
         // Starts the audio context
-        ac.start();
+        ac.runNonRealTime();
     }
 }

@@ -13,7 +13,11 @@ import net.beadsproject.beads.ugens.SamplePlayer;
  * <code>PerCommitAudioGenerator</code>.
  */
 public class PerCommitMeasureSonifier {
-    public static final String CONFLICT_DRUMS_FILEPATH = "audio/conflict_drums.wav";
+    public static final String CONFLICT_DRUMS_1_FILEPATH = "audio/conflict_drums_1.wav";
+    public static final String CONFLICT_DRUMS_2_FILEPATH = "audio/conflict_drums_2.wav";
+    public static final String CONFLICT_DRUMS_3_FILEPATH = "audio/conflict_drums_3.wav";
+    public static final String CONFLICT_DRUMS_4_FILEPATH = "audio/conflict_drums_4.wav";
+    public static final String CONFLICT_DRUMS_5_FILEPATH = "audio/conflict_drums_5.wav";
     public static final String DAY_SEPARATOR_FILEPATH = "audio/day_separator_1.wav";
     public static final String DEV_1_FILEPATH = "audio/dev1.wav";
     public static final String DEV_2_FILEPATH = "audio/dev2.wav";
@@ -41,7 +45,7 @@ public class PerCommitMeasureSonifier {
      * be used to control when the next measure will be sonified. In this way,
      * the <code>PerCommitMeasureSonifier</code> can make its measure particularly long
      * or short if needed.
-     */
+    */
     public void sonifyMeasure(AudioContext ac, Measure measure,
             ClockSpeedController clockSpeedController) {
         SampleManager.setVerbose(false);
@@ -55,7 +59,7 @@ public class PerCommitMeasureSonifier {
         }
         
         if(measure.isInConflict())
-            sonifyConflictDrums(ac);
+            sonifyConflictDrums(ac, measure.getNumConflicts());
     }
     
     /**
@@ -138,9 +142,29 @@ public class PerCommitMeasureSonifier {
     /**
      * Plays the conflict drums earcon for a measure that is part of a conflict.
      * @param ac THe AudioContext to play the audio to.
+     * @param numConflicts The number of simultaneous conflicts being sonified.
+     * Used to select louder drums for more conflicts.
      */
-    public void sonifyConflictDrums(AudioContext ac) {
-        Sample sample = SampleManager.sample(CONFLICT_DRUMS_FILEPATH);
+    public void sonifyConflictDrums(AudioContext ac, int numConflicts) {
+        Sample sample;
+        
+        switch(numConflicts) {
+            case 1:
+                sample = SampleManager.sample(CONFLICT_DRUMS_1_FILEPATH);
+                break;
+            case 2:
+                sample = SampleManager.sample(CONFLICT_DRUMS_2_FILEPATH);
+                break;
+            case 3:
+                sample = SampleManager.sample(CONFLICT_DRUMS_3_FILEPATH);
+                break;
+            case 4:
+                sample = SampleManager.sample(CONFLICT_DRUMS_4_FILEPATH);
+                break;
+            default:
+                sample = SampleManager.sample(CONFLICT_DRUMS_5_FILEPATH);
+                break;
+        }
         
         SamplePlayer player = new SamplePlayer(ac, sample);
         Gain gain = new Gain(ac, 2, 1.0f);
