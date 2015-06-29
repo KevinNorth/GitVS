@@ -17,8 +17,7 @@ public class PerCommitMeasureSonifier {
     public static final String CONFLICT_DRUMS_2_FILEPATH = "audio/conflict_drums_2.wav";
     public static final String CONFLICT_DRUMS_3_FILEPATH = "audio/conflict_drums_3.wav";
     public static final String CONFLICT_DRUMS_4_FILEPATH = "audio/conflict_drums_4.wav";
-    public static final String CONFLICT_DRUMS_5_FILEPATH = "audio/conflict_drums_5.wav";
-    public static final String DAY_SEPARATOR_FILEPATH = "audio/day_separator_1.wav";
+    public static final String DAY_SEPARATOR_FILEPATH = "audio/day_separator.wav";
     public static final String DEV_1_FILEPATH = "audio/dev1.wav";
     public static final String DEV_2_FILEPATH = "audio/dev2.wav";
     public static final String DEV_3_FILEPATH = "audio/dev3.wav";
@@ -158,11 +157,8 @@ public class PerCommitMeasureSonifier {
             case 3:
                 sample = SampleManager.sample(CONFLICT_DRUMS_3_FILEPATH);
                 break;
-            case 4:
-                sample = SampleManager.sample(CONFLICT_DRUMS_4_FILEPATH);
-                break;
             default:
-                sample = SampleManager.sample(CONFLICT_DRUMS_5_FILEPATH);
+                sample = SampleManager.sample(CONFLICT_DRUMS_4_FILEPATH);
                 break;
         }
         

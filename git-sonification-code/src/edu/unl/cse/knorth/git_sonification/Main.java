@@ -19,9 +19,9 @@ public class Main {
     public static void main(String[] args) throws IOException {
 //        GregorianCalendar cal = new GregorianCalendar();
 //        cal.set(2009, 11, 23);
-        DateTime since = new DateTime(2009, 12, 23, 0, 0);
+        DateTime since = new DateTime(2009, 11, 4, 10, 0);
 //        cal.set(2010, 0, 6);
-        DateTime until = new DateTime(2010, 1, 6, 0, 0);
+        DateTime until = new DateTime(2009, 11, 5, 14, 0);
                 
         List<PartialCommit> partialCommits;
         try(GitCaller gitCaller = new GitCaller("../../voldemort/.git")) {
