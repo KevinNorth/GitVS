@@ -18,3 +18,4 @@ hs_err_pid*
 # research, so we're not committing that data into a public repo before that
 # person's research is published
 data/
+/git-sonification-code/dist/
