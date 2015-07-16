@@ -1,4 +1,4 @@
-package edu.unl.cse.knorth.git_sonification.sonifier;
+package edu.unl.cse.knorth.git_sonification.display_preparation.sonification;
 
 import edu.unl.cse.knorth.git_sonification.intermediate_data.Commit;
 import java.util.List;

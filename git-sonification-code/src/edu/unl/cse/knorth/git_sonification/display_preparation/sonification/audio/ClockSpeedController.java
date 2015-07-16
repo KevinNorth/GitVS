@@ -1,4 +1,4 @@
-package edu.unl.cse.knorth.git_sonification.sonifier.audio;
+package edu.unl.cse.knorth.git_sonification.display_preparation.sonification.audio;
 
 import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.ugens.Envelope;

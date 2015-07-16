@@ -1,9 +1,9 @@
-package edu.unl.cse.knorth.git_sonification.sonifier;
+package edu.unl.cse.knorth.git_sonification.display_preparation.sonification;
 
 import edu.unl.cse.knorth.git_sonification.intermediate_data.Commit;
-import edu.unl.cse.knorth.git_sonification.sonifier.audio.AudioGenerator;
-import edu.unl.cse.knorth.git_sonification.sonifier.audio.per_commit.PerCommitAudioGenerator;
-import edu.unl.cse.knorth.git_sonification.sonifier.audio.per_commit.PerCommitMeasureProducer;
+import edu.unl.cse.knorth.git_sonification.display_preparation.sonification.audio.AudioGenerator;
+import edu.unl.cse.knorth.git_sonification.display_preparation.sonification.audio.per_commit.PerCommitAudioGenerator;
+import edu.unl.cse.knorth.git_sonification.display_preparation.sonification.audio.per_commit.PerCommitMeasureProducer;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;

@@ -1,6 +1,6 @@
-package edu.unl.cse.knorth.git_sonification.sonifier.audio;
+package edu.unl.cse.knorth.git_sonification.display_preparation.sonification.audio;
 
-import edu.unl.cse.knorth.git_sonification.sonifier.Measure;
+import edu.unl.cse.knorth.git_sonification.display_preparation.sonification.Measure;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 

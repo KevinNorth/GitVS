@@ -1,4 +1,4 @@
-package edu.unl.cse.knorth.git_sonification.sonifier;
+package edu.unl.cse.knorth.git_sonification.display_preparation.sonification;
 
 /**
  * A POCO that represents a measure of music that will be sonified.

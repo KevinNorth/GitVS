@@ -1,8 +1,8 @@
-package edu.unl.cse.knorth.git_sonification.sonifier.audio.per_commit;
+package edu.unl.cse.knorth.git_sonification.display_preparation.sonification.audio.per_commit;
 
 import edu.unl.cse.knorth.git_sonification.intermediate_data.Commit;
-import edu.unl.cse.knorth.git_sonification.sonifier.Measure;
-import edu.unl.cse.knorth.git_sonification.sonifier.MeasureProducer;
+import edu.unl.cse.knorth.git_sonification.display_preparation.sonification.Measure;
+import edu.unl.cse.knorth.git_sonification.display_preparation.sonification.MeasureProducer;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
