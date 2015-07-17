@@ -1,6 +1,8 @@
 package edu.unl.cse.knorth.git_sonification;
 
 import edu.unl.cse.knorth.git_sonification.data_collection.commit_processor.CommitProcessor;
+import edu.unl.cse.knorth.git_sonification.data_collection.components.Component;
+import edu.unl.cse.knorth.git_sonification.data_collection.components.ComponentDataParser;
 import edu.unl.cse.knorth.git_sonification.data_collection.conflict_data.Conflict;
 import edu.unl.cse.knorth.git_sonification.data_collection.conflict_data.ConflictDataParser;
 import edu.unl.cse.knorth.git_sonification.data_collection.git_caller.GitCaller;
@@ -19,9 +21,9 @@ public class Main {
     public static void main(String[] args) throws IOException {
 //        GregorianCalendar cal = new GregorianCalendar();
 //        cal.set(2009, 11, 23);
-        DateTime since = new DateTime(2009, 11, 4, 0, 0);
+        DateTime since = new DateTime(2009, 11, 1, 0, 0);
 //        cal.set(2010, 0, 6);
-        DateTime until = new DateTime(2009, 11, 9, 0, 0);
+        DateTime until = new DateTime(2009, 11, 8, 0, 0);
                 
         List<PartialCommit> partialCommits;
         try(GitCaller gitCaller = new GitCaller("../../../voldemort/.git")) {
@@ -31,8 +33,12 @@ public class Main {
         List<Conflict> conflicts = new ConflictDataParser()
                 .parseConflictData("data/conflict_data.dat");
         
+        List<Component> components = new ComponentDataParser()
+                .parseComponents("data/components.txt");
+        
         List<Commit> commits = new CommitProcessor()
-                .processCommits(partialCommits, conflicts, since, until);
+                .processCommits(partialCommits, conflicts, components, since,
+                        until);
         
         for(Commit commit : commits) {
             System.out.println(commit);

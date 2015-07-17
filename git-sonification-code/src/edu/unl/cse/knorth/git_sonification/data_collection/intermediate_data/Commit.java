@@ -1,5 +1,6 @@
 package edu.unl.cse.knorth.git_sonification.data_collection.intermediate_data;
 
+import edu.unl.cse.knorth.git_sonification.data_collection.components.Component;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,14 +18,14 @@ public class Commit {
     private String hash;
     private final List<String> parentHashes;
     private String resolvedConflictHash;
-    private final List<String> filesModified;
+    private final List<Component> componentsModified;
     
     /**
      * Creates an empty <code>Commit</code>.
      */
     public Commit() {
         parentHashes = new ArrayList<>();
-        filesModified = new ArrayList<>();
+        componentsModified = new ArrayList<>();
     };
 
     /**
@@ -135,40 +136,40 @@ public class Commit {
         this.parentHashes.addAll(parentHashes);
     }
     
-        /**
-     * Gets a list containing all of the files modified by this commit.
-     * @return A <code>List</code> of <code>String</code>s containing all of
-     * the files modified by this commit.
+    /**
+     * Gets a list containing all of the Components modified by this commit.
+     * @return A <code>List</code> of <code>Components</code>s containing all of
+     * the Components modified by this commit.
      */
-    public List<String> getFilesModified() {
-        return filesModified;
+    public List<Component> getComponentModified() {
+        return componentsModified;
     }
 
     /**
-     * Adds a file to the list of files changed by this commit.
-     * @param fileModified The path, relative to the Git directory, of the file
-     * to add to the list of files changed by this commit.
+     * Adds a Component to the list of Components changed by this commit.
+     * @param componentModified  The Component to add to the list of Components
+     * changed by this commit.
      */
-    public void addFileModified(String fileModified) {
-        this.filesModified.add(fileModified);
+    public void addComponentModified(Component componentModified) {
+        this.componentsModified.add(componentModified);
     }
     
     /**
-     * Adds multiple files to the list of files changed by this commit.
-     * @param filesModified The paths, relative to the Git directory, of the
-     * files to add to the list of files changed by this commit.
+     * Adds multiple Components to the list of omponents changed by this commit.
+     * @param componentsModified The components to add to the list of components
+     * changed by this commit.
      */
-    public void addFilesModified(String... filesModified) {
-        this.filesModified.addAll(Arrays.asList(filesModified));
+    public void addComponentsModified(Component... componentsModified) {
+        this.componentsModified.addAll(Arrays.asList(componentsModified));
     }
     
     /**
-     * Adds multiple files to the list of files changed by this commit.
-     * @param filesModified The paths, relative to the Git directory, of the
-     * files to add to the list of files changed by this commit.
+     * Adds multiple Components to the list of omponents changed by this commit.
+     * @param componentsModified The components to add to the list of components
+     * changed by this commit.
      */
-    public void addFilesModified(Collection<String> filesModified) {
-        this.filesModified.addAll(filesModified);
+    public void addComponentsModified(Collection<Component> componentsModified) {
+        this.componentsModified.addAll(componentsModified);
     }
 
     /**
@@ -204,7 +205,7 @@ public class Commit {
                 + introducesConflict + ", timestamp=" + timestamp + ", hash="
                 + hash + ", parentHashes=" + parentHashes
                 + ", resolvedConflictHash=" + resolvedConflictHash +
-                ", filesModified=" + filesModified + '}';
+                ", componentsModified=" + componentsModified + '}';
     }
     
     

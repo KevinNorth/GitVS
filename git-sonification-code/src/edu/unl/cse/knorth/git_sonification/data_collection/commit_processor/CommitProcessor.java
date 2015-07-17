@@ -2,12 +2,14 @@ package edu.unl.cse.knorth.git_sonification.data_collection.commit_processor;
 
 import edu.unl.cse.knorth.git_sonification.data_collection.commit_processor.commit_filter.CommitFilter;
 import edu.unl.cse.knorth.git_sonification.data_collection.commit_processor.commit_filter.DateCommitFilter;
+import edu.unl.cse.knorth.git_sonification.data_collection.components.Component;
 import edu.unl.cse.knorth.git_sonification.data_collection.conflict_data.Conflict;
 import edu.unl.cse.knorth.git_sonification.data_collection.git_caller.PartialCommit;
 import edu.unl.cse.knorth.git_sonification.data_collection.intermediate_data.Commit;
 import edu.unl.cse.knorth.git_sonification.data_collection.intermediate_data.CommitTimestampComparator;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedList;
 import org.joda.time.DateTime;
 import java.util.List;
 
@@ -31,8 +33,9 @@ public class CommitProcessor {
      * <code>until</code> and sorted in ascending order of commit timestamp.
      */
     public List<Commit> processCommits(List<PartialCommit> partialCommits,
-            List<Conflict> conflicts, DateTime since, DateTime until) {
-        return processCommits(partialCommits, conflicts,
+            List<Conflict> conflicts, List<Component> components,
+            DateTime since, DateTime until) {
+        return processCommits(partialCommits, conflicts, components,
                 new DateCommitFilter(since, until));
     }
     
@@ -50,9 +53,10 @@ public class CommitProcessor {
      * in ascending order of commit timestamp.
      */
     public List<Commit> processCommits(List<PartialCommit> partialCommits,
-            List<Conflict> conflicts, CommitFilter commitFilter) {
-        return processCommits(partialCommits, conflicts, commitFilter,
-                new CommitTimestampComparator());
+            List<Conflict> conflicts, List<Component> components,
+            CommitFilter commitFilter) {
+        return processCommits(partialCommits, conflicts, components,
+                commitFilter, new CommitTimestampComparator());
     }
     
     /**
@@ -72,8 +76,8 @@ public class CommitProcessor {
      * according to <code>commitComparator</code>.
      */
     public List<Commit> processCommits(List<PartialCommit> partialCommits,
-            List<Conflict> conflicts, CommitFilter commitFilter,
-            Comparator<Commit> commitComparator) {
+            List<Conflict> conflicts, List<Component> components,
+            CommitFilter commitFilter, Comparator<Commit> commitComparator) {
         List<PartialCommit> filteredCommits =
                 commitFilter.filterCommits(partialCommits);
 
@@ -83,7 +87,8 @@ public class CommitProcessor {
         
         for(PartialCommit filteredCommit : filteredCommits) {
             processedCommits.add(
-                    processPartialCommit(filteredCommit, conflicts));
+                    processPartialCommit(filteredCommit, conflicts,
+                            components));
         }
         
         processedCommits.sort(commitComparator);
@@ -108,7 +113,7 @@ public class CommitProcessor {
      * </ul>
      */
     private Commit processPartialCommit(PartialCommit partialCommit,
-        List<Conflict> conflicts) {
+        List<Conflict> conflicts, List<Component> components) {
                 String hash = partialCommit.getHash();
         String resolvedCommit = null;
         boolean introducesConflict = false;
@@ -120,15 +125,39 @@ public class CommitProcessor {
                 resolvedCommit = conflict.getCommitIntroducingConflict();
             }
         }
-
+        
         Commit commit = new Commit();
         commit.addParentHashes(partialCommit.getParentHashes());
-        commit.addFilesModified(partialCommit.getFilesModified());
+        commit.addComponentsModified(
+                matchFilesModifiedToComponents(partialCommit.getFilesModified(),
+                        components));
         commit.setAuthor(partialCommit.getAuthor());
         commit.setHash(hash);
         commit.setIntroducesConflict(introducesConflict);
         commit.setResolvedConflictHash(resolvedCommit);
         commit.setTimestamp(partialCommit.getDatetime());
+                
         return commit;
+    }
+    
+    /**
+     * Gets a list of all of the Components that include at least one of a list
+     * of files.
+     * @param filesModified The list of files to check.
+     * @param components A List of Components where each Component includes at
+     * least one of the files in <code>filesModified</code>.
+     * @return 
+     */
+    private List<Component> matchFilesModifiedToComponents(
+            List<String> filesModified, List<Component> components) {
+        List<Component> matchedComponents = new LinkedList<>();
+        
+        for(Component component : components) {
+            if(component.includesAnyFile(filesModified)) {
+                matchedComponents.add(component);
+            }
+        }
+        
+        return matchedComponents;
     }
 }
