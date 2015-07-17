@@ -1,12 +1,14 @@
 package edu.unl.cse.knorth.git_sonification.display.view;
 
+import edu.unl.cse.knorth.git_sonification.display.model.visualization.Row;
+import edu.unl.cse.knorth.git_sonification.display.model.visualization.RowType;
+import edu.unl.cse.knorth.git_sonification.display.model.visualization.RowDateComparator;
+import edu.unl.cse.knorth.git_sonification.display.model.visualization.Line;
+import edu.unl.cse.knorth.git_sonification.display.model.visualization.Layer;
+import edu.unl.cse.knorth.git_sonification.display.model.visualization.VisualizationData;
 import processing.core.PApplet;
 import processing.event.MouseEvent;
 
-/**
- *
- * @author Shane
- */
 public class VisMain extends PApplet {
 
     int num = 49;
@@ -18,7 +20,8 @@ public class VisMain extends PApplet {
 
     float aspect;
     float s;
-
+    float s4;
+    
     float yPos;
     float playHead;
     float rotateAmt;
@@ -27,6 +30,8 @@ public class VisMain extends PApplet {
     int right;
     int bottom;
     int top;
+
+    VisualizationData visDat;
 
     public static void main(String args[]) {
         String[] newArgs = new String[args.length + 1];
@@ -44,6 +49,7 @@ public class VisMain extends PApplet {
         fill(200);
         aspect = (float) width / (float) height;
         s = aspect * 10;
+        s4 = 4*s;
         yPos = 0;
         playHead = 0;
         rotateAmt = 0;
@@ -65,29 +71,55 @@ public class VisMain extends PApplet {
         line(left, playHead, -1000, right, playHead, -1000);
 
         pushMatrix();
-        translate(width / 2, 4 * s, 0);
+        translate(width / 2, s4, 0);
         rotateY((rotateAmt / (float) width) * (2 * PI));
-        for (int z = 0; z < 3; z++) {
-            noStroke();
-            for (int i = 0; i < 7; i++) {
-                for (int w = 0; w < 7; w++) {
-                    mx[w] = w * 4 * s;
-                    my[i] = i * 4 * s;
+
+        int numColors = visDat.getLayers().size();
+        int z = 0;
+        for (Layer layer : visDat.getLayers()) {
+            z++;
+            int y = 0;
+            for (Row row : layer.getRows()) {
+                y++;
+                strokeWeight(5);
+                stroke(z*255/numColors,z*255/numColors,z*255/numColors);
+                for (Line line : row.getOutgoingLines()) {
+                    if (line.isVisible) {
+                        line(line.fromBranch* s4, y* s4, z* s4, line.toBranch* s4, y* s4, z* s4);
+                    }
+                }
+                noStroke();
+                if (row.isVisable()) {
                     pushMatrix();
-                    fill(color(30 + z * 50, 30 + z * 50, 30 + z * 50));
-                    translate(mx[w], my[i], z * 4 * s);
+                    fill(color(z*255/numColors,z*255/numColors,z*255/numColors));
+                    translate(row.getBranchLocation() * s4, y * s4, z * s4);
                     sphere(s);
                     popMatrix();
                 }
             }
-            strokeWeight(5);
-            stroke(30 + z * 50, 30 + z * 50, 30 + z * 50);
-            for (int i = 0; i < 6; i++) {
-                for (int w = 0; w < 6; w++) {
-                    line(mx[w], my[i], z * 4 * s, mx[w + 1], my[i + 1], z * 4 * s);
-                }
-            }
         }
+
+//        for (int z = 0; z < 3; z++) {
+//            noStroke();
+//            for (int i = 0; i < 7; i++) {
+//                for (int w = 0; w < 7; w++) {
+//                    mx[w] = w * 4 * s;
+//                    my[i] = i * 4 * s;
+//                    pushMatrix();
+//                    fill(color(30 + z * 50, 30 + z * 50, 30 + z * 50));
+//                    translate(mx[w], my[i], z * 4 * s);
+//                    sphere(s);
+//                    popMatrix();
+//                }
+//            }
+//            strokeWeight(5);
+//            stroke(30 + z * 50, 30 + z * 50, 30 + z * 50);
+//            for (int i = 0; i < 6; i++) {
+//                for (int w = 0; w < 6; w++) {
+//                    line(mx[w], my[i], z * 4 * s, mx[w + 1], my[i + 1], z * 4 * s);
+//                }
+//            }
+//        }
         popMatrix();
         //System.out.println("playHead = " + playHead);
     }
@@ -97,7 +129,7 @@ public class VisMain extends PApplet {
         mouseStartX = mouseX;
         mouseStartY = mouseY;
         if (mouseButton == RIGHT) {
-            playHead = ((((float)mouseY * (float) (top - bottom)) / (float) height) + bottom - yPos);
+            playHead = ((((float) mouseY * (float) (top - bottom)) / (float) height) + bottom - yPos);
         }
     }
 
@@ -117,8 +149,8 @@ public class VisMain extends PApplet {
     @Override
     public void mouseWheel(MouseEvent event) {
         float e = event.getCount();
-        bottom -= e*5;
-        top += e*5;
+        bottom -= e * 5;
+        top += e * 5;
         left = (int) (bottom * aspect);
         right = (int) (top * aspect);
         ortho(left, right, bottom, top, -10000, 10000);

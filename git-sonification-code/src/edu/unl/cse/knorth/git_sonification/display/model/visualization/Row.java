@@ -59,4 +59,8 @@ public class Row {
   public int getBranchLocation() {
     return branchLocation;
   }
+  
+  public boolean isVisable(){
+      return isVisible;
+  }
 }
