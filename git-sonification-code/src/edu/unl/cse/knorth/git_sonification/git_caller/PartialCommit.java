@@ -66,6 +66,22 @@ public class PartialCommit {
         this.parentHashes.addAll(parentHashes);
     }
 
+    public List<String> getFilesModified() {
+        return filesModified;
+    }
+    
+    public void addFileModified(String fileModified) {
+        filesModified.add(fileModified);
+    }
+    
+    public void addFilesModified(String... filesModified) {
+        this.filesModified.addAll(Arrays.asList(filesModified));
+    }
+    
+    public void addFilesModified(Collection<String> filesModified) {
+        this.filesModified.addAll(filesModified);
+    }
+    
     public String getHash() {
         return hash;
     }

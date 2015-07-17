@@ -123,6 +123,7 @@ public class CommitProcessor {
 
         Commit commit = new Commit();
         commit.addParentHashes(partialCommit.getParentHashes());
+        commit.addFilesModified(partialCommit.getFilesModified());
         commit.setAuthor(partialCommit.getAuthor());
         commit.setHash(hash);
         commit.setIntroducesConflict(introducesConflict);
