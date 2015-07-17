@@ -17,12 +17,14 @@ public class Commit {
     private String hash;
     private final List<String> parentHashes;
     private String resolvedConflictHash;
+    private final List<String> filesModified;
     
     /**
      * Creates an empty <code>Commit</code>.
      */
     public Commit() {
         parentHashes = new ArrayList<>();
+        filesModified = new ArrayList<>();
     };
 
     /**
@@ -132,6 +134,42 @@ public class Commit {
     public void addParentHashes(Collection<String> parentHashes) {
         this.parentHashes.addAll(parentHashes);
     }
+    
+        /**
+     * Gets a list containing all of the files modified by this commit.
+     * @return A <code>List</code> of <code>String</code>s containing all of
+     * the files modified by this commit.
+     */
+    public List<String> getFilesModified() {
+        return filesModified;
+    }
+
+    /**
+     * Adds a file to the list of files changed by this commit.
+     * @param fileModified The path, relative to the Git directory, of the file
+     * to add to the list of files changed by this commit.
+     */
+    public void addFileModified(String fileModified) {
+        this.filesModified.add(fileModified);
+    }
+    
+    /**
+     * Adds multiple files to the list of files changed by this commit.
+     * @param filesModified The paths, relative to the Git directory, of the
+     * files to add to the list of files changed by this commit.
+     */
+    public void addFilesModified(String... filesModified) {
+        this.filesModified.addAll(Arrays.asList(filesModified));
+    }
+    
+    /**
+     * Adds multiple files to the list of files changed by this commit.
+     * @param filesModified The paths, relative to the Git directory, of the
+     * files to add to the list of files changed by this commit.
+     */
+    public void addFilesModified(Collection<String> filesModified) {
+        this.filesModified.addAll(filesModified);
+    }
 
     /**
      * If this commit resolves a conflict, this method gets the hash of the
@@ -165,7 +203,8 @@ public class Commit {
         return "Commit{" + "author=" + author + ", introducesConflict="
                 + introducesConflict + ", timestamp=" + timestamp + ", hash="
                 + hash + ", parentHashes=" + parentHashes
-                + ", resolvedConflictHash=" + resolvedConflictHash + '}';
+                + ", resolvedConflictHash=" + resolvedConflictHash +
+                ", filesModified=" + filesModified + '}';
     }
     
     
