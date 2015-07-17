@@ -1,8 +1,8 @@
-package edu.unl.cse.knorth.git_sonification.display_preparation.sonification.audio.per_commit;
+package edu.unl.cse.knorth.git_sonification.data_processing.sonification.audio.per_commit;
 
-import edu.unl.cse.knorth.git_sonification.display_preparation.sonification.Measure;
-import edu.unl.cse.knorth.git_sonification.display_preparation.sonification.audio.AudioGenerator;
-import edu.unl.cse.knorth.git_sonification.display_preparation.sonification.audio.ClockSpeedController;
+import edu.unl.cse.knorth.git_sonification.data_processing.sonification.Measure;
+import edu.unl.cse.knorth.git_sonification.data_processing.sonification.audio.AudioGenerator;
+import edu.unl.cse.knorth.git_sonification.data_processing.sonification.audio.ClockSpeedController;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import net.beadsproject.beads.core.AudioContext;

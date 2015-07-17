@@ -1,4 +1,4 @@
-package edu.unl.cse.knorth.git_sonification.intermediate_data;
+package edu.unl.cse.knorth.git_sonification.data_collection.intermediate_data;
 
 import java.util.Comparator;
 import org.joda.time.DateTime;

@@ -1,4 +1,4 @@
-package edu.unl.cse.knorth.git_sonification.conflict_data;
+package edu.unl.cse.knorth.git_sonification.data_collection.conflict_data;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

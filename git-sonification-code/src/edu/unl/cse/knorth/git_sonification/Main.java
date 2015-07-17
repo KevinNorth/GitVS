@@ -1,15 +1,15 @@
 package edu.unl.cse.knorth.git_sonification;
 
-import edu.unl.cse.knorth.git_sonification.commit_processor.CommitProcessor;
-import edu.unl.cse.knorth.git_sonification.conflict_data.Conflict;
-import edu.unl.cse.knorth.git_sonification.conflict_data.ConflictDataParser;
-import edu.unl.cse.knorth.git_sonification.git_caller.GitCaller;
-import edu.unl.cse.knorth.git_sonification.git_caller.PartialCommit;
-import edu.unl.cse.knorth.git_sonification.intermediate_data.Commit;
-import edu.unl.cse.knorth.git_sonification.display_preparation.sonification.Measure;
-import edu.unl.cse.knorth.git_sonification.display_preparation.sonification.MeasureProducer;
-import edu.unl.cse.knorth.git_sonification.display_preparation.sonification.Sonifier;
-import edu.unl.cse.knorth.git_sonification.display_preparation.sonification.audio.per_commit.PerCommitMeasureProducer;
+import edu.unl.cse.knorth.git_sonification.data_collection.commit_processor.CommitProcessor;
+import edu.unl.cse.knorth.git_sonification.data_collection.conflict_data.Conflict;
+import edu.unl.cse.knorth.git_sonification.data_collection.conflict_data.ConflictDataParser;
+import edu.unl.cse.knorth.git_sonification.data_collection.git_caller.GitCaller;
+import edu.unl.cse.knorth.git_sonification.data_collection.git_caller.PartialCommit;
+import edu.unl.cse.knorth.git_sonification.data_collection.intermediate_data.Commit;
+import edu.unl.cse.knorth.git_sonification.data_processing.sonification.Measure;
+import edu.unl.cse.knorth.git_sonification.data_processing.sonification.MeasureProducer;
+import edu.unl.cse.knorth.git_sonification.data_processing.sonification.Sonifier;
+import edu.unl.cse.knorth.git_sonification.data_processing.sonification.audio.per_commit.PerCommitMeasureProducer;
 import java.io.IOException;
 import java.util.List;
 import java.util.Queue;

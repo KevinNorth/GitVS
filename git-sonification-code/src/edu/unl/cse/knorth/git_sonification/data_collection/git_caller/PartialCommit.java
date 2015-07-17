@@ -1,4 +1,4 @@
-package edu.unl.cse.knorth.git_sonification.git_caller;
+package edu.unl.cse.knorth.git_sonification.data_collection.git_caller;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -1,11 +1,11 @@
-package edu.unl.cse.knorth.git_sonification.commit_processor;
+package edu.unl.cse.knorth.git_sonification.data_collection.commit_processor;
 
-import edu.unl.cse.knorth.git_sonification.commit_processor.commit_filter.CommitFilter;
-import edu.unl.cse.knorth.git_sonification.commit_processor.commit_filter.DateCommitFilter;
-import edu.unl.cse.knorth.git_sonification.conflict_data.Conflict;
-import edu.unl.cse.knorth.git_sonification.git_caller.PartialCommit;
-import edu.unl.cse.knorth.git_sonification.intermediate_data.Commit;
-import edu.unl.cse.knorth.git_sonification.intermediate_data.CommitTimestampComparator;
+import edu.unl.cse.knorth.git_sonification.data_collection.commit_processor.commit_filter.CommitFilter;
+import edu.unl.cse.knorth.git_sonification.data_collection.commit_processor.commit_filter.DateCommitFilter;
+import edu.unl.cse.knorth.git_sonification.data_collection.conflict_data.Conflict;
+import edu.unl.cse.knorth.git_sonification.data_collection.git_caller.PartialCommit;
+import edu.unl.cse.knorth.git_sonification.data_collection.intermediate_data.Commit;
+import edu.unl.cse.knorth.git_sonification.data_collection.intermediate_data.CommitTimestampComparator;
 import java.util.ArrayList;
 import java.util.Comparator;
 import org.joda.time.DateTime;

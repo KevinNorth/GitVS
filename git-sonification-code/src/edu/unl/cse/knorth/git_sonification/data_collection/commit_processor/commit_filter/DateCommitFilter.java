@@ -1,6 +1,6 @@
-package edu.unl.cse.knorth.git_sonification.commit_processor.commit_filter;
+package edu.unl.cse.knorth.git_sonification.data_collection.commit_processor.commit_filter;
 
-import edu.unl.cse.knorth.git_sonification.git_caller.PartialCommit;
+import edu.unl.cse.knorth.git_sonification.data_collection.git_caller.PartialCommit;
 import org.joda.time.DateTime;
 
 /**
