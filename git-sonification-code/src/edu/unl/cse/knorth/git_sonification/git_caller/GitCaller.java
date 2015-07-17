@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.diff.DiffFormatter;
+import org.eclipse.jgit.diff.RawTextComparator;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.lib.Ref;
@@ -13,6 +16,8 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+import org.eclipse.jgit.treewalk.TreeWalk;
+import org.eclipse.jgit.util.io.DisabledOutputStream;
 import org.joda.time.DateTime;
 
 /**
@@ -86,9 +91,14 @@ public class GitCaller implements AutoCloseable, Closeable {
                         
         List<PartialCommit> partialCommits  = new LinkedList<>();
         
-        for(RevCommit commit : walk) {
-            PartialCommit partialCommit = getCommitData(commit);
-            partialCommits.add(partialCommit);
+        try {
+            for(RevCommit commit : walk) {
+                PartialCommit partialCommit = getCommitData(commit);
+                partialCommits.add(partialCommit);
+            }
+        }
+        catch(IOException err) {
+            throw new IOException("Problem processing commits", err);
         }
 
         walk.dispose();
@@ -103,7 +113,7 @@ public class GitCaller implements AutoCloseable, Closeable {
      * @return A <code>PartialCommit</code> containing the commit's hash,
      * author, timestamp, and list of parents' hashes.
      */
-    private PartialCommit getCommitData(RevCommit commit) {
+    private PartialCommit getCommitData(RevCommit commit) throws IOException {
         String hash = commit.getName();
         String author = commit.getAuthorIdent().getName();
 
@@ -115,8 +125,78 @@ public class GitCaller implements AutoCloseable, Closeable {
             parentHashes.add(parent.getName());
         }
         
-        return new PartialCommit(hash, author, date, parentHashes);
+        List<String> filesChanged = getFilesInCommit(commit);
+        
+        return new PartialCommit(hash, author, date, parentHashes,
+                filesChanged);
     }
+    
+	/**
+	 * Returns the list of files changed in a specified commit. If the
+	 * repository does not exist or is empty, an empty list is returned.
+	 *<p/>
+         * This function is adapted from the gitblit project (specifically,
+         * this version of the JGitUtils.java file:
+         * https://github.com/gitblit/gitblit/blob/f76fee63ed9cb3a30d3c0c092d860b1cb93a481b/src/main/java/com/gitblit/utils/JGitUtils.java
+         * ). gitblit is licensed under Apache Software Foundation license,
+         * version 2.0 (https://www.apache.org/licenses/LICENSE-2.0).
+         * 
+	 * @param repository
+	 * @param commit
+	 *            if null, HEAD is assumed.
+	 * @param calculateDiffStat
+	 *            if true, each PathChangeModel will have insertions/deletions
+	 * @return list of files changed in a commit
+	 */
+	private List<String> getFilesInCommit(RevCommit commit) throws IOException {
+		List<String> list = new ArrayList<>();
+		RevWalk rw = new RevWalk(repo);
+		try {
+                    if (commit.getParentCount() == 0) {
+                        // For the first commit, any files present after the
+                        // first commit must have been added in that commit.
+                        // So get the list of present files and return that.
+                        TreeWalk tw = null;
+                        try {
+                            tw = new TreeWalk(repo);
+                            tw.reset();
+                            tw.setRecursive(true);
+                            tw.addTree(commit.getTree());
+                            while (tw.next()) {
+                                    list.add(tw.getPathString());
+                            }
+                        } finally {
+                            if(tw != null) {
+                                tw.release();
+                            }
+                        }
+                    } else if(commit.getParentCount() == 1) {
+                        RevCommit parent = rw.parseCommit(commit.getParent(0).getId());
+                        DiffFormatter df = new DiffFormatter(DisabledOutputStream.INSTANCE);
+                        df.setRepository(repo);
+                        df.setDiffComparator(RawTextComparator.DEFAULT);
+                        // Moving a file can affect two different components:
+                        // the component the file was moved from, and the
+                        // component the file moved to. To find both components,
+                        // treat file movement as a seperate addition and
+                        // deletion.
+                        df.setDetectRenames(false);
+                        List<DiffEntry> diffs = df.scan(parent.getTree(), commit.getTree());
+                        for (DiffEntry diff : diffs) {
+                            list.add(diff.getNewPath());
+                        }
+                    } else {
+                        // For merge commits, we won't prepare a list of changed
+                        // files because Git doesn't store that information
+                        // directly. Instead, we will calculate that information
+                        // in a seperate, much later data processing step. So
+                        // we do nothing here and return an empty list.
+                    }
+		} finally {
+			rw.dispose();
+		}
+		return list;
+	}
     
     /**
      * Allows the resources the GitCaller is using for its reference to a

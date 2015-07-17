@@ -15,32 +15,24 @@ public class PartialCommit {
     private String author;
     private DateTime datetime;
     private final List<String> parentHashes;
+    private final List<String> filesModified;
     
     public PartialCommit() {
         hash = null;
         author = null;
         datetime = null;
         parentHashes = new ArrayList<>();
+        filesModified = new ArrayList<>();
     }
 
     public PartialCommit(String hash, String author, DateTime datetime,
-            Collection<String> parentHashes) {
+            Collection<String> parentHashes, Collection<String> filesModified) {
         this.hash = hash;
         this.author = author;
         this.datetime = datetime;
-        this.parentHashes = new ArrayList<>();
-        this.parentHashes.addAll(parentHashes);
+        this.parentHashes = new ArrayList<>(parentHashes);
+        this.filesModified = new ArrayList<>(filesModified);
     }
-
-    public PartialCommit(String hash, String author, DateTime datetime,
-            String... parentHashes) {
-        this.hash = hash;
-        this.author = author;
-        this.datetime = datetime;
-        this.parentHashes = new ArrayList<>();
-        this.parentHashes.addAll(Arrays.asList(parentHashes));
-    }
-
     
     public String getAuthor() {
         return author;
@@ -85,14 +77,21 @@ public class PartialCommit {
     @Override
     public String toString() {
         StringBuilder parentHashesString = new StringBuilder();
+        StringBuilder filesModifiedString = new StringBuilder();
         
         for(String parentHash : parentHashes) {
             parentHashesString.append(parentHash);
             parentHashesString.append(' ');
         }
         
+        for(String file : filesModified) {
+            filesModifiedString.append(file);
+            filesModifiedString.append(' ');
+        }
+        
         return "PartialCommit{" + "hash=" + hash + ", author=" + author +
                 ", datetime=" + datetime.toString() + ", parentHashes="
-                + parentHashesString.toString() + '}';
+                + parentHashesString.toString() + ", filesModified="
+                + filesModifiedString.toString() + '}';
     }
 }
