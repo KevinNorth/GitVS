@@ -89,6 +89,7 @@ public class VisMain extends PApplet {
             }
         }
         popMatrix();
+        //System.out.println("playHead = " + playHead);
     }
 
     @Override
@@ -96,31 +97,31 @@ public class VisMain extends PApplet {
         mouseStartX = mouseX;
         mouseStartY = mouseY;
         if (mouseButton == RIGHT) {
-            playHead = (float) (mouseY - yPos) ;//* ((float) (top - bottom) / (float) height);
+            playHead = ((((float)mouseY * (float) (top - bottom)) / (float) height) + bottom - yPos);
         }
     }
 
     @Override
     public void mouseDragged() {
         if (mouseButton == LEFT) {
-            yPos -= (float) (mouseStartY - mouseY) ;//* ((float) (top - bottom) / (float) height);
+            yPos -= (float) (mouseStartY - mouseY) * ((float) (top - bottom) / (float) height);
             rotateAmt += (mouseStartX - mouseX);
         }
         if (mouseButton == RIGHT) {
-            playHead -= (float) (mouseStartY - mouseY);// * ((float) (top - bottom) / (float) height);
+            playHead -= (float) (mouseStartY - mouseY) * ((float) (top - bottom) / (float) height);
         }
         mouseStartX = mouseX;
         mouseStartY = mouseY;
     }
-//
-//    @Override
-//    public void mouseWheel(MouseEvent event) {
-//        float e = event.getCount();
-//        bottom -= e;
-//        top += e;
-//        left = (int) (bottom * aspect);
-//        right = (int) (top * aspect);
-//        ortho(left, right, bottom, top, -10000, 10000);
-//    }
+
+    @Override
+    public void mouseWheel(MouseEvent event) {
+        float e = event.getCount();
+        bottom -= e*5;
+        top += e*5;
+        left = (int) (bottom * aspect);
+        right = (int) (top * aspect);
+        ortho(left, right, bottom, top, -10000, 10000);
+    }
 
 }
