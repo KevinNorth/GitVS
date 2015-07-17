@@ -20,6 +20,7 @@ public class VisMain extends PApplet {
     float s;
 
     float yPos;
+    float playHead;
     float rotateAmt;
 
     int left;
@@ -30,20 +31,21 @@ public class VisMain extends PApplet {
     public static void main(String args[]) {
         String[] newArgs = new String[args.length + 1];
         newArgs[0] = VisMain.class.getCanonicalName();
-        for(int i = 0; i < args.length; i++) {
-            newArgs[i+1] = args[i];
+        for (int i = 0; i < args.length; i++) {
+            newArgs[i + 1] = args[i];
         }
-        
+
         PApplet.main(newArgs);
     }
-    
+
     @Override
     public void setup() {
         size(1200, 600, P3D);
         fill(200);
-        aspect = (float)width/(float)height;
+        aspect = (float) width / (float) height;
         s = aspect * 10;
-        yPos = 4 * s;
+        yPos = 0;
+        playHead = 0;
         rotateAmt = 0;
         left = 0;
         right = width;
@@ -52,17 +54,19 @@ public class VisMain extends PApplet {
         ortho(left, right, bottom, top, -10000, 10000);
     }
 
-    
     @Override
     public void draw() {
         background(color(200, 50, 30));
         directionalLight(126, 126, 126, 0, 0, -1);
         ambientLight(102, 102, 102);
 
-        translate(width / 2, yPos, 0);
+        translate(0, yPos, 0);
+        strokeWeight(10);
+        line(left, playHead, -1000, right, playHead, -1000);
 
         pushMatrix();
-        rotateY((rotateAmt / (float)width)*(2*PI));
+        translate(width / 2, 4 * s, 0);
+        rotateY((rotateAmt / (float) width) * (2 * PI));
         for (int z = 0; z < 3; z++) {
             noStroke();
             for (int i = 0; i < 7; i++) {
@@ -87,31 +91,36 @@ public class VisMain extends PApplet {
         popMatrix();
     }
 
-    
     @Override
     public void mousePressed() {
         mouseStartX = mouseX;
         mouseStartY = mouseY;
+        if (mouseButton == RIGHT) {
+            playHead = (float) (mouseY - yPos) ;//* ((float) (top - bottom) / (float) height);
+        }
     }
 
-    
     @Override
     public void mouseDragged() {
-        yPos -= (mouseStartY - mouseY);
-        rotateAmt += (mouseStartX - mouseX);
+        if (mouseButton == LEFT) {
+            yPos -= (float) (mouseStartY - mouseY) ;//* ((float) (top - bottom) / (float) height);
+            rotateAmt += (mouseStartX - mouseX);
+        }
+        if (mouseButton == RIGHT) {
+            playHead -= (float) (mouseStartY - mouseY);// * ((float) (top - bottom) / (float) height);
+        }
         mouseStartX = mouseX;
         mouseStartY = mouseY;
     }
-
-    
-    @Override
-    public void mouseWheel(MouseEvent event) {
-        float e = event.getCount();
-        bottom -= e;
-        top += e;
-        left = (int)(bottom * aspect);
-        right = (int)(top * aspect);
-        ortho(left, right, bottom, top, -10000, 10000);
-    }
+//
+//    @Override
+//    public void mouseWheel(MouseEvent event) {
+//        float e = event.getCount();
+//        bottom -= e;
+//        top += e;
+//        left = (int) (bottom * aspect);
+//        right = (int) (top * aspect);
+//        ortho(left, right, bottom, top, -10000, 10000);
+//    }
 
 }
