@@ -19,10 +19,9 @@ public class VisMain extends PApplet {
     float mouseStartY;
 
     float aspect;
-    float fps;
     float s;
     float s4;
-    
+
     float yPos;
     float playHead;
     float playSpeed;
@@ -32,6 +31,10 @@ public class VisMain extends PApplet {
     int right;
     int bottom;
     int top;
+    
+    double time;
+    double oldTime;
+    double delta;
 
     VisualizationData visDat;
 
@@ -48,13 +51,12 @@ public class VisMain extends PApplet {
     @Override
     public void setup() {
         size(1200, 600, P3D);
-        fps = 30;
-        frameRate(fps);
+        frameRate(30);
         fill(200);
         aspect = (float) width / (float) height;
         s = 30;
-        s4 = 4*s;
-        playSpeed = (s4*25)/(60*fps);
+        s4 = 4 * s;
+        playSpeed = (s4 * 25) / (60);
         playHead = 0;
         yPos = 0;
         rotateAmt = 0;
@@ -62,26 +64,26 @@ public class VisMain extends PApplet {
         right = width;
         bottom = 0;
         top = height;
+        oldTime = time;
+        time = System.currentTimeMillis();
+	delta = 0;
         ortho(left, right, bottom, top, -10000, 10000);
     }
 
     @Override
     public void draw() {
+	oldTime = time;
+        time = System.currentTimeMillis(); 
+        delta = (time - oldTime) * 0.001f;
+        
         background(color(200, 50, 30));
         directionalLight(126, 126, 126, 0, 0, -1);
         ambientLight(102, 102, 102);
 
         translate(0, yPos, 0); //sets everything to be relitive to yPos
-        
+
         //this is the playhead for the music
         strokeWeight(10);
-        if(keyPressed){
-            if(key == 'w'){
-                playHead -= playSpeed;
-            }else if(key == 's'){
-                playHead += playSpeed;
-            }
-        }
         line(left, playHead, -1000, right, playHead, -1000);
 
         pushMatrix();
@@ -97,7 +99,7 @@ public class VisMain extends PApplet {
 //                y++;
 //                strokeWeight(5);
 //                stroke(z*255/numColors,z*255/numColors,z*255/numColors);
-//                for (Line line : row.getOutgoingLines()) {
+//                for (Line line : row.getIncommingLines()) {
 //                    if (line.isVisible) {
 //                        line(line.fromBranch* s4, y* s4, z* s4, line.toBranch* s4, y* s4, z* s4);
 //                    }
@@ -112,7 +114,6 @@ public class VisMain extends PApplet {
 //                }
 //            }
 //        }
-
         for (int z = 0; z < 3; z++) {
             noStroke();
             for (int i = 0; i < 7; i++) {
@@ -134,9 +135,23 @@ public class VisMain extends PApplet {
                 }
             }
         }
-        
+
         popMatrix();
-        System.out.println("playHead = " + ((playHead/s4)+0.25));
+        //System.out.println("playHead = " + ((playHead / s4) + 0.25));
+        //System.out.println("framerate = " + frameRate);
+        //System.out.println("delta time = " + delta);
+    }
+
+    @Override
+    public void keyPressed() {
+        if (key == CODED) {
+            if (keyCode == UP) {
+                playHead -= playSpeed * delta;
+            }
+            if (keyCode == DOWN) {
+                playHead += playSpeed * delta;
+            }
+        }
     }
 
     @Override
