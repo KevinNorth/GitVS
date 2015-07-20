@@ -1,13 +1,20 @@
 package edu.unl.cse.knorth.git_sonification.display.view;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.Row;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.RowType;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.RowDateComparator;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.Line;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.Layer;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.VisualizationData;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import processing.core.PApplet;
 import processing.event.MouseEvent;
+import javax.sound.sampled.*;
 
 public class VisMain extends PApplet {
 
@@ -31,10 +38,15 @@ public class VisMain extends PApplet {
     int right;
     int bottom;
     int top;
-    
+
     double time;
     double oldTime;
     double delta;
+
+    Clip clip;
+
+    Map<String, Integer> map;
+    int count;
 
     VisualizationData visDat;
 
@@ -56,26 +68,34 @@ public class VisMain extends PApplet {
         aspect = (float) width / (float) height;
         s = 30;
         s4 = 4 * s;
+
         playSpeed = (s4 * 25) / (60);
         playHead = 0;
+
         yPos = 0;
         rotateAmt = 0;
+
         left = 0;
         right = width;
         bottom = 0;
         top = height;
+
         oldTime = time;
         time = System.currentTimeMillis();
-	delta = 0;
+        delta = 0;
+
+        map = new HashMap<String, Integer>();
+        count = 0;
+
         ortho(left, right, bottom, top, -10000, 10000);
     }
 
     @Override
     public void draw() {
-	oldTime = time;
-        time = System.currentTimeMillis(); 
+        oldTime = time;
+        time = System.currentTimeMillis();
         delta = (time - oldTime) * 0.001f;
-        
+
         background(color(200, 50, 30));
         directionalLight(126, 126, 126, 0, 0, -1);
         ambientLight(102, 102, 102);
@@ -86,6 +106,36 @@ public class VisMain extends PApplet {
         strokeWeight(10);
         line(left, playHead, -1000, right, playHead, -1000);
 
+        if (!clip.isActive()) {
+            String author = visDat.getLayers().get(0).getRows().get((int) (playHead / s4)).getAuthor();
+            if (author == null) {
+                //play Day Seporator
+            } else {
+                Integer n = map.get(author);
+                if (n == null) {
+                    map.put(author, count);
+                    n = count;
+                    count++;
+                }
+                try {
+                    clip = AudioSystem.getClip();
+                    clip.open(AudioSystem.getAudioInputStream(new File("audio/dev" + n + ".wav")));
+                } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
+                    Logger.getLogger(VisMain.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                clip.start();
+            }
+        }else if (clip.getFrameLength() == clip.getFramePosition()) {
+            clip.close();
+        }
+
+//        if((((int)((playHead / s4) + 0.25))&1)==0){
+//            if (dev1.getFrameLength() == dev1.getFramePosition()){
+//                dev1.setFramePosition(0);
+//                dev1.stop();
+//            }
+//            dev1.start();
+//        }
         pushMatrix();
         translate(width / 2, s4, 0); //centers the vis and starts it a unit down
         rotateY((rotateAmt / (float) width) * (2 * PI));
@@ -137,9 +187,11 @@ public class VisMain extends PApplet {
         }
 
         popMatrix();
-        //System.out.println("playHead = " + ((playHead / s4) + 0.25));
-        //System.out.println("framerate = " + frameRate);
-        //System.out.println("delta time = " + delta);
+//        System.out.println("playHead = " + ((playHead / s4) + 0.25));
+//        System.out.println("framerate = " + frameRate);
+//        System.out.println("delta time = " + delta);
+//        System.out.println("lenght = " + dev1.getFrameLength());
+//        System.out.println("pos = " + dev1.getFramePosition());
     }
 
     @Override
