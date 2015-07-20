@@ -1,6 +1,7 @@
 package edu.unl.cse.knorth.git_sonification.display.model.visualization;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import org.joda.time.DateTime;
@@ -10,7 +11,7 @@ public class Row {
 
   private String author;
   private DateTime commitDate;
-  private List<Line> outgoingLines;
+  private List<Line> incomingLines;
   private RowType type;
   private int branchLocation;
   private boolean isVisible;
@@ -18,28 +19,45 @@ public class Row {
   /**
    * Creates a new Row that represents a commit.
    */
-  public Row(String author, DateTime commitDate, Collection<Line> outgoingLines,
-    int branchLocation, boolean isVisible) {
+  public Row(String author, DateTime commitDate, int branchLocation,
+    boolean isVisible, Collection<Line> incomingLines) {
     this.author = author;
     this.commitDate = commitDate;
-    this.outgoingLines = new ArrayList<Line>(outgoingLines);
     this.type = RowType.COMMIT;
     this.branchLocation = branchLocation;
     this.isVisible = isVisible;
+    this.incomingLines = new ArrayList<>(incomingLines);
   }
 
   /**
+   * Creates a new Row that represents a commit.
+   */
+  public Row(String author, DateTime commitDate, int branchLocation,
+    boolean isVisible, Line... incomingLines) {
+      this(author, commitDate, branchLocation, isVisible,
+              Arrays.asList(incomingLines));
+  }
+  
+  /**
    * Creates a new Row that represents a day separator.
    */
-  public Row(DateTime startOfNewDay, Collection<Line> outgoingLines) {
+  public Row(DateTime startOfNewDay, Collection<Line> incomingLines) {
     this.author = null;
     this.commitDate = startOfNewDay;
-    this.outgoingLines = new ArrayList<Line>(outgoingLines);
+    this.incomingLines = new ArrayList<>(incomingLines);
     this.type = RowType.DAY_SEPARATOR;
     this.branchLocation = NO_BRANCH_LOCATION;
     this.isVisible = false;
   }
 
+    /**
+   * Creates a new Row that represents a day separator.
+   */
+  public Row(DateTime startOfNewDay, Line... incomingLines) {
+      this(startOfNewDay, Arrays.asList(incomingLines));
+  }
+
+  
   public String getAuthor() {
     return author;
   }
@@ -49,7 +67,7 @@ public class Row {
   }
 
   public List<Line> getOutgoingLines() {
-    return outgoingLines;
+    return incomingLines;
   }
 
   public RowType getType() {
