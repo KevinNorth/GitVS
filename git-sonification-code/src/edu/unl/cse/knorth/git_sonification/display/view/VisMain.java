@@ -106,27 +106,29 @@ public class VisMain extends PApplet {
         strokeWeight(10);
         line(left, playHead, -1000, right, playHead, -1000);
 
-        if (!clip.isActive()) {
-            String author = visDat.getLayers().get(0).getRows().get((int) (playHead / s4)).getAuthor();
-            if (author == null) {
-                //play Day Seporator
-            } else {
-                Integer n = map.get(author);
-                if (n == null) {
-                    map.put(author, count);
-                    n = count;
-                    count++;
+        if (((playHead / s4) > (((int) (playHead / s4)) - 0.25)) && ((playHead / s4) < (((int) (playHead / s4)) + 0.25))) {
+            if (!clip.isActive()) {
+                String author = visDat.getLayers().get(0).getRows().get((int) (playHead / s4)).getAuthor();
+                if (author == null) {
+                    //play Day Seporator
+                } else {
+                    Integer n = map.get(author);
+                    if (n == null) {
+                        map.put(author, count);
+                        n = count;
+                        count++;
+                    }
+                    try {
+                        clip = AudioSystem.getClip();
+                        clip.open(AudioSystem.getAudioInputStream(new File("audio/dev" + n + ".wav")));
+                    } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
+                        Logger.getLogger(VisMain.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    clip.start();
                 }
-                try {
-                    clip = AudioSystem.getClip();
-                    clip.open(AudioSystem.getAudioInputStream(new File("audio/dev" + n + ".wav")));
-                } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
-                    Logger.getLogger(VisMain.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                clip.start();
+            } else if (clip.getFrameLength() == clip.getFramePosition()) {
+                clip.close();
             }
-        }else if (clip.getFrameLength() == clip.getFramePosition()) {
-            clip.close();
         }
 
 //        if((((int)((playHead / s4) + 0.25))&1)==0){
