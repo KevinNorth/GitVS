@@ -1,9 +1,12 @@
 package edu.unl.cse.knorth.git_sonification.data_processing.sonification;
 
 import edu.unl.cse.knorth.git_sonification.data_collection.intermediate_data.Commit;
+import edu.unl.cse.knorth.git_sonification.display.model.sonification.Measure;
+import edu.unl.cse.knorth.git_sonification.display.model.sonification.SonificationData;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.LocalDate;
 
@@ -11,9 +14,9 @@ import org.joda.time.LocalDate;
  * Takes a list of Commits and uses it to produce a list of Measures that are
  * used in 
  */
-public class MeasureProducer {
-    public Queue<Measure>
-        produceMeasures(List<Commit> commits) {
+public class SonificationProcessor {
+    public SonificationData
+        processSonificationData(List<Commit> commits) {
         Queue<Measure> measures = new LinkedList<>();
         List<String> introducedConflictHashes = new LinkedList<>();
         
@@ -38,6 +41,7 @@ public class MeasureProducer {
                 
                 if(daysSincePreviousCommit > 0) {
                     addDaySeparators(measures, daysSincePreviousCommit,
+                            previousCommit.getTimestamp().plusDays(1),
                             introducedConflictHashes.size());
                 }
             }
@@ -51,14 +55,14 @@ public class MeasureProducer {
                         commit.getResolvedConflictHash());
             }
             
-            Measure measure = new Measure(author,
-                    introducedConflictHashes.size(), false);
+            Measure measure = new Measure(author, commit.getTimestamp(),
+                    false, introducedConflictHashes.size());
             measures.add(measure);
             
             previousCommit = commit;
         }
         
-        return measures;
+        return new SonificationData(measures);
     }
     
     /**
@@ -69,10 +73,13 @@ public class MeasureProducer {
      * occurring in the middle of a conflict. <code>false</code> otherwise.
      */
     private void addDaySeparators(Queue<Measure> measures,
-            int numberOfSeparators, int numConflicts) {
-            
+            int numberOfSeparators, DateTime firstDay, int numConflicts) {
+        DateTime currentDay = firstDay;
+        
         for(int i = 0; i < numberOfSeparators; i++) {
-            measures.add(new Measure(null, numConflicts, true));
+            measures.add(new Measure(null, currentDay.withTimeAtStartOfDay(),
+                    true, numConflicts));
+            currentDay = currentDay.plusDays(1);
         }            
     }
     

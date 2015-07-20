@@ -8,11 +8,11 @@ import edu.unl.cse.knorth.git_sonification.data_collection.conflict_data.Conflic
 import edu.unl.cse.knorth.git_sonification.data_collection.git_caller.GitCaller;
 import edu.unl.cse.knorth.git_sonification.data_collection.git_caller.PartialCommit;
 import edu.unl.cse.knorth.git_sonification.data_collection.intermediate_data.Commit;
-import edu.unl.cse.knorth.git_sonification.data_processing.sonification.Measure;
-import edu.unl.cse.knorth.git_sonification.data_processing.sonification.MeasureProducer;
+import edu.unl.cse.knorth.git_sonification.data_processing.sonification.SonificationProcessor;
+import edu.unl.cse.knorth.git_sonification.display.model.sonification.Measure;
+import edu.unl.cse.knorth.git_sonification.display.model.sonification.SonificationData;
 import java.io.IOException;
 import java.util.List;
-import java.util.Queue;
 import org.joda.time.DateTime;
 
 public class Main {
@@ -44,10 +44,10 @@ public class Main {
         
         System.out.println("\n----------------\n");
         
-        MeasureProducer measureProducer = new MeasureProducer();
-        Queue<Measure> measures = measureProducer.produceMeasures(commits);
+        SonificationProcessor sonificationProcessor = new SonificationProcessor();
+        SonificationData sonificationData = sonificationProcessor.processSonificationData(commits);
         
-        for(Measure measure : measures) {
+        for(Measure measure : sonificationData.getMeasures()) {
             System.out.println(measure);
         }
     }

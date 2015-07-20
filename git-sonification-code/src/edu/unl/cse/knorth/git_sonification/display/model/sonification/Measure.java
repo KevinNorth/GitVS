@@ -31,4 +31,11 @@ public class Measure {
   public int getNumConflicts() {
     return numConflicts;
   }
+
+    @Override
+    public String toString() {
+        return "Measure{" + "author=" + author + ", timestamp=" + timestamp +
+                ", isDaySeparator=" + isDaySeparator + ", numConflicts=" +
+                numConflicts + '}';
+    }
 }
