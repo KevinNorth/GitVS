@@ -45,6 +45,21 @@ public class VisMain extends PApplet {
     double delta;
 
     Clip clip;
+    Clip dev1;
+    Clip dev2;
+    Clip dev3;
+    Clip dev4;
+    Clip dev5;
+    Clip dev6;
+    Clip dev7;
+    Clip dev8;
+    Clip dev9;
+    Clip dev10;
+    Clip dev11;
+    Clip dev12;
+    Clip dev13;
+    Clip dev14;
+    Clip daySep;
 
     Map<String, Integer> map;
     int count;
@@ -53,6 +68,8 @@ public class VisMain extends PApplet {
     List<Row> rows;
     List<Layer> layers;
     VisualizationData visDat;
+    
+    int numRows;
 
     public static void main(String args[]) {
         String[] newArgs = new String[args.length + 1];
@@ -80,16 +97,33 @@ public class VisMain extends PApplet {
         rows.add(new Row("author0", new DateTime(), 1, true, lines));
         rows.add(new Row("author1", new DateTime(), 1, true, lines));
         rows.add(new Row("author2", new DateTime(), 1, true, lines));
+        rows.add(new Row(new DateTime(), lines));
         rows.add(new Row("author3", new DateTime(), 1, true, lines));
         layers.add(new Layer(rows));
         layers.add(new Layer(rows));
         visDat = new VisualizationData(layers, 1, 1);
+        
+        numRows = visDat.getLayers().get(0).getRows().size();
 
         playSpeed = (s4 * 25) / (60);
         playHead = height;
         try {
-            clip = AudioSystem.getClip();
-        } catch (LineUnavailableException ex) {
+            dev1 = AudioSystem.getClip();
+            dev1.open(AudioSystem.getAudioInputStream(new File("audio/dev1.wav")));
+            dev2 = AudioSystem.getClip();
+            dev2.open(AudioSystem.getAudioInputStream(new File("audio/dev2.wav")));
+            dev3 = AudioSystem.getClip();
+            dev3.open(AudioSystem.getAudioInputStream(new File("audio/dev3.wav")));
+            dev4 = AudioSystem.getClip();
+            dev4.open(AudioSystem.getAudioInputStream(new File("audio/dev4.wav")));
+            dev5 = AudioSystem.getClip();
+            dev5.open(AudioSystem.getAudioInputStream(new File("audio/dev5.wav")));
+            dev6 = AudioSystem.getClip();
+            dev6.open(AudioSystem.getAudioInputStream(new File("audio/dev6.wav")));
+            daySep = AudioSystem.getClip();
+            daySep.open(AudioSystem.getAudioInputStream(new File("audio/day_separator.wav")));
+
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
             Logger.getLogger(VisMain.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -116,6 +150,14 @@ public class VisMain extends PApplet {
         oldTime = time;
         time = System.currentTimeMillis();
         delta = (time - oldTime) * 0.001f;
+        if (keyPressed && key == CODED) {
+            if (keyCode == UP) {
+                playHead -= playSpeed * delta;
+            }
+            if (keyCode == DOWN) {
+                playHead += playSpeed * delta;
+            }
+        }
 
         background(color(200, 50, 30));
         directionalLight(126, 126, 126, 0, 0, -1);
@@ -127,17 +169,19 @@ public class VisMain extends PApplet {
         strokeWeight(10);
         line(left, playHead, -1000, right, playHead, -1000);
 
-        if (((playHead / s4) > (((int) (playHead / s4)) - 0.25)) && ((playHead / s4) < (((int) (playHead / s4)) + 0.25))) {
-            if (!clip.isOpen()) {
-                String author;
+        if ( (playHead / s4) > -0.25 && (playHead / s4) < (numRows-0.75) && ((playHead / s4) > ((round((playHead / s4))) - 0.25)) && ((playHead / s4) < ((round((playHead / s4))) + 0.25))) {
+            if ((clip == null) || !clip.isRunning()) {
+                String author = null;
                 try {
-                    author = visDat.getLayers().get(0).getRows().get((int) (playHead / s4)).getAuthor();
-                    System.out.println(author);
+                    author = visDat.getLayers().get(0).getRows().get((int) ((playHead / s4)+0.25)).getAuthor();
                     if (author == null) {
-                        //play Day Seporator
+                        clip = daySep;
+                        clip.start();
                     }
                 } catch (IndexOutOfBoundsException ex) {
                     author = null;
+                } finally{
+                    System.out.println(author);
                 }
                 if (author != null) {
                     Integer n = map.get(author);
@@ -146,15 +190,35 @@ public class VisMain extends PApplet {
                         n = count;
                         count++;
                     }
-                    try {
-                        clip.open(AudioSystem.getAudioInputStream(new File("audio/dev" + n + ".wav")));
-                    } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
-                        Logger.getLogger(VisMain.class.getName()).log(Level.SEVERE, null, ex);
+                    switch (n) {
+                        case 1:
+                            clip = dev1;
+                            break;
+                        case 2:
+                            clip = dev2;
+                            break;
+                        case 3:
+                            clip = dev3;
+                            break;
+                        case 4:
+                            clip = dev4;
+                            break;
+                        case 5:
+                            clip = dev5;
+                            break;
+                        case 6:
+                            clip = dev6;
+                            break;
+                        default:
+                            clip = null;
+                            break;
                     }
                     clip.start();
                 }
-            } else if (clip.getFrameLength() == clip.getFramePosition()) {
-                clip.close();
+            }
+            if (!(clip == null) && (clip.getFrameLength() == clip.getFramePosition())) {
+                clip.setFramePosition(0);
+                clip.stop();
             }
         }
 
@@ -216,23 +280,13 @@ public class VisMain extends PApplet {
 //        }
 
         popMatrix();
-//        System.out.println("playHead = " + ((playHead / s4) + 0.25));
+//        System.out.println("playHead = " + (playHead / s4));
+//        System.out.println("playHead- = " + (((int)((playHead / s4)+0.25)) - 0.25));
+//        System.out.println("playHead+ = " + (((int)((playHead / s4)+0.25)) + 0.25));
 //        System.out.println("framerate = " + frameRate);
 //        System.out.println("delta time = " + delta);
 //        System.out.println("lenght = " + dev1.getFrameLength());
 //        System.out.println("pos = " + dev1.getFramePosition());
-    }
-
-    @Override
-    public void keyPressed() {
-        if (key == CODED) {
-            if (keyCode == UP) {
-                playHead -= playSpeed * delta;
-            }
-            if (keyCode == DOWN) {
-                playHead += playSpeed * delta;
-            }
-        }
     }
 
     @Override
