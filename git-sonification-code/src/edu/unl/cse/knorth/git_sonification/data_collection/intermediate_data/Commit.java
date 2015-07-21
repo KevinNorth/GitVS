@@ -141,7 +141,7 @@ public class Commit {
      * @return A <code>List</code> of <code>Components</code>s containing all of
      * the Components modified by this commit.
      */
-    public List<Component> getComponentModified() {
+    public List<Component> getComponentsModified() {
         return componentsModified;
     }
 

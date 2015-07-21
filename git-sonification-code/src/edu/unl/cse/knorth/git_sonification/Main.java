@@ -9,6 +9,8 @@ import edu.unl.cse.knorth.git_sonification.data_collection.git_caller.GitCaller;
 import edu.unl.cse.knorth.git_sonification.data_collection.git_caller.PartialCommit;
 import edu.unl.cse.knorth.git_sonification.data_collection.intermediate_data.Commit;
 import edu.unl.cse.knorth.git_sonification.data_processing.sonification.SonificationProcessor;
+import edu.unl.cse.knorth.git_sonification.data_processing.visualization.intermediate_steps.annotated_commits.AnnotatedCommit;
+import edu.unl.cse.knorth.git_sonification.data_processing.visualization.intermediate_steps.annotated_commits.CommitAnnotator;
 import edu.unl.cse.knorth.git_sonification.display.model.sonification.Measure;
 import edu.unl.cse.knorth.git_sonification.display.model.sonification.SonificationData;
 import java.io.IOException;
@@ -49,6 +51,13 @@ public class Main {
         
         for(Measure measure : sonificationData.getMeasures()) {
             System.out.println(measure);
+        }
+        
+        List<AnnotatedCommit> annotatedCommits =
+                new CommitAnnotator().annotateCommits(commits);
+        
+        for(AnnotatedCommit annotatedCommit : annotatedCommits) {
+            System.out.println(annotatedCommit);
         }
     }
 }
