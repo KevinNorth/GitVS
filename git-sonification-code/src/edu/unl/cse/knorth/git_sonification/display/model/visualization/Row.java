@@ -66,7 +66,7 @@ public class Row {
     return commitDate;
   }
 
-  public List<Line> getOutgoingLines() {
+  public List<Line> getIncomingLines() {
     return incomingLines;
   }
 

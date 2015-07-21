@@ -4,17 +4,18 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.Row;
-import edu.unl.cse.knorth.git_sonification.display.model.visualization.RowType;
-import edu.unl.cse.knorth.git_sonification.display.model.visualization.RowDateComparator;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.Line;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.Layer;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.VisualizationData;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import processing.core.PApplet;
 import processing.event.MouseEvent;
 import javax.sound.sampled.*;
+import org.joda.time.DateTime;
 
 public class VisMain extends PApplet {
 
@@ -48,6 +49,9 @@ public class VisMain extends PApplet {
     Map<String, Integer> map;
     int count;
 
+    List<Line> lines;
+    List<Row> rows;
+    List<Layer> layers;
     VisualizationData visDat;
 
     public static void main(String args[]) {
@@ -69,8 +73,25 @@ public class VisMain extends PApplet {
         s = 30;
         s4 = 4 * s;
 
+        layers = new ArrayList<>();
+        rows = new ArrayList<>();
+        lines = new ArrayList<>();
+        lines.add(new Line(1, 1, true));
+        rows.add(new Row("author0", new DateTime(), 1, true, lines));
+        rows.add(new Row("author1", new DateTime(), 1, true, lines));
+        rows.add(new Row("author2", new DateTime(), 1, true, lines));
+        rows.add(new Row("author3", new DateTime(), 1, true, lines));
+        layers.add(new Layer(rows));
+        layers.add(new Layer(rows));
+        visDat = new VisualizationData(layers, 1, 1);
+
         playSpeed = (s4 * 25) / (60);
-        playHead = 0;
+        playHead = height;
+        try {
+            clip = AudioSystem.getClip();
+        } catch (LineUnavailableException ex) {
+            Logger.getLogger(VisMain.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         yPos = 0;
         rotateAmt = 0;
@@ -84,8 +105,8 @@ public class VisMain extends PApplet {
         time = System.currentTimeMillis();
         delta = 0;
 
-        map = new HashMap<String, Integer>();
-        count = 0;
+        map = new HashMap<>();
+        count = 1;
 
         ortho(left, right, bottom, top, -10000, 10000);
     }
@@ -107,11 +128,18 @@ public class VisMain extends PApplet {
         line(left, playHead, -1000, right, playHead, -1000);
 
         if (((playHead / s4) > (((int) (playHead / s4)) - 0.25)) && ((playHead / s4) < (((int) (playHead / s4)) + 0.25))) {
-            if (!clip.isActive()) {
-                String author = visDat.getLayers().get(0).getRows().get((int) (playHead / s4)).getAuthor();
-                if (author == null) {
-                    //play Day Seporator
-                } else {
+            if (!clip.isOpen()) {
+                String author;
+                try {
+                    author = visDat.getLayers().get(0).getRows().get((int) (playHead / s4)).getAuthor();
+                    System.out.println(author);
+                    if (author == null) {
+                        //play Day Seporator
+                    }
+                } catch (IndexOutOfBoundsException ex) {
+                    author = null;
+                }
+                if (author != null) {
                     Integer n = map.get(author);
                     if (n == null) {
                         map.put(author, count);
@@ -119,7 +147,6 @@ public class VisMain extends PApplet {
                         count++;
                     }
                     try {
-                        clip = AudioSystem.getClip();
                         clip.open(AudioSystem.getAudioInputStream(new File("audio/dev" + n + ".wav")));
                     } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
                         Logger.getLogger(VisMain.class.getName()).log(Level.SEVERE, null, ex);
@@ -139,54 +166,54 @@ public class VisMain extends PApplet {
 //            dev1.start();
 //        }
         pushMatrix();
-        translate(width / 2, s4, 0); //centers the vis and starts it a unit down
+        translate(width / 2, 0, 0); //centers the vis and starts it a unit down
         rotateY((rotateAmt / (float) width) * (2 * PI));
 
-//        int numColors = visDat.getLayers().size();
-//        int z = 0;
-//        for (Layer layer : visDat.getLayers()) {
-//            z++;
-//            int y = 0;
-//            for (Row row : layer.getRows()) {
-//                y++;
-//                strokeWeight(5);
-//                stroke(z*255/numColors,z*255/numColors,z*255/numColors);
-//                for (Line line : row.getIncommingLines()) {
-//                    if (line.isVisible) {
-//                        line(line.fromBranch* s4, y* s4, z* s4, line.toBranch* s4, y* s4, z* s4);
-//                    }
-//                }
-//                noStroke();
-//                if (row.isVisable()) {
+        int numColors = visDat.getLayers().size();
+        int z = 0;
+        for (Layer layer : visDat.getLayers()) {
+            int y = 0;
+            for (Row row : layer.getRows()) {
+                noStroke();
+                if (row.isVisable()) {
+                    pushMatrix();
+                    fill(color(z * 255 / numColors, z * 255 / numColors, z * 255 / numColors));
+                    translate(row.getBranchLocation() * s4, y * s4, z * s4);
+                    sphere(s);
+                    popMatrix();
+                }
+                strokeWeight(5);
+                stroke(z * 255 / numColors, z * 255 / numColors, z * 255 / numColors);
+                for (Line line : row.getIncomingLines()) {
+                    if (line.isVisible) {
+                        line(line.fromBranch * s4, y * s4, z * s4, line.toBranch * s4, (y * s4) + s4, z * s4);
+                    }
+                }
+                y++;
+            }
+            z++;
+        }
+//        for (int z = 0; z < 3; z++) {
+//            noStroke();
+//            for (int i = 0; i < 7; i++) {
+//                for (int w = 0; w < 7; w++) {
+//                    mx[w] = w * s4;
+//                    my[i] = i * s4;
 //                    pushMatrix();
-//                    fill(color(z*255/numColors,z*255/numColors,z*255/numColors));
-//                    translate(row.getBranchLocation() * s4, y * s4, z * s4);
+//                    fill(color(30 + z * 50, 30 + z * 50, 30 + z * 50));
+//                    translate(mx[w], my[i], z * s4);
 //                    sphere(s);
 //                    popMatrix();
 //                }
 //            }
+//            strokeWeight(5);
+//            stroke(30 + z * 50, 30 + z * 50, 30 + z * 50);
+//            for (int i = 0; i < 6; i++) {
+//                for (int w = 0; w < 6; w++) {
+//                    line(mx[w], my[i], z * s4, mx[w + 1], my[i + 1], z * s4);
+//                }
+//            }
 //        }
-        for (int z = 0; z < 3; z++) {
-            noStroke();
-            for (int i = 0; i < 7; i++) {
-                for (int w = 0; w < 7; w++) {
-                    mx[w] = w * s4;
-                    my[i] = i * s4;
-                    pushMatrix();
-                    fill(color(30 + z * 50, 30 + z * 50, 30 + z * 50));
-                    translate(mx[w], my[i], z * s4);
-                    sphere(s);
-                    popMatrix();
-                }
-            }
-            strokeWeight(5);
-            stroke(30 + z * 50, 30 + z * 50, 30 + z * 50);
-            for (int i = 0; i < 6; i++) {
-                for (int w = 0; w < 6; w++) {
-                    line(mx[w], my[i], z * s4, mx[w + 1], my[i + 1], z * s4);
-                }
-            }
-        }
 
         popMatrix();
 //        System.out.println("playHead = " + ((playHead / s4) + 0.25));
