@@ -2,6 +2,7 @@ package edu.unl.cse.knorth.git_sonification.data_processing.visualization.interm
 
 import edu.unl.cse.knorth.git_sonification.data_collection.intermediate_data.Commit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -38,17 +39,16 @@ public class CommitAnnotator {
         List<AnnotatedCommit> annotatedCommits =
                 new ArrayList<>(commitsToAnnotate.size());
                 
-        annotatedCommits.add(annotateFirstCommit(commitsToAnnotate.remove(0)));
-        
-        // After the first commit, there will always be one branch - the branch
-        // the current one is on
-        int numCurrentBranches = 1;
-        
+        AnnotatedCommit firstCommit =
+                annotateFirstCommit(commitsToAnnotate.remove(0));
+        annotatedCommits.add(firstCommit);
+                
+        AnnotatedCommit previousCommit = firstCommit;
         for(Commit commit : commitsToAnnotate) {
-            AnnotatedCommitResult result = annotateCommit(commit,
-                    annotatedCommits, commitsToAnnotate, numCurrentBranches);
-            numCurrentBranches = result.getNewNumStartingBranches();
-            annotatedCommits.add(result.getAnnotatedCommit());
+            AnnotatedCommit result = annotateCommit(commit, previousCommit,
+                    annotatedCommits);
+            annotatedCommits.add(result);
+            previousCommit = result;
         }
         
         return annotatedCommits;
@@ -72,20 +72,20 @@ public class CommitAnnotator {
         // We'll show all of the first commit's parents being merged into it
         // at the very bottom of the commit graph.
         for(int i = 1; i <= commit.getParentHashes().size(); i++) {
-            annotatedCommit.getIncomingBranches().add(i);
+            annotatedCommit.getIncomingBranches().add(
+                new AnnotatedCommitLine(i, 1, commit.getHash()));
         }
         
         // It's possible that the first commit is the first commit in the
         // entire repository, in which case it doesn't have any parents.
         // In this case, be aware that annotatedCommit will have an empty
         // incomingBranches list.
-        
         return annotatedCommit;
     }
     
-    private AnnotatedCommitResult annotateCommit(Commit commit,
-            List<AnnotatedCommit> annotatedCommits, List<Commit> commits,
-            int numStartingBranches) {
+    private AnnotatedCommit annotateCommit(Commit commit,
+            AnnotatedCommit previousCommit,
+            List<AnnotatedCommit> annotatedCommits) {
 
         AnnotatedCommit annotatedCommit = new AnnotatedCommit();
         annotatedCommit.setAuthor(commit.getAuthor());
@@ -93,119 +93,102 @@ public class CommitAnnotator {
         annotatedCommit.setComponents(commit.getComponentsModified());
         annotatedCommit.setTimestamp(commit.getTimestamp());
         
-        int newNumCurrentBranches = numStartingBranches;
-        
         if(commit.getParentHashes().isEmpty()) {
-            newNumCurrentBranches++;
-            annotatedCommit.setBranch(newNumCurrentBranches);
+            int newBranch = addNewStartingBranch(annotatedCommits);
+            annotatedCommit.setBranch(newBranch);
         } else {
-            // Add lines 
-            for(String parentHash : commit.getParentHashes()) {
-                int parentBranch = lookupParentBranch(parentHash,
+            // Get the lowest-numbered branch that comes from one of this
+            // commit's parents. If none of the commit's parents can be reached
+            // without branching, we'll end up creating a new branch for the
+            // commit anyway, so put it in a new branch number.
+            int newBranch = previousCommit.getMaxToBranchNumber() + 1;
+            
+            for(AnnotatedCommitLine line : previousCommit.getIncomingBranches())
+            {
+                if(commit.getParentHashes().contains(line.getParentHash())) {
+                    if(line.getToBranch() < newBranch) {
+                        newBranch = line.getToBranch();
+                    }
+                }
+            }
+            
+            annotatedCommit.setBranch(newBranch);
+        }
+        
+        int numBranchesMerged = 0;
+        int commitBranch = annotatedCommit.getBranch();
+        List<String> checkedParents = new ArrayList<>();
+        List<AnnotatedCommitLine> lines = previousCommit.getIncomingBranches();
+        Collections.sort(lines, new AnnotatedCommitLineToBranchComparator());
+        
+        for(AnnotatedCommitLine line : lines) {
+            if(commit.getParentHashes().contains(line.getParentHash())) {
+                annotatedCommit.getIncomingBranches().add(
+                    new AnnotatedCommitLine(line.getToBranch(), commitBranch,
+                        commit.getHash()));
+                checkedParents.add(line.getParentHash());
+            } else {
+                // If a line doesn't pass through 
+                annotatedCommit.getIncomingBranches().add(
+                    new AnnotatedCommitLine(line.getToBranch(),
+                            line.getToBranch() - numBranchesMerged,
+                            line.getParentHash()));
+            }
+        }
+        
+        for(String parent : commit.getParentHashes()) {
+            if(!checkedParents.contains(parent)) {
+                int newFromBranch = addNewBranchFromParent(parent,
                         annotatedCommits);
-                if(parentBranch == -1) {
-                    // If a parent branch doesn't show up in the list of commits
-                    // processed so far, it must be off the bottom of our graph.
-                    // So we add a new starting branch at the bottom and connect
-                    // our commit to it.
-                    newNumCurrentBranches++;
-                    annotatedCommit.getIncomingBranches()
-                            .add(newNumCurrentBranches);
-                } else {
-                    annotatedCommit.getIncomingBranches().add(parentBranch);
-                }
+                annotatedCommit.getIncomingBranches().add(
+                        new AnnotatedCommitLine(newFromBranch, commitBranch,
+                                commit.getHash()));
             }
-            
-            int minIncomingBranch = Integer.MAX_VALUE;
-            for(int incomingBranch : annotatedCommit.getIncomingBranches()) {
-                if(incomingBranch < minIncomingBranch) {
-                    minIncomingBranch = incomingBranch;
-                }
-            }
-            
-            annotatedCommit.setBranch(minIncomingBranch);
         }
         
-        DetermineOugoingLinesResults results = determineOutgoingLines(commit,
-                commits, annotatedCommit.getBranch(), newNumCurrentBranches);
-        newNumCurrentBranches = results.getNewNumCurrentBranches();
-        annotatedCommit.setOutgoingBranches(results.getOutgoingLines());
-        
-        return new AnnotatedCommitResult(annotatedCommit,
-                newNumCurrentBranches);
+        return annotatedCommit;
     }
     
-    private int lookupParentBranch(String parentHash,
-            List<AnnotatedCommit> annotatedCommits) {
+    /**
+     * Adds a new branch off the bottom of the graph that can be used to place
+     * a commit that has no parents, or that has parents outside of the portion
+     * of the history being visualized.
+     * @param annotatedCommits The list of annotated commits so far. They will
+     * be modified to add a new branch.
+     * @return The branch number of the new branch that should be used with the
+     * new parentless commit the starting branch was added for.
+     */
+    private int addNewStartingBranch(List<AnnotatedCommit> annotatedCommits) {
         for(AnnotatedCommit annotatedCommit : annotatedCommits) {
-            if(parentHash.equals(annotatedCommit.getHash())) {
-                // Select one of the branches coming out of the parent that we
-                // haven't used yet
-                int branch = annotatedCommit.getUnusedOutgoingBranch();
-                // And mark it as used so that we don't select it in the future
-                annotatedCommit.useOutgoingBranch(branch);
-            }
+            annotatedCommit.getIncomingBranches().add(new AnnotatedCommitLine(
+                    annotatedCommit.getMaxFromBranchNumber() + 1,
+                    annotatedCommit.getMaxToBranchNumber() + 1, null));
         }
         
-        return -1;
+        return annotatedCommits.get(annotatedCommits.size() - 1)
+                .getMaxToBranchNumber();
     }
     
-    private DetermineOugoingLinesResults determineOutgoingLines(
-            Commit commitToCheck, List<Commit> commits,
-            int commitToCheckBranch, int numCurrentBranches) {
-        List<Integer> outgoingBranches = new ArrayList<>();
-        int newNumCurrentBranches = numCurrentBranches;
+    private int addNewBranchFromParent(String parentHash,
+            List<AnnotatedCommit> annotatedCommits) {
+        boolean addingNewBranch = false;
+        int previousBranch = 0;
         
-        boolean usedCurrentBranch = false;
-        for(Commit commit : commits) {
-            if(commit.getParentHashes().contains(commitToCheck.getHash())) {
-                if(usedCurrentBranch) {
-                    newNumCurrentBranches++;
-                    outgoingBranches.add(newNumCurrentBranches);
-                } else {
-                    usedCurrentBranch = true;
-                    outgoingBranches.add(commitToCheckBranch);
+        for(AnnotatedCommit annotatedCommit : annotatedCommits) {
+            if(!addingNewBranch) {
+                if(annotatedCommit.getHash().equals(parentHash)) {
+                    addingNewBranch = true;
+                    previousBranch = annotatedCommit.getBranch();
                 }
+            } else {
+                int newBranch = annotatedCommit.getMaxToBranchNumber() + 1;
+                annotatedCommit.getIncomingBranches().add(
+                        new AnnotatedCommitLine(previousBranch, newBranch,
+                                parentHash));
+                previousBranch = newBranch;
             }
         }
         
-        return new DetermineOugoingLinesResults(outgoingBranches,
-                newNumCurrentBranches);
-    }
-    
-    private static final class AnnotatedCommitResult {
-        private final AnnotatedCommit annotatedCommit;
-        private final int newNumCurrentBranches;
-
-        public AnnotatedCommitResult(AnnotatedCommit annotatedCommit, int newNumCurrentBranches) {
-            this.annotatedCommit = annotatedCommit;
-            this.newNumCurrentBranches = newNumCurrentBranches;
-        }
-
-        public AnnotatedCommit getAnnotatedCommit() {
-            return annotatedCommit;
-        }
-
-        public int getNewNumStartingBranches() {
-            return newNumCurrentBranches;
-        }
-    }
-    
-    private static final class DetermineOugoingLinesResults {
-        private final List<Integer> outgoingLines;
-        private final int newNumCurrentBranches;
-
-        public DetermineOugoingLinesResults(List<Integer> outgoingLines, int nerNumCurrentBranches) {
-            this.outgoingLines = outgoingLines;
-            this.newNumCurrentBranches = nerNumCurrentBranches;
-        }
-
-        public List<Integer> getOutgoingLines() {
-            return outgoingLines;
-        }
-
-        public int getNewNumCurrentBranches() {
-            return newNumCurrentBranches;
-        }
+        return previousBranch;
     }
 }

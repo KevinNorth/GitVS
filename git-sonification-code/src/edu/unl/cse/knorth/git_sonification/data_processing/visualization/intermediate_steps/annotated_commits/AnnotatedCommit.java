@@ -10,28 +10,21 @@ public class AnnotatedCommit {
     private String hash;
     private String author;
     private int branch;
-    private List<Integer> incomingBranches;
-    private List<Integer> outgoingBranches;
-    private List<Integer> usedOutgoingBranches;
+    private List<AnnotatedCommitLine> incomingBranches;
     private List<Component> components;
 
     public AnnotatedCommit() {
         incomingBranches = new ArrayList<>();
-        outgoingBranches = new ArrayList<>();
-        usedOutgoingBranches = new ArrayList<>();
         components = new ArrayList<>();
     }
 
     public AnnotatedCommit(DateTime timestamp, String hash, String author,
-            int branch, List<Integer> incomingBranches,
-            List<Integer> outgoingBranches, List<Component> components) {
+            int branch, List<AnnotatedCommitLine> incomingBranches) {
         this.timestamp = timestamp;
         this.hash = hash;
         this.author = author;
         this.branch = branch;
         this.incomingBranches = incomingBranches;
-        this.outgoingBranches = outgoingBranches;
-        this.usedOutgoingBranches = new ArrayList<>();
         this.components = components;
     }
 
@@ -67,63 +60,50 @@ public class AnnotatedCommit {
         this.branch = branch;
     }
 
-    public List<Integer> getIncomingBranches() {
+    public List<AnnotatedCommitLine> getIncomingBranches() {
         return incomingBranches;
     }
 
-    public void setIncomingBranches(List<Integer> incomingBranches) {
+    public void setIncomingBranches(List<AnnotatedCommitLine> incomingBranches) {
         this.incomingBranches = incomingBranches;
-    }
-
-    // Deliberately marked as package visibility because the CommitAnnotator
-    // is the only other class that needs access to this method.
-    List<Integer> getOutgoingBranches() {
-        return outgoingBranches;
-    }
-
-    // Deliberately marked as package visibility because the CommitAnnotator
-    // is the only other class that needs access to this method.
-    void setOutgoingBranches(List<Integer> outgoingBranches) {
-        this.outgoingBranches = outgoingBranches;
-    }
-    
-    /**
-     * Returns an arbitrary outgoing branch that hasn't been marked as used yet.
-     * @return One of the elements of <code>outgoingBranches</code> that hasn't
-     * been marked as used by <code>useOutgoingBranch()</code>, or
-     * <code>-1</code> if no such branch exists.
-     */
-    // Deliberately marked as package visibility because the CommitAnnotator
-    // is the only other class that needs access to this method.
-    int getUnusedOutgoingBranch() {
-        for(int outgoingBranch : outgoingBranches) {
-            if(!usedOutgoingBranches.contains(outgoingBranch)) {
-                return outgoingBranch;
-            }
-        }
-        
-        return -1;
-    }
-    
-    /**
-     * Marks an outgoing branch as used so that
-     * <code>getUnusedOutgoingBranch()</code> won't return it anymore.
-     * @param outgoingBranch The number of the branch to mark as used.
-     */
-    // Deliberately marked as package visibility because the CommitAnnotator
-    // is the only other class that needs access to this method.
-    void useOutgoingBranch(int outgoingBranch) {
-        this.usedOutgoingBranches.add(outgoingBranch);
-    }
-    
-    public List<Component> getComponents() {
-        return components;
     }
 
     public void setComponents(List<Component> components) {
         this.components = components;
     }
 
+    public int getMaxFromBranchNumber() {
+        if(incomingBranches.isEmpty()) {
+            return 0;
+        }
+        
+        int max = incomingBranches.get(0).getFromBranch();
+        
+        for(AnnotatedCommitLine line : incomingBranches) {
+            if(line.getFromBranch() > max) {
+                max = line.getFromBranch();
+            }
+        }
+        
+        return max;
+    }
+    
+    public int getMaxToBranchNumber() {
+        if(incomingBranches.isEmpty()) {
+            return this.branch;
+        }
+        
+        int max = incomingBranches.get(0).getToBranch();
+        
+        for(AnnotatedCommitLine line : incomingBranches) {
+            if(line.getToBranch() > max) {
+                max = line.getToBranch();
+            }
+        }
+        
+        return max;
+    }
+    
     @Override
     public String toString() {
         return "AnnotatedCommit{" + "timestamp=" + timestamp +
@@ -131,8 +111,6 @@ public class AnnotatedCommit {
                 ", author=" + author +
                 ", branch=" + branch +
                 ", incomingBranches=" + incomingBranches +
-                ", outgoingBranches=" + outgoingBranches +
-                ", usedOutgoingBranches=" + usedOutgoingBranches +
                 ", components=" + components + '}';
     }
 }
