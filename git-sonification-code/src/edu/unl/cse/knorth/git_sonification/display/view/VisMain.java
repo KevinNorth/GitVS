@@ -43,6 +43,8 @@ public class VisMain extends PApplet {
     double time;
     double oldTime;
     double delta;
+    
+    int oldCom;
 
     Clip clip;
     Clip dev1;
@@ -60,6 +62,11 @@ public class VisMain extends PApplet {
     Clip dev13;
     Clip dev14;
     Clip daySep;
+    Clip conflict;
+    Clip cd1;
+    Clip cd2;
+    Clip cd3;
+    Clip cd4;
 
     Map<String, Integer> map;
     int count;
@@ -68,7 +75,7 @@ public class VisMain extends PApplet {
     List<Row> rows;
     List<Layer> layers;
     VisualizationData visDat;
-    
+
     int numRows;
 
     public static void main(String args[]) {
@@ -94,15 +101,15 @@ public class VisMain extends PApplet {
         rows = new ArrayList<>();
         lines = new ArrayList<>();
         lines.add(new Line(1, 1, true));
-        rows.add(new Row("author0", new DateTime(), 1, true, lines));
-        rows.add(new Row("author1", new DateTime(), 1, true, lines));
-        rows.add(new Row("author2", new DateTime(), 1, true, lines));
-        rows.add(new Row(new DateTime(), lines));
-        rows.add(new Row("author3", new DateTime(), 1, true, lines));
+        rows.add(new Row("author0", new DateTime(), 1, true, 0, lines));
+        rows.add(new Row("author1", new DateTime(), 1, true, 0, lines));
+        rows.add(new Row("author2", new DateTime(), 1, true, 1, lines));
+        rows.add(new Row(new DateTime(), 1, lines));
+        rows.add(new Row("author3", new DateTime(), 1, true, 0, lines));
         layers.add(new Layer(rows));
         layers.add(new Layer(rows));
         visDat = new VisualizationData(layers, 1, 1);
-        
+
         numRows = visDat.getLayers().get(0).getRows().size();
 
         playSpeed = (s4 * 25) / (60);
@@ -122,10 +129,20 @@ public class VisMain extends PApplet {
             dev6.open(AudioSystem.getAudioInputStream(new File("audio/dev6.wav")));
             daySep = AudioSystem.getClip();
             daySep.open(AudioSystem.getAudioInputStream(new File("audio/day_separator.wav")));
-
+            cd1 = AudioSystem.getClip();
+            cd1.open(AudioSystem.getAudioInputStream(new File("audio/conflict_drums_1.wav")));
+            cd2 = AudioSystem.getClip();
+            cd2.open(AudioSystem.getAudioInputStream(new File("audio/conflict_drums_2.wav")));
+            cd3 = AudioSystem.getClip();
+            cd3.open(AudioSystem.getAudioInputStream(new File("audio/conflict_drums_3.wav")));
+            cd4 = AudioSystem.getClip();
+            cd4.open(AudioSystem.getAudioInputStream(new File("audio/conflict_drums_4.wav")));
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
             Logger.getLogger(VisMain.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+        clip = dev1;
+        conflict = cd1;
 
         yPos = 0;
         rotateAmt = 0;
@@ -169,20 +186,24 @@ public class VisMain extends PApplet {
         strokeWeight(10);
         line(left, playHead, -1000, right, playHead, -1000);
 
-        if ( (playHead / s4) > -0.25 && (playHead / s4) < (numRows-0.75) && ((playHead / s4) > ((round((playHead / s4))) - 0.25)) && ((playHead / s4) < ((round((playHead / s4))) + 0.25))) {
+        if ((playHead / s4) > -0.25 && (playHead / s4) < (numRows - 0.75) && ((playHead / s4) > ((round((playHead / s4))) - 0.25)) && ((playHead / s4) < ((round((playHead / s4))) + 0.25))) {
+            if (((int) ((playHead / s4) + 0.25) != oldCom) || (clip.getFrameLength() <= clip.getFramePosition())) {
+                clip.setFramePosition(0);
+                clip.stop();
+                conflict.setFramePosition(0);
+                conflict.stop();
+            }
+            oldCom = (int) ((playHead / s4) + 0.25);
+            String author = null;
+            int numCon = 0;
+            try {
+                Row row = visDat.getLayers().get(0).getRows().get(oldCom);
+                author = row.getAuthor();
+                numCon = row.getNumConflicts();
+            } catch (IndexOutOfBoundsException ex) {
+                System.out.println("index out of bounds exception");
+            }
             if ((clip == null) || !clip.isRunning()) {
-                String author = null;
-                try {
-                    author = visDat.getLayers().get(0).getRows().get((int) ((playHead / s4)+0.25)).getAuthor();
-                    if (author == null) {
-                        clip = daySep;
-                        clip.start();
-                    }
-                } catch (IndexOutOfBoundsException ex) {
-                    author = null;
-                } finally{
-                    System.out.println(author);
-                }
                 if (author != null) {
                     Integer n = map.get(author);
                     if (n == null) {
@@ -210,15 +231,35 @@ public class VisMain extends PApplet {
                             clip = dev6;
                             break;
                         default:
-                            clip = null;
+                            clip = dev1;
                             break;
                     }
-                    clip.start();
+                } else {
+                    clip = daySep;
                 }
+                clip.start();
             }
-            if (!(clip == null) && (clip.getFrameLength() == clip.getFramePosition())) {
-                clip.setFramePosition(0);
-                clip.stop();
+            if ((conflict == null) || !conflict.isRunning()) {
+                if (numCon > 0) {
+                    switch (numCon) {
+                        case 1:
+                            conflict = cd1;
+                            break;
+                        case 2:
+                            conflict = cd2;
+                            break;
+                        case 3:
+                            conflict = cd3;
+                            break;
+                        case 4:
+                            conflict = cd4;
+                            break;
+                        default:
+                            conflict = cd1;
+                            break;
+                    }
+                    conflict.start();
+                }
             }
         }
 
