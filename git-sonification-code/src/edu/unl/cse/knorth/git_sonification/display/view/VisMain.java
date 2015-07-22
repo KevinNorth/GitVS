@@ -47,26 +47,10 @@ public class VisMain extends PApplet {
     int oldCom;
 
     Clip clip;
-    Clip dev1;
-    Clip dev2;
-    Clip dev3;
-    Clip dev4;
-    Clip dev5;
-    Clip dev6;
-    Clip dev7;
-    Clip dev8;
-    Clip dev9;
-    Clip dev10;
-    Clip dev11;
-    Clip dev12;
-    Clip dev13;
-    Clip dev14;
+    Clip[] dev = new Clip[14];
     Clip daySep;
     Clip conflict;
-    Clip cd1;
-    Clip cd2;
-    Clip cd3;
-    Clip cd4;
+    Clip[] cd = new Clip[4];
 
     Map<String, Integer> map;
     int count;
@@ -115,34 +99,22 @@ public class VisMain extends PApplet {
         playSpeed = (s4 * 25) / (60);
         playHead = height;
         try {
-            dev1 = AudioSystem.getClip();
-            dev1.open(AudioSystem.getAudioInputStream(new File("audio/dev1.wav")));
-            dev2 = AudioSystem.getClip();
-            dev2.open(AudioSystem.getAudioInputStream(new File("audio/dev2.wav")));
-            dev3 = AudioSystem.getClip();
-            dev3.open(AudioSystem.getAudioInputStream(new File("audio/dev3.wav")));
-            dev4 = AudioSystem.getClip();
-            dev4.open(AudioSystem.getAudioInputStream(new File("audio/dev4.wav")));
-            dev5 = AudioSystem.getClip();
-            dev5.open(AudioSystem.getAudioInputStream(new File("audio/dev5.wav")));
-            dev6 = AudioSystem.getClip();
-            dev6.open(AudioSystem.getAudioInputStream(new File("audio/dev6.wav")));
+            for(int i = 0; i < 14; i++){
+                dev[i] = AudioSystem.getClip();
+                dev[i].open(AudioSystem.getAudioInputStream(new File("audio/dev" + (i+1) + ".wav")));
+            }
             daySep = AudioSystem.getClip();
             daySep.open(AudioSystem.getAudioInputStream(new File("audio/day_separator.wav")));
-            cd1 = AudioSystem.getClip();
-            cd1.open(AudioSystem.getAudioInputStream(new File("audio/conflict_drums_1.wav")));
-            cd2 = AudioSystem.getClip();
-            cd2.open(AudioSystem.getAudioInputStream(new File("audio/conflict_drums_2.wav")));
-            cd3 = AudioSystem.getClip();
-            cd3.open(AudioSystem.getAudioInputStream(new File("audio/conflict_drums_3.wav")));
-            cd4 = AudioSystem.getClip();
-            cd4.open(AudioSystem.getAudioInputStream(new File("audio/conflict_drums_4.wav")));
+            for(int i = 0; i < 4; i++){
+                cd[i] = AudioSystem.getClip();
+                cd[i].open(AudioSystem.getAudioInputStream(new File("audio/conflict_drums_" + (i+1) + ".wav")));
+            }
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
             Logger.getLogger(VisMain.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        clip = dev1;
-        conflict = cd1;
+        clip = dev[0];
+        conflict = cd[0];
 
         yPos = 0;
         rotateAmt = 0;
@@ -157,7 +129,7 @@ public class VisMain extends PApplet {
         delta = 0;
 
         map = new HashMap<>();
-        count = 1;
+        count = 0;
 
         ortho(left, right, bottom, top, -10000, 10000);
     }
@@ -211,28 +183,8 @@ public class VisMain extends PApplet {
                         n = count;
                         count++;
                     }
-                    switch (n) {
-                        case 1:
-                            clip = dev1;
-                            break;
-                        case 2:
-                            clip = dev2;
-                            break;
-                        case 3:
-                            clip = dev3;
-                            break;
-                        case 4:
-                            clip = dev4;
-                            break;
-                        case 5:
-                            clip = dev5;
-                            break;
-                        case 6:
-                            clip = dev6;
-                            break;
-                        default:
-                            clip = dev1;
-                            break;
+                    if(n < 14){
+                        clip = dev[n];
                     }
                 } else {
                     clip = daySep;
@@ -240,24 +192,8 @@ public class VisMain extends PApplet {
                 clip.start();
             }
             if ((conflict == null) || !conflict.isRunning()) {
-                if (numCon > 0) {
-                    switch (numCon) {
-                        case 1:
-                            conflict = cd1;
-                            break;
-                        case 2:
-                            conflict = cd2;
-                            break;
-                        case 3:
-                            conflict = cd3;
-                            break;
-                        case 4:
-                            conflict = cd4;
-                            break;
-                        default:
-                            conflict = cd1;
-                            break;
-                    }
+                if (numCon > 0 && numCon < 5) {
+                    conflict = cd[numCon-1];
                     conflict.start();
                 }
             }
