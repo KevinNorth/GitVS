@@ -92,9 +92,10 @@ public class CommitAnnotator {
         annotatedCommit.setHash(commit.getHash());
         annotatedCommit.setComponents(commit.getComponentsModified());
         annotatedCommit.setTimestamp(commit.getTimestamp());
-        
+
+        // Determine which branch the commit should be placed on
         if(commit.getParentHashes().isEmpty()) {
-            int newBranch = addNewStartingBranch(annotatedCommits);
+            int newBranch = previousCommit.getMaxToBranchNumber() + 1;
             annotatedCommit.setBranch(newBranch);
         } else {
             // Get the lowest-numbered branch that comes from one of this
@@ -115,27 +116,75 @@ public class CommitAnnotator {
             annotatedCommit.setBranch(newBranch);
         }
         
+        // If the commit doesn't have any parents, add a new starting branch for
+        // it
+        if(commit.getParentHashes().isEmpty()) {
+            addNewStartingBranch(annotatedCommits);
+        }
+        
+        // Extend all of the previous commit's lines to continue through the
+        // current commit. If we merge branches, move outside branches in to
+        // fill the space the merged branches create
         int numBranchesMerged = 0;
         int commitBranch = annotatedCommit.getBranch();
         List<String> checkedParents = new ArrayList<>();
+        List<Integer> branchesExtended = new ArrayList<>();
         List<AnnotatedCommitLine> lines = previousCommit.getIncomingBranches();
         Collections.sort(lines, new AnnotatedCommitLineToBranchComparator());
         
+        // First, connect all lines with the current commits' parents at the
+        // front 
         for(AnnotatedCommitLine line : lines) {
-            if(commit.getParentHashes().contains(line.getParentHash())) {
+            if(commit.getParentHashes().contains(line.getParentHash())
+                    && !branchesExtended.contains(line.getToBranch())) {
+                // If a branch merges into the current branch, we simply add a
+                // line to the current branch.
                 annotatedCommit.getIncomingBranches().add(
                     new AnnotatedCommitLine(line.getToBranch(), commitBranch,
                         commit.getHash()));
                 checkedParents.add(line.getParentHash());
-            } else {
-                // If a line doesn't pass through 
-                annotatedCommit.getIncomingBranches().add(
-                    new AnnotatedCommitLine(line.getToBranch(),
-                            line.getToBranch() - numBranchesMerged,
-                            line.getParentHash()));
+                numBranchesMerged++;
+                branchesExtended.add(line.getToBranch());
             }
         }
         
+        for(AnnotatedCommitLine line : lines) {
+            if(!branchesExtended.contains(line.getToBranch())) {
+                // If a branch doesn't connect to the current commit, add a line
+                // continuing the branch parallel to the current commit. If
+                // we've merged two or more branches into the parent, outside
+                // branches will move inside to fill in the created space.
+                int numBranchesToMoveInwards = 0;
+                if(numBranchesMerged >= 2) {
+                    numBranchesToMoveInwards = numBranchesMerged - 1;
+                }
+                
+                // Note that, conviniently, if a commit has no parents, then
+                // all of the previous commits' branches will simply be moved
+                // straight up by this algorithm. Since we've already added an
+                // additional starting branch to the graph, this will connect
+                // the current commit for us automagically. The only thing we
+                // have to do is change the new line's parent from null to the
+                // current commit.
+                String newLineParent;
+                if(line.getToBranch() - numBranchesToMoveInwards ==
+                        annotatedCommit.getBranch()) {
+                    newLineParent = commit.getHash();
+                } else {
+                    newLineParent = line.getParentHash();
+                }
+                annotatedCommit.getIncomingBranches().add(
+                    new AnnotatedCommitLine(line.getToBranch(),
+                        line.getToBranch() - numBranchesToMoveInwards,
+                        newLineParent));
+                
+                branchesExtended.add(line.getToBranch());
+            }
+        }
+        
+        // Finally, any parents that weren't merged into the current commit's
+        // branch must be below the cutoff of the Git data we're processing.
+        // Add a new starting branch for the commit accordingly.
         for(String parent : commit.getParentHashes()) {
             if(!checkedParents.contains(parent)) {
                 int newFromBranch = addNewBranchFromParent(parent,
@@ -189,6 +238,19 @@ public class CommitAnnotator {
             }
         }
         
-        return previousBranch;
+        // If we never added a new branch, then the parent must have been
+        // earlier than the first commit in the Git data we're analyzing. Create
+        // a new starting branch accordingly.
+        if(!addingNewBranch) {
+            for(AnnotatedCommit annotatedCommit : annotatedCommits) {
+                annotatedCommit.getIncomingBranches().add(new AnnotatedCommitLine(
+                        annotatedCommit.getMaxFromBranchNumber() + 1,
+                        annotatedCommit.getMaxToBranchNumber() + 1, null));
+            }
+            return annotatedCommits.get(annotatedCommits.size() - 1)
+                .getMaxToBranchNumber();
+        } else {
+            return previousBranch;
+        }
     }
 }

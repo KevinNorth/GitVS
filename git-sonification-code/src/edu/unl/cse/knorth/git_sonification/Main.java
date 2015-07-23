@@ -26,7 +26,7 @@ public class Main {
         DateTime until = new DateTime(2009, 11, 9, 0, 0);
                 
         List<PartialCommit> partialCommits;
-        try(GitCaller gitCaller = new GitCaller("../../../voldemort/.git")) {
+        try(GitCaller gitCaller = new GitCaller("../../../../voldemort/.git")) {
             partialCommits = gitCaller.getPartialCommits();
         }
         
