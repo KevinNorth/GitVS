@@ -34,7 +34,8 @@ public class VisMain extends PApplet {
     float playHead;
     float playSpeed;
     float rotateAmt;
-
+    float startPos;
+    
     int left;
     int right;
     int bottom;
@@ -87,9 +88,16 @@ public class VisMain extends PApplet {
         lines.add(new Line(1, 1, true));
         rows.add(new Row("author0", new DateTime(), 1, true, 0, lines));
         rows.add(new Row("author1", new DateTime(), 1, true, 0, lines));
+        rows.add(new Row("author0", new DateTime(), 1, true, 0, lines));
+        rows.add(new Row("author1", new DateTime(), 1, true, 0, lines));
+        rows.add(new Row("author0", new DateTime(), 1, true, 0, lines));
+        rows.add(new Row("author1", new DateTime(), 1, true, 0, lines));
         rows.add(new Row("author2", new DateTime(), 1, true, 1, lines));
         rows.add(new Row(new DateTime(), 1, lines));
         rows.add(new Row("author3", new DateTime(), 1, true, 0, lines));
+        layers.add(new Layer(rows));
+        layers.add(new Layer(rows));
+        layers.add(new Layer(rows));
         layers.add(new Layer(rows));
         layers.add(new Layer(rows));
         visDat = new VisualizationData(layers, 1, 1);
@@ -118,11 +126,11 @@ public class VisMain extends PApplet {
 
         yPos = 0;
         rotateAmt = 0;
-
-        left = 0;
-        right = width;
-        bottom = 0;
-        top = height;
+        
+        bottom = -20;
+        top = height + 20;
+        left = (int) (bottom * aspect);
+        right = (int) (top * aspect);
 
         oldTime = time;
         time = System.currentTimeMillis();
@@ -130,6 +138,8 @@ public class VisMain extends PApplet {
 
         map = new HashMap<>();
         count = 0;
+        
+        startPos = (((int)(height/s4))*s4)-(numRows*s4);
 
         ortho(left, right, bottom, top, -10000, 10000);
     }
@@ -149,23 +159,26 @@ public class VisMain extends PApplet {
         }
 
         background(color(200, 50, 30));
-        directionalLight(126, 126, 126, 0, 0, -1);
-        ambientLight(102, 102, 102);
+        //directionalLight(126, 126, 126, 0, 0, -1);
+        ambientLight(240,240,240);
+        pointLight(50, 50, 50, (left+right)/2,(top+bottom),200);
 
         translate(0, yPos, 0); //sets everything to be relitive to yPos
 
         //this is the playhead for the music
         strokeWeight(10);
         line(left, playHead, -1000, right, playHead, -1000);
-
-        if ((playHead / s4) > -0.25 && (playHead / s4) < (numRows - 0.75) && ((playHead / s4) > ((round((playHead / s4))) - 0.25)) && ((playHead / s4) < ((round((playHead / s4))) + 0.25))) {
-            if (((int) ((playHead / s4) + 0.25) != oldCom) || (clip.getFrameLength() <= clip.getFramePosition())) {
+        
+        float playHeadValue = playHead - startPos;
+        
+        if ((playHeadValue / s4) > -0.25 && (playHeadValue / s4) < (numRows - 0.75) && ((playHeadValue / s4) > ((round((playHeadValue / s4))) - 0.25)) && ((playHeadValue / s4) < ((round((playHeadValue / s4))) + 0.25))) {
+            if (((int) ((playHeadValue / s4) + 0.25) != oldCom) || (clip.getFrameLength() <= clip.getFramePosition())) {
                 clip.setFramePosition(0);
                 clip.stop();
                 conflict.setFramePosition(0);
                 conflict.stop();
             }
-            oldCom = (int) ((playHead / s4) + 0.25);
+            oldCom = (int) ((playHeadValue / s4) + 0.25);
             String author = null;
             int numCon = 0;
             try {
@@ -207,10 +220,10 @@ public class VisMain extends PApplet {
 //            dev1.start();
 //        }
         pushMatrix();
-        translate(width / 2, 0, 0); //centers the vis and starts it a unit down
+        translate((left+right) / 2, startPos, ((left+right)) / 2); //centers the vis and starts it a unit up
         rotateY((rotateAmt / (float) width) * (2 * PI));
 
-        int numColors = visDat.getLayers().size();
+        int numLayers = visDat.getLayers().size();
         int z = 0;
         for (Layer layer : visDat.getLayers()) {
             int y = 0;
@@ -218,16 +231,16 @@ public class VisMain extends PApplet {
                 noStroke();
                 if (row.isVisable()) {
                     pushMatrix();
-                    fill(color(z * 255 / numColors, z * 255 / numColors, z * 255 / numColors));
-                    translate(row.getBranchLocation() * s4, y * s4, z * s4);
+                    fill(color(z * 255 / numLayers, z * 255 / numLayers, z * 255 / numLayers));
+                    translate(row.getBranchLocation() * s4, y * s4, s4*(z-(numLayers/2)));
                     sphere(s);
                     popMatrix();
                 }
                 strokeWeight(5);
-                stroke(z * 255 / numColors, z * 255 / numColors, z * 255 / numColors);
+                stroke(z * 255 / numLayers, z * 255 / numLayers, z * 255 / numLayers);
                 for (Line line : row.getIncomingLines()) {
                     if (line.isVisible) {
-                        line(line.fromBranch * s4, y * s4, z * s4, line.toBranch * s4, (y * s4) + s4, z * s4);
+                        line(line.fromBranch * s4, y * s4, s4*(z-(numLayers/2)), line.toBranch * s4, (y * s4) + s4, s4*(z-(numLayers/2)));
                     }
                 }
                 y++;
