@@ -35,7 +35,7 @@ public class VisMain extends PApplet {
     float playSpeed;
     float rotateAmt;
     float startPos;
-    
+
     int left;
     int right;
     int bottom;
@@ -44,7 +44,7 @@ public class VisMain extends PApplet {
     double time;
     double oldTime;
     double delta;
-    
+
     int oldCom;
 
     Clip clip;
@@ -86,6 +86,8 @@ public class VisMain extends PApplet {
         rows = new ArrayList<>();
         lines = new ArrayList<>();
         lines.add(new Line(1, 1, true));
+        lines.add(new Line(1, 2, true));
+        lines.add(new Line(2, 2, true));
         rows.add(new Row("author0", new DateTime(), 1, true, 0, lines));
         rows.add(new Row("author1", new DateTime(), 1, true, 0, lines));
         rows.add(new Row("author0", new DateTime(), 1, true, 0, lines));
@@ -95,11 +97,9 @@ public class VisMain extends PApplet {
         rows.add(new Row("author2", new DateTime(), 1, true, 1, lines));
         rows.add(new Row(new DateTime(), 1, lines));
         rows.add(new Row("author3", new DateTime(), 1, true, 0, lines));
-        layers.add(new Layer(rows));
-        layers.add(new Layer(rows));
-        layers.add(new Layer(rows));
-        layers.add(new Layer(rows));
-        layers.add(new Layer(rows));
+        for (int i = 0; i < 30; i++) {
+            layers.add(new Layer(rows));
+        }
         visDat = new VisualizationData(layers, 1, 1);
 
         numRows = visDat.getLayers().get(0).getRows().size();
@@ -107,15 +107,15 @@ public class VisMain extends PApplet {
         playSpeed = (s4 * 25) / (60);
         playHead = height;
         try {
-            for(int i = 0; i < 14; i++){
+            for (int i = 0; i < 14; i++) {
                 dev[i] = AudioSystem.getClip();
-                dev[i].open(AudioSystem.getAudioInputStream(new File("audio/dev" + (i+1) + ".wav")));
+                dev[i].open(AudioSystem.getAudioInputStream(new File("audio/dev" + (i + 1) + ".wav")));
             }
             daySep = AudioSystem.getClip();
             daySep.open(AudioSystem.getAudioInputStream(new File("audio/day_separator.wav")));
-            for(int i = 0; i < 4; i++){
+            for (int i = 0; i < 4; i++) {
                 cd[i] = AudioSystem.getClip();
-                cd[i].open(AudioSystem.getAudioInputStream(new File("audio/conflict_drums_" + (i+1) + ".wav")));
+                cd[i].open(AudioSystem.getAudioInputStream(new File("audio/conflict_drums_" + (i + 1) + ".wav")));
             }
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
             Logger.getLogger(VisMain.class.getName()).log(Level.SEVERE, null, ex);
@@ -126,7 +126,7 @@ public class VisMain extends PApplet {
 
         yPos = 0;
         rotateAmt = 0;
-        
+
         bottom = -20;
         top = height + 20;
         left = (int) (bottom * aspect);
@@ -138,8 +138,8 @@ public class VisMain extends PApplet {
 
         map = new HashMap<>();
         count = 0;
-        
-        startPos = (((int)(height/s4))*s4)-(numRows*s4);
+
+        startPos = (((int) (height / s4)) * s4) - (numRows * s4);
 
         ortho(left, right, bottom, top, -10000, 10000);
     }
@@ -158,19 +158,20 @@ public class VisMain extends PApplet {
             }
         }
 
-        background(color(200, 50, 30));
+        background(color(100, 100, 250));
         //directionalLight(126, 126, 126, 0, 0, -1);
-        ambientLight(240,240,240);
-        pointLight(50, 50, 50, (left+right)/2,(top+bottom),200);
+        ambientLight(240, 240, 240);
+        pointLight(50, 50, 50, (left + right) / 2, (top + bottom), 200);
 
         translate(0, yPos, 0); //sets everything to be relitive to yPos
 
         //this is the playhead for the music
         strokeWeight(10);
+        stroke(250, 250, 250);
         line(left, playHead, -1000, right, playHead, -1000);
-        
+
         float playHeadValue = playHead - startPos;
-        
+
         if ((playHeadValue / s4) > -0.25 && (playHeadValue / s4) < (numRows - 0.75) && ((playHeadValue / s4) > ((round((playHeadValue / s4))) - 0.25)) && ((playHeadValue / s4) < ((round((playHeadValue / s4))) + 0.25))) {
             if (((int) ((playHeadValue / s4) + 0.25) != oldCom) || (clip.getFrameLength() <= clip.getFramePosition())) {
                 clip.setFramePosition(0);
@@ -196,7 +197,7 @@ public class VisMain extends PApplet {
                         n = count;
                         count++;
                     }
-                    if(n < 14){
+                    if (n < 14) {
                         clip = dev[n];
                     }
                 } else {
@@ -206,7 +207,7 @@ public class VisMain extends PApplet {
             }
             if ((conflict == null) || !conflict.isRunning()) {
                 if (numCon > 0 && numCon < 5) {
-                    conflict = cd[numCon-1];
+                    conflict = cd[numCon - 1];
                     conflict.start();
                 }
             }
@@ -220,8 +221,8 @@ public class VisMain extends PApplet {
 //            dev1.start();
 //        }
         pushMatrix();
-        translate((left+right) / 2, startPos, ((left+right)) / 2); //centers the vis and starts it a unit up
-        rotateY((rotateAmt / (float) width) * (2 * PI));
+        translate((left + right) / 2, startPos, ((left + right)) / 2); //centers the vis and starts it a unit up
+        rotateY(((rotateAmt / (float) width) * (2 * PI)) - (PI / 100));
 
         int numLayers = visDat.getLayers().size();
         int z = 0;
@@ -231,16 +232,16 @@ public class VisMain extends PApplet {
                 noStroke();
                 if (row.isVisable()) {
                     pushMatrix();
-                    fill(color(z * 255 / numLayers, z * 255 / numLayers, z * 255 / numLayers));
-                    translate(row.getBranchLocation() * s4, y * s4, s4*(z-(numLayers/2)));
+                    fill(color(Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(3)) * ((z * 200 / numLayers) + 50), Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(2)) * ((z * 200 / numLayers) + 50), Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(1)) * ((z * 200 / numLayers) + 50)));
+                    translate(row.getBranchLocation() * s4, y * s4, s4 * (z - (numLayers / 2)));
                     sphere(s);
                     popMatrix();
                 }
-                strokeWeight(5);
-                stroke(z * 255 / numLayers, z * 255 / numLayers, z * 255 / numLayers);
+                strokeWeight(10 * height/(top - bottom));
+                stroke(Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(3)) * ((z * 200 / numLayers) + 50), Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(2)) * ((z * 200 / numLayers) + 50), Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(1)) * ((z * 200 / numLayers) + 50));
                 for (Line line : row.getIncomingLines()) {
                     if (line.isVisible) {
-                        line(line.fromBranch * s4, y * s4, s4*(z-(numLayers/2)), line.toBranch * s4, (y * s4) + s4, s4*(z-(numLayers/2)));
+                        line(line.fromBranch * s4, y * s4, s4 * (z - (numLayers / 2)), line.toBranch * s4, (y * s4) + s4, s4 * (z - (numLayers / 2)));
                     }
                 }
                 y++;
@@ -292,7 +293,7 @@ public class VisMain extends PApplet {
     public void mouseDragged() {
         if (mouseButton == LEFT) {
             yPos -= (float) (mouseStartY - mouseY) * ((float) (top - bottom) / (float) height);
-            rotateAmt += (mouseStartX - mouseX);
+            rotateAmt += (mouseStartX - mouseX)/10;
         }
         if (mouseButton == RIGHT) {
             playHead -= (float) (mouseStartY - mouseY) * ((float) (top - bottom) / (float) height);
