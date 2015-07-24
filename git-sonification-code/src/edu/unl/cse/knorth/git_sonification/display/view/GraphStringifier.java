@@ -26,6 +26,7 @@ public class GraphStringifier {
             str.append(":\n");
             str.append(stringifyLayer(layer));
             str.append("\n\n");
+            layerNum++;
         }
         
         return str.toString();
