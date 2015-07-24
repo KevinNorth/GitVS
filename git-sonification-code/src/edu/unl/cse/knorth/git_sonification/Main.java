@@ -1,10 +1,9 @@
 package edu.unl.cse.knorth.git_sonification;
 
-import edu.unl.cse.knorth.git_sonification.data_collection.git_caller.GitCaller;
-import edu.unl.cse.knorth.git_sonification.data_processing.visualization.VisualizationProcessor;
 import edu.unl.cse.knorth.git_sonification.display.model.ViewModel;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.Layer;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.VisualizationData;
+import edu.unl.cse.knorth.git_sonification.display.view.GraphStringifier;
 import java.io.IOException;
 import org.joda.time.DateTime;
 
@@ -25,5 +24,9 @@ public class Main {
         for(Layer layer : visualizationData.getLayers()) {
             System.out.println(layer);
         }
+        
+        System.out.println(
+                new GraphStringifier().stringifyVisualizationData(
+                        visualizationData));
     }
 }
