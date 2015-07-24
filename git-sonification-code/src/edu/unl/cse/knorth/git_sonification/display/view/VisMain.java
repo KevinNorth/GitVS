@@ -1,5 +1,7 @@
 package edu.unl.cse.knorth.git_sonification.display.view;
 
+import edu.unl.cse.knorth.git_sonification.GitDataProcessor;
+import edu.unl.cse.knorth.git_sonification.display.model.ViewModel;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,17 +10,15 @@ import edu.unl.cse.knorth.git_sonification.display.model.visualization.Line;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.Layer;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.VisualizationData;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import org.joda.time.DateTime;
 import processing.core.PApplet;
 import processing.event.MouseEvent;
-import org.joda.time.DateTime;
 
 public class VisMain extends PApplet {
 
@@ -55,9 +55,9 @@ public class VisMain extends PApplet {
     Map<String, Integer> map;
     int count;
 
-    List<Line> lines;
-    List<Row> rows;
-    List<Layer> layers;
+//    List<Line> lines;
+//    List<Row> rows;
+//    List<Layer> layers;
     VisualizationData visDat;
 
     int numRows;
@@ -70,6 +70,7 @@ public class VisMain extends PApplet {
         for (int i = 0; i < args.length; i++) {
             newArgs[i + 1] = args[i];
         }
+        
 
         PApplet.main(newArgs);
     }
@@ -83,23 +84,30 @@ public class VisMain extends PApplet {
         s = 30;
         s4 = 4 * s;
 
-        layers = new ArrayList<>();
-        rows = new ArrayList<>();
-        lines = new ArrayList<>();
-        lines.add(new Line(1, 1, true));
-        lines.add(new Line(1, 2, true));
-        lines.add(new Line(2, 2, true));
-        for (int i = 0; i < 100; i++) {
-            rows.add(new Row("author0", new DateTime(), 1, true, 0, lines));
-            rows.add(new Row("author1", new DateTime(), 1, true, 0, lines));
+        DateTime since = new DateTime(2009, 11, 4, 0, 0);
+        DateTime until = new DateTime(2009, 11, 9, 0, 0);
+        try {
+            visDat = new GitDataProcessor().processGitData("../../voldemort/.git", since, until).getVisualizationData();
+        } catch (IOException ex) {
+            Logger.getLogger(VisMain.class.getName()).log(Level.SEVERE, null, ex);
         }
-        rows.add(new Row("author2", new DateTime(), 1, true, 1, lines));
-        rows.add(new Row(new DateTime(), 1, lines));
-        rows.add(new Row("author3", new DateTime(), 1, true, 0, lines));
-        for (int i = 0; i < 50; i++) {
-            layers.add(new Layer(rows));
-        }
-        visDat = new VisualizationData(layers, 1, 1);
+//        layers = new ArrayList<>();
+//        rows = new ArrayList<>();
+//        lines = new ArrayList<>();
+//        lines.add(new Line(1, 1, true));
+//        lines.add(new Line(1, 2, true));
+//        lines.add(new Line(2, 2, true));
+//        for (int i = 0; i < 100; i++) {
+//            rows.add(new Row("author0", new DateTime(), 1, true, 0, lines));
+//            rows.add(new Row("author1", new DateTime(), 1, true, 0, lines));
+//        }
+//        rows.add(new Row("author2", new DateTime(), 1, true, 1, lines));
+//        rows.add(new Row(new DateTime(), 1, lines));
+//        rows.add(new Row("author3", new DateTime(), 1, true, 0, lines));
+//        for (int i = 0; i < 50; i++) {
+//            layers.add(new Layer(rows));
+//        }
+//        visDat = new VisualizationData(layers, 1, 1);
 
         numLayers = visDat.getLayers().size();
         numRows = visDat.getLayers().get(0).getRows().size();
@@ -139,8 +147,8 @@ public class VisMain extends PApplet {
         map = new HashMap<>();
         count = 0;
 
-        startPos = (((int) (height / s4)) * s4) - (numRows * s4);
-        viewDist = (numLayers) * s4;
+        startPos = (((int) (height / s4)) * s4) - (numRows * s4) - s4;
+        viewDist = 20000;
 
         ortho(left, right, bottom, top, -viewDist, viewDist);
     }
@@ -171,7 +179,7 @@ public class VisMain extends PApplet {
         stroke(250, 250, 250);
         line(left, playHead, -(viewDist / 2), right, playHead, -(viewDist / 2));
 
-        float playHeadValue = playHead - startPos;
+        float playHeadValue = playHead - startPos - s4;
 
         if ((playHeadValue / s4) > -0.25 && (playHeadValue / s4) < (numRows - 0.75) && ((playHeadValue / s4) > ((round((playHeadValue / s4))) - 0.25)) && ((playHeadValue / s4) < ((round((playHeadValue / s4))) + 0.25))) {
             if (((int) ((playHeadValue / s4) + 0.25) != oldCom) || (clip.getFrameLength() <= clip.getFramePosition())) {
@@ -227,7 +235,7 @@ public class VisMain extends PApplet {
                     if (row.isVisable()) {
                         pushMatrix();
                         fill(color(Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(3)) * ((z * 200 / numLayers) + 50), Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(2)) * ((z * 200 / numLayers) + 50), Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(1)) * ((z * 200 / numLayers) + 50)));
-                        translate(row.getBranchLocation() * s4, y * s4, s4 * (z - (numLayers / 2)));
+                        translate(row.getBranchLocation() * s4, y * s4 + s4, s4 * (z - (numLayers / 2)));
                         sphere(s);
                         popMatrix();
                     }
@@ -252,9 +260,9 @@ public class VisMain extends PApplet {
 //        System.out.println("delta time = " + delta);
 //        System.out.println("lenght = " + dev1.getFrameLength());
 //        System.out.println("pos = " + dev1.getFramePosition());
-        System.out.println("top = " + top);
-        System.out.println("bot = " + bottom);
-        System.out.println("yPos = " + yPos);
+//        System.out.println("top = " + top);
+//        System.out.println("bot = " + bottom);
+//        System.out.println("yPos = " + yPos);
     }
 
     @Override
