@@ -53,7 +53,6 @@ public class VisMain extends PApplet {
     Clip[] cd = new Clip[4];
 
     Map<String, Integer> map;
-    int count;
 
 //    List<Line> lines;
 //    List<Row> rows;
@@ -70,7 +69,6 @@ public class VisMain extends PApplet {
         for (int i = 0; i < args.length; i++) {
             newArgs[i + 1] = args[i];
         }
-        
 
         PApplet.main(newArgs);
     }
@@ -113,7 +111,7 @@ public class VisMain extends PApplet {
         numRows = visDat.getLayers().get(0).getRows().size();
 
         playSpeed = (s4 * 25) / (60);
-        playHead = height;
+        playHead = -(5*s);
         try {
             for (int i = 0; i < 14; i++) {
                 dev[i] = AudioSystem.getClip();
@@ -135,8 +133,8 @@ public class VisMain extends PApplet {
         yPos = 0;
         rotateAmt = 0;
 
-        bottom = -20;
-        top = height + 20;
+        bottom = -200;
+        top = height + 200;
         left = (int) (bottom * aspect);
         right = (int) (top * aspect);
 
@@ -145,10 +143,21 @@ public class VisMain extends PApplet {
         delta = 0;
 
         map = new HashMap<>();
-        count = 0;
 
-        startPos = (((int) (height / s4)) * s4) - (numRows * s4) - s4;
+        //startPos = (((int) (height / s4)) * s4) - (numRows * s4) - s4;
+        startPos = - s4;
         viewDist = 20000;
+
+        String author = null;
+        int count = 0;
+        for (Row row : visDat.getLayers().get(0).getRows()) {
+            author = row.getAuthor();
+            Integer n = map.get(author);
+            if (n == null) {
+                map.put(author, count);
+                count++;
+            }
+        }
 
         ortho(left, right, bottom, top, -viewDist, viewDist);
     }
@@ -201,13 +210,10 @@ public class VisMain extends PApplet {
             if ((clip == null) || !clip.isRunning()) {
                 if (author != null) {
                     Integer n = map.get(author);
-                    if (n == null) {
-                        map.put(author, count);
-                        n = count;
-                        count++;
-                    }
-                    if (n < 14) {
+                    if (n < 13) {
                         clip = dev[n];
+                    } else {
+                        clip = dev[13];
                     }
                 } else {
                     clip = daySep;
@@ -230,7 +236,7 @@ public class VisMain extends PApplet {
         for (Layer layer : visDat.getLayers()) {
             int y = 0;
             for (Row row : layer.getRows()) {
-                if (y*s4+yPos+startPos<top+s4 && y*s4+yPos+startPos>bottom-s4) {
+                if (y * s4 + yPos + startPos < top + s4 && y * s4 + yPos + startPos > bottom - s4) {
                     noStroke();
                     if (row.isVisable()) {
                         pushMatrix();
@@ -253,15 +259,15 @@ public class VisMain extends PApplet {
         }
 
         popMatrix();
-//        System.out.println("playHead = " + (playHead / s4));
+        System.out.println("playHead = " + playHead);
 //        System.out.println("playHead- = " + (((int)((playHead / s4)+0.25)) - 0.25));
 //        System.out.println("playHead+ = " + (((int)((playHead / s4)+0.25)) + 0.25));
 //        System.out.println("framerate = " + frameRate);
 //        System.out.println("delta time = " + delta);
 //        System.out.println("lenght = " + dev1.getFrameLength());
 //        System.out.println("pos = " + dev1.getFramePosition());
-//        System.out.println("top = " + top);
-//        System.out.println("bot = " + bottom);
+        System.out.println("top = " + top);
+        System.out.println("bot = " + bottom);
 //        System.out.println("yPos = " + yPos);
     }
 
