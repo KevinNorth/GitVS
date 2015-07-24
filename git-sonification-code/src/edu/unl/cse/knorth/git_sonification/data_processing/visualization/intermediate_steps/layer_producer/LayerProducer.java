@@ -79,7 +79,7 @@ public class LayerProducer {
         List<Line> lines = new ArrayList<>(
             commit.getIncomingBranches().size());
         for(AnnotatedCommitLine oldLine : commit.getIncomingBranches()) {
-            lines.add(new Line(oldLine.getFromBranch(), oldLine.getToBranch(),
+            lines.add(new Line(oldLine.getFromBranch(), oldLine.getFromBranch(),
                 true));
         }
 
