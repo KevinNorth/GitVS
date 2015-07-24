@@ -125,10 +125,10 @@ public class CommitAnnotator {
         // Extend all of the previous commit's lines to continue through the
         // current commit. If we merge branches, move outside branches in to
         // fill the space the merged branches create
-        int numBranchesMerged = 0;
         int commitBranch = annotatedCommit.getBranch();
         List<String> checkedParents = new ArrayList<>();
         List<Integer> branchesExtended = new ArrayList<>();
+        List<Integer> branchesMerged = new ArrayList<>();
         List<AnnotatedCommitLine> lines = previousCommit.getIncomingBranches();
         Collections.sort(lines, new AnnotatedCommitLineToBranchComparator());
         
@@ -143,8 +143,8 @@ public class CommitAnnotator {
                     new AnnotatedCommitLine(line.getToBranch(), commitBranch,
                         commit.getHash()));
                 checkedParents.add(line.getParentHash());
-                numBranchesMerged++;
                 branchesExtended.add(line.getToBranch());
+                branchesMerged.add(line.getToBranch());
             }
         }
         
@@ -154,7 +154,15 @@ public class CommitAnnotator {
                 // continuing the branch parallel to the current commit. If
                 // we've merged two or more branches into the parent, outside
                 // branches will move inside to fill in the created space.
+                int numBranchesMerged = 0;
                 int numBranchesToMoveInwards = 0;
+                
+                for(int branch : branchesMerged) {
+                    if(line.getToBranch() > branch) {
+                        numBranchesMerged++;
+                    }
+                }
+                
                 if(numBranchesMerged >= 2) {
                     numBranchesToMoveInwards = numBranchesMerged - 1;
                 }
