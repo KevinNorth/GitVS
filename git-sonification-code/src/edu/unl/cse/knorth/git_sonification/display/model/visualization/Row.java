@@ -89,4 +89,15 @@ public class Row {
   public boolean isVisable(){
       return isVisible;
   }
+
+  @Override
+  public String toString() {
+    return "Row{" + "author=" + author +
+            ", commitDate=" + commitDate +
+            ", incomingLines=" + incomingLines +
+            ", type=" + type +
+            ", branchLocation=" + branchLocation +
+            ", isVisible=" + isVisible +
+            ", numConflicts=" + numConflicts + '}';
+  }
 }

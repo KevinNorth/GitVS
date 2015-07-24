@@ -10,4 +10,11 @@ public class Line {
     this.toBranch = toBranch;
     this.isVisible = isVisible;
   }
+
+    @Override
+    public String toString() {
+        return "Line{" + "fromBranch=" + fromBranch +
+                ", toBranch=" + toBranch +
+                ", isVisible=" + isVisible + '}';
+    }
 }

@@ -68,6 +68,10 @@ public class AnnotatedCommit {
         this.incomingBranches = incomingBranches;
     }
 
+    public List<Component> getComponents() {
+        return components;
+    }
+
     public void setComponents(List<Component> components) {
         this.components = components;
     }

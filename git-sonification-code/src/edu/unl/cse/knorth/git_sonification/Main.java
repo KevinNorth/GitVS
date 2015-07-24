@@ -9,10 +9,11 @@ import edu.unl.cse.knorth.git_sonification.data_collection.git_caller.GitCaller;
 import edu.unl.cse.knorth.git_sonification.data_collection.git_caller.PartialCommit;
 import edu.unl.cse.knorth.git_sonification.data_collection.intermediate_data.Commit;
 import edu.unl.cse.knorth.git_sonification.data_processing.sonification.SonificationProcessor;
-import edu.unl.cse.knorth.git_sonification.data_processing.visualization.intermediate_steps.annotated_commits.AnnotatedCommit;
-import edu.unl.cse.knorth.git_sonification.data_processing.visualization.intermediate_steps.annotated_commits.CommitAnnotator;
+import edu.unl.cse.knorth.git_sonification.data_processing.visualization.VisualizationProcessor;
 import edu.unl.cse.knorth.git_sonification.display.model.sonification.Measure;
 import edu.unl.cse.knorth.git_sonification.display.model.sonification.SonificationData;
+import edu.unl.cse.knorth.git_sonification.display.model.visualization.Layer;
+import edu.unl.cse.knorth.git_sonification.display.model.visualization.VisualizationData;
 import java.io.IOException;
 import java.util.List;
 import org.joda.time.DateTime;
@@ -53,11 +54,12 @@ public class Main {
             System.out.println(measure);
         }
         
-        List<AnnotatedCommit> annotatedCommits =
-                new CommitAnnotator().annotateCommits(commits);
+        VisualizationData visualizationData =
+                new VisualizationProcessor().produceVisualizationData(commits,
+                        components, sonificationData);
         
-        for(AnnotatedCommit annotatedCommit : annotatedCommits) {
-            System.out.println(annotatedCommit);
+        for(Layer layer : visualizationData.getLayers()) {
+            System.out.println(layer);
         }
     }
 }
