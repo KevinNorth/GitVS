@@ -10,6 +10,7 @@ import edu.unl.cse.knorth.git_sonification.display.model.visualization.Line;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.Layer;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.VisualizationData;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.sampled.AudioSystem;
@@ -58,6 +59,7 @@ public class VisMain extends PApplet {
 //    List<Row> rows;
 //    List<Layer> layers;
     VisualizationData visDat;
+    List<Layer> layers;
 
     int numRows;
     int numLayers;
@@ -85,9 +87,9 @@ public class VisMain extends PApplet {
         s4 = 4 * s;
 
         DateTime since = new DateTime(2009, 11, 1, 0, 0);
-        DateTime until = new DateTime(2009, 11, 2, 0, 0);
+        DateTime until = new DateTime(2009, 11, 10, 0, 0);
         try {
-            visDat = new GitDataProcessor().processGitData("../../voldemort/.git", since, until, CreateComponentTechniques.DIRECTORY_REGEXES).getVisualizationData();
+            visDat = new GitDataProcessor().processGitData("../../voldemort/.git", since, until, CreateComponentTechniques.EACH_INDIVIDUAL_FILE).getVisualizationData();
         } catch (IOException ex) {
             Logger.getLogger(VisMain.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -109,8 +111,9 @@ public class VisMain extends PApplet {
 //        }
 //        visDat = new VisualizationData(layers, 1, 1);
 
-        numLayers = visDat.getLayers().size();
-        numRows = visDat.getLayers().get(0).getRows().size();
+        layers = visDat.getVisibleLayers();
+        numLayers = layers.size();
+        numRows = layers.get(0).getRows().size();
 
         playSpeed = (s4 * 25) / (60);
         playHead = -(5*s);
@@ -154,7 +157,7 @@ public class VisMain extends PApplet {
         int currentBranch = 0;
         String author = null;
         int count = 0;
-        for (Row row : visDat.getLayers().get(0).getRows()) {
+        for (Row row : layers.get(0).getRows()) {
             currentBranch = row.getBranchLocation();
             if(currentBranch > maxBranch){
                 maxBranch = currentBranch;
@@ -209,7 +212,7 @@ public class VisMain extends PApplet {
             String author = null;
             int numCon = 0;
             try {
-                Row row = visDat.getLayers().get(0).getRows().get(oldCom);
+                Row row = layers.get(0).getRows().get(oldCom);
                 author = row.getAuthor();
                 numCon = row.getNumConflicts();
             } catch (IndexOutOfBoundsException ex) {
@@ -242,7 +245,7 @@ public class VisMain extends PApplet {
         rotateY(((rotateAmt / ((float)width)) * (2 * PI)) - (PI / 100));
 
         int z = 0;
-        for (Layer layer : visDat.getLayers()) {
+        for (Layer layer : layers) {
             int y = 0;
             for (Row row : layer.getRows()) {
                 if (y * s4 + yPos + startPos < top + (2*s4) && y * s4 + yPos + startPos > bottom - (2*s4)) {
