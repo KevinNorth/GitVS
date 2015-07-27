@@ -25,12 +25,12 @@ public class Main {
         
         VisualizationData visualizationData = viewModel.getVisualizationData();
                 
-        for(Layer layer : visualizationData.getLayers()) {
-            System.out.println(layer);
-        }
+//        for(Layer layer : visualizationData.getLayers()) {
+//            System.out.println(layer);
+//        }
         
         System.out.println(
                 new GraphStringifier().stringifyVisualizationData(
-                        visualizationData));
+                        visualizationData, false));
     }
 }

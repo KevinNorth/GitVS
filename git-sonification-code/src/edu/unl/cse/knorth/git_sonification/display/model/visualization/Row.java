@@ -15,18 +15,21 @@ public class Row {
   private RowType type;
   private int branchLocation;
   private boolean isVisible;
+  private boolean isMergeRow;
   private int numConflicts;
 
   /**
    * Creates a new Row that represents a commit.
    */
   public Row(String author, DateTime commitDate, int branchLocation,
-    boolean isVisible, int numConflicts, Collection<Line> incomingLines) {
+    boolean isVisible, boolean isMergeRow, int numConflicts,
+    Collection<Line> incomingLines) {
     this.author = author;
     this.commitDate = commitDate;
     this.type = RowType.COMMIT;
     this.branchLocation = branchLocation;
     this.isVisible = isVisible;
+    this.isMergeRow = isMergeRow;
     this.incomingLines = new ArrayList<>(incomingLines);
     this.numConflicts = numConflicts;
   }
@@ -35,9 +38,10 @@ public class Row {
    * Creates a new Row that represents a commit.
    */
   public Row(String author, DateTime commitDate, int branchLocation,
-    boolean isVisible, int numConflicts, Line... incomingLines) {
-      this(author, commitDate, branchLocation, isVisible, numConflicts,
-              Arrays.asList(incomingLines));
+    boolean isVisible, boolean isMergeRow, int numConflicts,
+    Line... incomingLines) {
+      this(author, commitDate, branchLocation, isVisible, isMergeRow,
+              numConflicts, Arrays.asList(incomingLines));
   }
   
   /**
@@ -50,6 +54,7 @@ public class Row {
     this.type = RowType.DAY_SEPARATOR;
     this.branchLocation = NO_BRANCH_LOCATION;
     this.isVisible = false;
+    this.isMergeRow = false;
     this.numConflicts = numConflicts;
   }
 
@@ -90,6 +95,10 @@ public class Row {
       return isVisible;
   }
 
+  public boolean isMergeRow() {
+      return isMergeRow;
+  }
+  
   @Override
   public String toString() {
     return "Row{" + "author=" + author +

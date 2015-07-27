@@ -25,11 +25,12 @@ public class Layer {
    * Indicates whether this Layer contains at least one commit that modified
    * the component the layer represents.
    * @return <code>true</code> if this Layer contains at least one Row for which
-   * <code>row.isVisible()</code> is true. <code>false</code> otherwise.
+   * <code>row.isVisible()</code> is true, not counting merge rows.
+   * <code>false</code> otherwise.
    */
   public boolean hasVisibleCommits() {
       for(Row row : rows) {
-          if(row.isVisible()) {
+          if(row.isVisible() && !row.isMergeRow()) {
               return true;
           }
       }

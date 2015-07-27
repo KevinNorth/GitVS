@@ -13,19 +13,24 @@ public class GraphStringifier {
     /**
      * Create a string representing all of the layers
      * @param visualizationData A VisualizationData with the layers to stringify
+     * @param showEmptyLayers If true, of the VisualizationData's Layers will be
+     * stringified, even if they don't contain any visible commits. If false,
+     * Layers that don't have any visible commits will be hidden.
      * @return A string that can be output to console to visualize the data
      */
     public String stringifyVisualizationData(
-            VisualizationData visualizationData) {
+            VisualizationData visualizationData, boolean showEmptyLayers) {
         StringBuilder str = new StringBuilder();
         
         int layerNum = 1;
         for(Layer layer : visualizationData.getLayers()) {
-            str.append("Layer ");
-            str.append(layerNum);
-            str.append(":\n");
-            str.append(stringifyLayer(layer));
-            str.append("\n\n");
+            if(showEmptyLayers || layer.hasVisibleCommits()) {
+                str.append("Layer ");
+                str.append(layerNum);
+                str.append(":\n");
+                str.append(stringifyLayer(layer));
+                str.append("\n\n");
+            }
             layerNum++;
         }
         

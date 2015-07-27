@@ -68,8 +68,9 @@ public class LayerProducer {
             boolean isCommitVisible =
                     commit.getComponents().contains(component)
                     || commit.getComponents().isEmpty(); // is a merge commit
+            boolean isMergeRow = commit.getComponents().isEmpty();
             Row row = new Row(commit.getAuthor(), commit.getTimestamp(),
-                    commit.getBranch(), isCommitVisible,
+                    commit.getBranch(), isCommitVisible, isMergeRow,
                     currentMeasure.getNumConflicts(), lines);
             layer.getRows().add(row);
         }
