@@ -1,5 +1,8 @@
-package edu.unl.cse.knorth.git_sonification.data_collection.components;
+package edu.unl.cse.knorth.git_sonification.data_collection.components.factories;
 
+import edu.unl.cse.knorth.git_sonification.data_collection.components.Component;
+import edu.unl.cse.knorth.git_sonification.data_collection.components.implementations.MiscellaneousComponent;
+import edu.unl.cse.knorth.git_sonification.data_collection.components.implementations.DirectoryComponent;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -8,9 +11,10 @@ import java.util.List;
 
 /**
  * Reads a text file containing regular expressions to use to identify
- * components in the target software's design.
+ * components in the target software's design based on regexes that represent
+ * important directories in the target software's directory structure.
  */
-public class ComponentDataParser {
+public class DirectoryRegexComponentFactory {
     /**
      * Reads a configuration file with a list of Java regexes. These regexes
      * will be used to categorize files into "Components" based on their

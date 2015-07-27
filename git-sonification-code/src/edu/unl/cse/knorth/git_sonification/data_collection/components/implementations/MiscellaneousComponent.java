@@ -1,5 +1,6 @@
-package edu.unl.cse.knorth.git_sonification.data_collection.components;
+package edu.unl.cse.knorth.git_sonification.data_collection.components.implementations;
 
+import edu.unl.cse.knorth.git_sonification.data_collection.components.Component;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
