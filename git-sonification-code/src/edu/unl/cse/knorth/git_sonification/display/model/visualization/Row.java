@@ -86,7 +86,7 @@ public class Row {
     return numConflicts;
   }
   
-  public boolean isVisable(){
+  public boolean isVisible(){
       return isVisible;
   }
 

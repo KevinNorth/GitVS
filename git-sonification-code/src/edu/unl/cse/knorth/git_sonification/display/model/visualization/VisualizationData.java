@@ -5,12 +5,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class VisualizationData {
-  private List<Layer> layers;
-  private int numStart;
-  private int numEnd;
+  private final List<Layer> layers;
+  private final int numStart;
+  private final int numEnd;
 
   public VisualizationData(Collection<Layer> layers, int numStart, int numEnd) {
-    this.layers = new ArrayList<Layer>(layers);
+    this.layers = new ArrayList<>(layers);
     this.numStart = numStart;
     this.numEnd = numEnd;
   }
@@ -18,6 +18,26 @@ public class VisualizationData {
   public List<Layer> getLayers() {
     return layers;
   }
+  
+  /**
+   * Gets a List of Layers that have at least one visible commit, filtering out
+   * all Layers that do not have any visible commits. Be aware that this method
+   * recomputes the list every time it is called, which takes O(n) time when
+   * there are n Layers in this VisualizationData.
+   * @return A List of Layers that have at least one visible commit
+   */
+  public List<Layer> getVisibleLayers() {
+      List<Layer> visibleLayers = new ArrayList<>();
+      
+      for(Layer layer : layers) {
+          if(layer.hasVisibleCommits()) {
+              visibleLayers.add(layer);
+          }
+      }
+      
+      return visibleLayers;
+  }
+  
   public int getNumStart() {
     return numStart;
   }

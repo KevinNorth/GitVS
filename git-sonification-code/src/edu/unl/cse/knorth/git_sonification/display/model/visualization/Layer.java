@@ -21,6 +21,22 @@ public class Layer {
     return rows;
   }
   
+  /**
+   * Indicates whether this Layer contains at least one commit that modified
+   * the component the layer represents.
+   * @return <code>true</code> if this Layer contains at least one Row for which
+   * <code>row.isVisible()</code> is true. <code>false</code> otherwise.
+   */
+  public boolean hasVisibleCommits() {
+      for(Row row : rows) {
+          if(row.isVisible()) {
+              return true;
+          }
+      }
+      
+      return false;
+  }
+  
   @Override
   public String toString() {
       StringBuilder str = new StringBuilder();

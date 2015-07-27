@@ -136,7 +136,7 @@ public class GraphStringifier {
                 // Commits that are "visible" on the layer are *s. "Invisible"
                 // commits as Os.
                 if(rowNum == (row.getBranchLocation() - 1) * 2) {
-                    if(row.isVisable()) {
+                    if(row.isVisible()) {
                         str.append('*');
                     } else {
                         str.append('O');

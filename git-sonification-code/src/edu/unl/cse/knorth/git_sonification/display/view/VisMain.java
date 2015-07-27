@@ -247,7 +247,7 @@ public class VisMain extends PApplet {
             for (Row row : layer.getRows()) {
                 if (y * s4 + yPos + startPos < top + (2*s4) && y * s4 + yPos + startPos > bottom - (2*s4)) {
                     noStroke();
-                    if (row.isVisable()) {
+                    if (row.isVisible()) {
                         pushMatrix();
                         fill(color(Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(3)) * ((z * 200 / numLayers) + 50), Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(2)) * ((z * 200 / numLayers) + 50), Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(1)) * ((z * 200 / numLayers) + 50)));
                         translate((-0.5f+row.getBranchLocation()-(maxBranch/2f)) * s4, y * s4 + s4, s4 * (0.5f+z - (numLayers / 2f)));
