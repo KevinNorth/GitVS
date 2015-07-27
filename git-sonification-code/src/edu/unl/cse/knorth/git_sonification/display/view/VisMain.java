@@ -1,7 +1,6 @@
 package edu.unl.cse.knorth.git_sonification.display.view;
 
 import edu.unl.cse.knorth.git_sonification.GitDataProcessor;
-import edu.unl.cse.knorth.git_sonification.display.model.ViewModel;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -62,6 +61,8 @@ public class VisMain extends PApplet {
     int numRows;
     int numLayers;
     float viewDist;
+    
+    int maxBranch;
 
     public static void main(String args[]) {
         String[] newArgs = new String[args.length + 1];
@@ -82,8 +83,8 @@ public class VisMain extends PApplet {
         s = 30;
         s4 = 4 * s;
 
-        DateTime since = new DateTime(2009, 11, 4, 0, 0);
-        DateTime until = new DateTime(2009, 11, 9, 0, 0);
+        DateTime since = new DateTime(2009, 10, 4, 0, 0);
+        DateTime until = new DateTime(2009, 12, 9, 0, 0);
         try {
             visDat = new GitDataProcessor().processGitData("../../voldemort/.git", since, until).getVisualizationData();
         } catch (IOException ex) {
@@ -148,9 +149,15 @@ public class VisMain extends PApplet {
         startPos = - s4;
         viewDist = 20000;
 
+        maxBranch = 0;
+        int currentBranch = 0;
         String author = null;
         int count = 0;
         for (Row row : visDat.getLayers().get(0).getRows()) {
+            currentBranch = row.getBranchLocation();
+            if(currentBranch > maxBranch){
+                maxBranch = currentBranch;
+            }
             author = row.getAuthor();
             Integer n = map.get(author);
             if (n == null) {
@@ -228,8 +235,9 @@ public class VisMain extends PApplet {
             }
         }
 
+        sphereDetail(8);
         pushMatrix();
-        translate((left + right) / 2, startPos, ((left + right)) / 2); //centers the vis and starts it a unit up
+        translate((((left + right)) / 2), startPos, (((left + right)) / 2)); //centers the vis and starts it a unit up
         rotateY(((rotateAmt / (float) width) * (2 * PI)) - (PI / 100));
 
         int z = 0;
@@ -245,7 +253,11 @@ public class VisMain extends PApplet {
                         sphere(s);
                         popMatrix();
                     }
-                    strokeWeight(10 * height / (top - bottom));
+                    if((top - bottom != 0)){
+                        strokeWeight(10 * height / (top - bottom));
+                    }else{
+                        strokeWeight(10 * height/ (0.001f));
+                    }
                     stroke(Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(3)) * ((z * 200 / numLayers) + 50), Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(2)) * ((z * 200 / numLayers) + 50), Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(1)) * ((z * 200 / numLayers) + 50));
                     noFill();
                     for (Line line : row.getIncomingLines()) {
