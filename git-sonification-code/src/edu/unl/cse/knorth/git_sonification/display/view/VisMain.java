@@ -1,11 +1,7 @@
 package edu.unl.cse.knorth.git_sonification.display.view;
 
 import edu.unl.cse.knorth.git_sonification.GitDataProcessor;
-<<<<<<< HEAD
-=======
 import edu.unl.cse.knorth.git_sonification.data_collection.components.CreateComponentTechniques;
-import edu.unl.cse.knorth.git_sonification.display.model.ViewModel;
->>>>>>> b8ae1a73f6df61147c1013d587f0789edf91b9b8
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
