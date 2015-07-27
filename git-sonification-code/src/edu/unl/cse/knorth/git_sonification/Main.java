@@ -1,5 +1,6 @@
 package edu.unl.cse.knorth.git_sonification;
 
+import edu.unl.cse.knorth.git_sonification.data_collection.components.CreateComponentTechniques;
 import edu.unl.cse.knorth.git_sonification.display.model.ViewModel;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.Layer;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.VisualizationData;
@@ -14,10 +15,13 @@ public class Main {
         DateTime since = new DateTime(2009, 11, 4, 0, 0);
 //        cal.set(2010, 0, 6);
         DateTime until = new DateTime(2009, 11, 9, 0, 0);
-                
+        
         ViewModel viewModel =
                 new GitDataProcessor().processGitData("../../voldemort/.git",
-                        since, until);
+                        since, until,
+                        CreateComponentTechniques.EACH_INDIVIDUAL_FILE);
+        
+        
         
         VisualizationData visualizationData = viewModel.getVisualizationData();
                 

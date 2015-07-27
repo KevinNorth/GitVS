@@ -1,6 +1,7 @@
 package edu.unl.cse.knorth.git_sonification.display.view;
 
 import edu.unl.cse.knorth.git_sonification.GitDataProcessor;
+import edu.unl.cse.knorth.git_sonification.data_collection.components.CreateComponentTechniques;
 import edu.unl.cse.knorth.git_sonification.display.model.ViewModel;
 import java.io.File;
 import java.util.HashMap;
@@ -85,7 +86,7 @@ public class VisMain extends PApplet {
         DateTime since = new DateTime(2009, 11, 4, 0, 0);
         DateTime until = new DateTime(2009, 11, 9, 0, 0);
         try {
-            visDat = new GitDataProcessor().processGitData("../../voldemort/.git", since, until).getVisualizationData();
+            visDat = new GitDataProcessor().processGitData("../../voldemort/.git", since, until, CreateComponentTechniques.EACH_INDIVIDUAL_FILE).getVisualizationData();
         } catch (IOException ex) {
             Logger.getLogger(VisMain.class.getName()).log(Level.SEVERE, null, ex);
         }
