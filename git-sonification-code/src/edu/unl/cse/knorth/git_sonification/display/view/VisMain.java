@@ -247,9 +247,11 @@ public class VisMain extends PApplet {
                     }
                     strokeWeight(10 * height / (top - bottom));
                     stroke(Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(3)) * ((z * 200 / numLayers) + 50), Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(2)) * ((z * 200 / numLayers) + 50), Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(1)) * ((z * 200 / numLayers) + 50));
+                    noFill();
                     for (Line line : row.getIncomingLines()) {
                         if (line.isVisible) {
-                            line(line.fromBranch * s4, y * s4, s4 * (z - (numLayers / 2)), line.toBranch * s4, (y * s4) + s4, s4 * (z - (numLayers / 2)));
+                            //line(line.fromBranch * s4, y * s4, s4 * (z - (numLayers / 2)), line.toBranch * s4, (y * s4) + s4, s4 * (z - (numLayers / 2)));
+                            bezier(line.fromBranch * s4, y * s4, s4 * (z - (numLayers / 2)),line.fromBranch * s4, (y * s4) + s4, s4 * (z - (numLayers / 2)), line.toBranch * s4, y * s4, s4 * (z - (numLayers / 2)), line.toBranch * s4, (y * s4) + s4, s4 * (z - (numLayers / 2)));
                         }
                     }
                 }
@@ -259,15 +261,15 @@ public class VisMain extends PApplet {
         }
 
         popMatrix();
-        System.out.println("playHead = " + playHead);
+//        System.out.println("playHead = " + playHead);
 //        System.out.println("playHead- = " + (((int)((playHead / s4)+0.25)) - 0.25));
 //        System.out.println("playHead+ = " + (((int)((playHead / s4)+0.25)) + 0.25));
 //        System.out.println("framerate = " + frameRate);
 //        System.out.println("delta time = " + delta);
 //        System.out.println("lenght = " + dev1.getFrameLength());
 //        System.out.println("pos = " + dev1.getFramePosition());
-        System.out.println("top = " + top);
-        System.out.println("bot = " + bottom);
+//        System.out.println("top = " + top);
+//        System.out.println("bot = " + bottom);
 //        System.out.println("yPos = " + yPos);
     }
 
