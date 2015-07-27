@@ -84,10 +84,10 @@ public class VisMain extends PApplet {
         s = 30;
         s4 = 4 * s;
 
-        DateTime since = new DateTime(2009, 10, 4, 0, 0);
-        DateTime until = new DateTime(2009, 12, 9, 0, 0);
+        DateTime since = new DateTime(2009, 11, 1, 0, 0);
+        DateTime until = new DateTime(2009, 11, 2, 0, 0);
         try {
-            visDat = new GitDataProcessor().processGitData("../../voldemort/.git", since, until, CreateComponentTechniques.EACH_INDIVIDUAL_FILE).getVisualizationData();
+            visDat = new GitDataProcessor().processGitData("../../voldemort/.git", since, until, CreateComponentTechniques.DIRECTORY_REGEXES).getVisualizationData();
         } catch (IOException ex) {
             Logger.getLogger(VisMain.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -238,19 +238,19 @@ public class VisMain extends PApplet {
 
         sphereDetail(8);
         pushMatrix();
-        translate((((left + right)) / 2), startPos, (((left + right)) / 2)); //centers the vis and starts it a unit up
-        rotateY(((rotateAmt / (float) width) * (2 * PI)) - (PI / 100));
+        translate(((left + right) / 2f), startPos, 0); //centers the vis and starts it a unit up
+        rotateY(((rotateAmt / ((float)width)) * (2 * PI)) - (PI / 100));
 
         int z = 0;
         for (Layer layer : visDat.getLayers()) {
             int y = 0;
             for (Row row : layer.getRows()) {
-                if (y * s4 + yPos + startPos < top + s4 && y * s4 + yPos + startPos > bottom - s4) {
+                if (y * s4 + yPos + startPos < top + (2*s4) && y * s4 + yPos + startPos > bottom - (2*s4)) {
                     noStroke();
                     if (row.isVisable()) {
                         pushMatrix();
                         fill(color(Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(3)) * ((z * 200 / numLayers) + 50), Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(2)) * ((z * 200 / numLayers) + 50), Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(1)) * ((z * 200 / numLayers) + 50)));
-                        translate(row.getBranchLocation() * s4, y * s4 + s4, s4 * (z - (numLayers / 2)));
+                        translate((-0.5f+row.getBranchLocation()-(maxBranch/2f)) * s4, y * s4 + s4, s4 * (0.5f+z - (numLayers / 2f)));
                         sphere(s);
                         popMatrix();
                     }
@@ -264,7 +264,7 @@ public class VisMain extends PApplet {
                     for (Line line : row.getIncomingLines()) {
                         if (line.isVisible) {
                             //line(line.fromBranch * s4, y * s4, s4 * (z - (numLayers / 2)), line.toBranch * s4, (y * s4) + s4, s4 * (z - (numLayers / 2)));
-                            bezier(line.fromBranch * s4, y * s4, s4 * (z - (numLayers / 2)),line.fromBranch * s4, (y * s4) + s4, s4 * (z - (numLayers / 2)), line.toBranch * s4, y * s4, s4 * (z - (numLayers / 2)), line.toBranch * s4, (y * s4) + s4, s4 * (z - (numLayers / 2)));
+                            bezier((-0.5f+line.fromBranch-(maxBranch/2f)) * s4, y * s4, s4 * (0.5f+z - (numLayers / 2f)),(-0.5f+line.fromBranch-(maxBranch/2f)) * s4, (y * s4) + s4, s4 * (0.5f+z - (numLayers / 2f)), (-0.5f+line.toBranch-(maxBranch/2f)) * s4, y * s4, s4 * (0.5f+z - (numLayers / 2f)), (-0.5f+line.toBranch-(maxBranch/2f))  * s4, (y * s4) + s4, s4 * (0.5f+z - (numLayers / 2f)));
                         }
                     }
                 }
