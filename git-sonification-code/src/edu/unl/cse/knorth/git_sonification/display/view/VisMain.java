@@ -89,7 +89,7 @@ public class VisMain extends PApplet {
         DateTime since = new DateTime(2009, 11, 1, 0, 0);
         DateTime until = new DateTime(2009, 11, 10, 0, 0);
         try {
-            visDat = new GitDataProcessor().processGitData("../../voldemort/.git", since, until, CreateComponentTechniques.EACH_INDIVIDUAL_FILE).getVisualizationData();
+            visDat = new GitDataProcessor().processGitData("../../voldemort/.git", since, until, CreateComponentTechniques.DIRECTORY_REGEXES).getVisualizationData();
         } catch (IOException ex) {
             Logger.getLogger(VisMain.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -254,9 +254,14 @@ public class VisMain extends PApplet {
                         pushMatrix();
                         fill(color(Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(3)) * ((z * 200 / numLayers) + 50), Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(2)) * ((z * 200 / numLayers) + 50), Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(1)) * ((z * 200 / numLayers) + 50)));
                         translate((-0.5f+row.getBranchLocation()-(maxBranch/2f)) * s4, y * s4 + s4, s4 * (0.5f+z - (numLayers / 2f)));
+                        if(row.getNumConflicts()>0){
+                            stroke(0);
+                            strokeWeight(0.5f);
+                        }
                         sphere(s);
                         popMatrix();
                     }
+                    pushMatrix();
                     if((top - bottom != 0)){
                         strokeWeight(10 * height / (top - bottom));
                     }else{
@@ -270,6 +275,7 @@ public class VisMain extends PApplet {
                             bezier((-0.5f+line.fromBranch-(maxBranch/2f)) * s4, y * s4, s4 * (0.5f+z - (numLayers / 2f)),(-0.5f+line.fromBranch-(maxBranch/2f)) * s4, (y * s4) + s4, s4 * (0.5f+z - (numLayers / 2f)), (-0.5f+line.toBranch-(maxBranch/2f)) * s4, y * s4, s4 * (0.5f+z - (numLayers / 2f)), (-0.5f+line.toBranch-(maxBranch/2f))  * s4, (y * s4) + s4, s4 * (0.5f+z - (numLayers / 2f)));
                         }
                     }
+                    popMatrix();
                 }
                 y++;
             }
