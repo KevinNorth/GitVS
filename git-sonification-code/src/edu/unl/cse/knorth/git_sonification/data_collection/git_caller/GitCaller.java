@@ -4,8 +4,10 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.diff.RawTextComparator;
@@ -141,11 +143,8 @@ public class GitCaller implements AutoCloseable, Closeable {
          * ). gitblit is licensed under Apache Software Foundation license,
          * version 2.0 (https://www.apache.org/licenses/LICENSE-2.0).
          * 
-	 * @param repository
 	 * @param commit
 	 *            if null, HEAD is assumed.
-	 * @param calculateDiffStat
-	 *            if true, each PathChangeModel will have insertions/deletions
 	 * @return list of files changed in a commit
 	 */
 	private List<String> getFilesInCommit(RevCommit commit) throws IOException {
@@ -186,11 +185,24 @@ public class GitCaller implements AutoCloseable, Closeable {
                             list.add(diff.getNewPath());
                         }
                     } else {
-                        // For merge commits, we won't prepare a list of changed
-                        // files because Git doesn't store that information
-                        // directly. Instead, we will calculate that information
-                        // in a seperate, much later data processing step. So
-                        // we do nothing here and return an empty list.
+                        // For merge commits, we iterate over all of the merge's
+                        // parents and include any files that changed between
+                        // at least one of them.
+                        Set<String> set = new HashSet<>(); // To ignore dups
+                        DiffFormatter df = new DiffFormatter(DisabledOutputStream.INSTANCE);
+                        df.setRepository(repo);
+                        df.setDiffComparator(RawTextComparator.DEFAULT);
+                        df.setDetectRenames(false);
+
+                        for(RevCommit parent : commit.getParents()) {
+                            parent = rw.parseCommit(parent.getId());
+                            List<DiffEntry> diffs = df.scan(parent.getTree(), commit.getTree());
+                            for (DiffEntry diff : diffs) {
+                                set.add(diff.getNewPath());
+                            }
+                        }
+                        
+                        list.addAll(set);
                     }
 		} finally {
 			rw.dispose();

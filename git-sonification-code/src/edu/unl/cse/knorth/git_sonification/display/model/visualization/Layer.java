@@ -30,7 +30,7 @@ public class Layer {
    */
   public boolean hasVisibleCommits() {
       for(Row row : rows) {
-          if(row.isVisible() && !row.isMergeRow()) {
+          if(row.isVisible()) {
               return true;
           }
       }

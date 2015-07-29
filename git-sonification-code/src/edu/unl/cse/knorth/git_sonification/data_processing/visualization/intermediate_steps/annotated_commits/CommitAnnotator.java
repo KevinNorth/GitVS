@@ -139,9 +139,10 @@ public class CommitAnnotator {
                     && !branchesExtended.contains(line.getToBranch())) {
                 // If a branch merges into the current branch, we simply add a
                 // line to the current branch.
-                annotatedCommit.getIncomingBranches().add(
-                    new AnnotatedCommitLine(line.getToBranch(), commitBranch,
-                        commit.getHash()));
+                AnnotatedCommitLine newLine =
+                        new AnnotatedCommitLine(line.getToBranch(),
+                                commitBranch, commit.getHash());
+                annotatedCommit.getIncomingBranches().add(newLine);
                 checkedParents.add(line.getParentHash());
                 branchesExtended.add(line.getToBranch());
                 branchesMerged.add(line.getToBranch());
@@ -181,10 +182,14 @@ public class CommitAnnotator {
                 } else {
                     newLineParent = line.getParentHash();
                 }
-                annotatedCommit.getIncomingBranches().add(
+
+                AnnotatedCommitLine newLine =
                     new AnnotatedCommitLine(line.getToBranch(),
                         line.getToBranch() - numBranchesToMoveInwards,
-                        newLineParent));
+                        newLineParent);
+                newLine.setComponentsModified(line.getComponentsModified());
+                
+                annotatedCommit.getIncomingBranches().add(newLine);
                 
                 branchesExtended.add(line.getToBranch());
             }
@@ -197,9 +202,12 @@ public class CommitAnnotator {
             if(!checkedParents.contains(parent)) {
                 int newFromBranch = addNewBranchFromParent(parent,
                         annotatedCommits);
-                annotatedCommit.getIncomingBranches().add(
+                AnnotatedCommitLine newLine =
                         new AnnotatedCommitLine(newFromBranch, commitBranch,
-                                commit.getHash()));
+                                commit.getHash());
+                newLine.getComponentsModified().addAll(
+                        commit.getComponentsModified());
+                annotatedCommit.getIncomingBranches().add(newLine);
             }
         }
         
