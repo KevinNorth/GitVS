@@ -89,7 +89,7 @@ public class VisMain extends PApplet {
         DateTime since = new DateTime(2009, 11, 1, 0, 0);
         DateTime until = new DateTime(2009, 11, 10, 0, 0);
         try {
-            visDat = new GitDataProcessor().processGitData("../../voldemort/.git", since, until, CreateComponentTechniques.DIRECTORY_REGEXES).getVisualizationData();
+            visDat = new GitDataProcessor().processGitData("../../voldemort/.git", since, until, CreateComponentTechniques.EACH_INDIVIDUAL_FILE).getVisualizationData();
         } catch (IOException ex) {
             Logger.getLogger(VisMain.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 
 /**
@@ -26,6 +27,9 @@ public class IndividualFileComponentFactory {
             String absoluteFilePath = file.getAbsolutePath();
             String relativeFilePath =
                     absoluteFilePath.substring(rootPath.length() + 1);
+            // Make sure we use forward slashes to separate directories in order
+            // to match the format jGit gives us for files modified by commits
+            relativeFilePath = FilenameUtils.separatorsToUnix(relativeFilePath);
             
             Component newComponent =
                     new FilePathStringComponent(relativeFilePath);
