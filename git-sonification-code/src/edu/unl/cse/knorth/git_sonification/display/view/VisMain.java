@@ -67,16 +67,28 @@ public class VisMain extends PApplet {
     
     int maxBranch;
 
+    /* To hold onto the date values obtained from the command line arguments
+     * until we're in a non-static context (i.e. not main()) */
+    private static DateTime sinceFromArgs;
+    private static DateTime untilFromArgs;
+    
     public static void main(String args[]) {
+        if(args.length == 2) {
+            sinceFromArgs = DateTime.parse(args[0]);
+            untilFromArgs = DateTime.parse(args[1]);
+        } else {
+            // Default date range is the first 10 days of November 2009
+            sinceFromArgs = new DateTime(2009, 11, 1, 0, 0);
+            untilFromArgs = new DateTime(2009, 11, 10, 0, 0);
+        }
+        
         String[] newArgs = new String[args.length + 1];
         newArgs[0] = VisMain.class.getCanonicalName();
-        for (int i = 0; i < args.length; i++) {
-            newArgs[i + 1] = args[i];
-        }
+        System.arraycopy(args, 0, newArgs, 1, args.length);
 
         PApplet.main(newArgs);
     }
-
+    
     @Override
     public void setup() {
         size(1200, 600, P3D);
@@ -86,8 +98,9 @@ public class VisMain extends PApplet {
         s = 30;
         s4 = 4 * s;
 
-        DateTime since = new DateTime(2009, 11, 1, 0, 0);
-        DateTime until = new DateTime(2009, 11, 10, 0, 0);
+        DateTime since = sinceFromArgs;
+        DateTime until = untilFromArgs;
+        
         try {
             visDat = new GitDataProcessor().processGitData("../../voldemort/.git", since, until, CreateComponentTechniques.EACH_INDIVIDUAL_FILE).getVisualizationData();
         } catch (IOException ex) {
