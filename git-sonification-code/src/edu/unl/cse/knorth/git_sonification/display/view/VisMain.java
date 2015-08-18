@@ -102,7 +102,7 @@ public class VisMain extends PApplet {
         s4 = 4 * s;
 
         format = DateTimeFormat.forPattern("MMMM dd, yyyy 'at' HH:mm:ss");
-        
+
         DateTime since = sinceFromArgs;
         DateTime until = untilFromArgs;
 
@@ -276,24 +276,32 @@ public class VisMain extends PApplet {
         translate(((left + right) / 2f), startPos, 0); //centers the vis and starts it a unit up
 
         int i = 0;
+        textSize(12 * ((float) (top - bottom) / (float) height));
+        fill(255, 255, 255);
         for (Row row : layers.get(0).getRows()) {
-            fill(255, 255, 255);
-            textSize(12 * ((float) (top - bottom) / (float) height));
             text(format.print(row.getCommitDate()), left - ((left + right) / 2f), i * s4 + s4, -10000);
             i++;
         }
-
+        
         rotateY(((rotateAmt / ((float) width)) * (2 * PI)) - (PI / 100));
-
+        
         int z = 0;
         for (Layer layer : layers) {
+            int color = color(Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(3)) * ((z * 200 / numLayers) + 50), Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(2)) * ((z * 200 / numLayers) + 50), Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(1)) * ((z * 200 / numLayers) + 50));
+            fill(color);
+            pushMatrix();
+            rotateY(PI/2);
+            rotateZ(PI/2);
+            //tbd: change this to show actual file names
+            text("file #" + z, bottom-startPos-yPos, (s4 * (0.5f + z - (numLayers / 2f))) - s, (0.5f-maxBranch/2f)*s4);
+            popMatrix();
             int y = 0;
             for (Row row : layer.getRows()) {
                 if (y * s4 + yPos + startPos < top + (2 * s4) && y * s4 + yPos + startPos > bottom - (2 * s4)) {
                     noStroke();
                     if (row.isVisible()) {
                         pushMatrix();
-                        fill(color(Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(3)) * ((z * 200 / numLayers) + 50), Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(2)) * ((z * 200 / numLayers) + 50), Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(1)) * ((z * 200 / numLayers) + 50)));
+                        fill(color);
                         translate((-0.5f + row.getBranchLocation() - (maxBranch / 2f)) * s4, y * s4 + s4, s4 * (0.5f + z - (numLayers / 2f)));
                         if (row.getNumConflicts() > 0) {
                             stroke(0);
@@ -308,7 +316,7 @@ public class VisMain extends PApplet {
                     } else {
                         strokeWeight(10 * height / (0.001f));
                     }
-                    stroke(Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(3)) * ((z * 200 / numLayers) + 50), Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(2)) * ((z * 200 / numLayers) + 50), Character.getNumericValue(Integer.toBinaryString((z % 8) + 8).charAt(1)) * ((z * 200 / numLayers) + 50));
+                    stroke(color);
                     noFill();
                     for (Line line : row.getIncomingLines()) {
                         if (line.isVisible) {
