@@ -1,4 +1,4 @@
-package edu.unl.cse.knorth.git_sonification.display.view;
+package edu.unl.cse.knorth.git_sonification.display.view.deprecated3d;
 
 import edu.unl.cse.knorth.git_sonification.GitDataProcessor;
 import edu.unl.cse.knorth.git_sonification.data_collection.components.CreateComponentTechniques;
@@ -21,6 +21,7 @@ import org.joda.time.DateTime;
 import processing.core.PApplet;
 import processing.event.MouseEvent;
 
+@Deprecated
 public class VisMain extends PApplet {
 
     float mouseStartX;
