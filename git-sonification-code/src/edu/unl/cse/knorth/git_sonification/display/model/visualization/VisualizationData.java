@@ -6,11 +6,14 @@ import java.util.Collection;
 
 public class VisualizationData {
   private final List<Layer> layers;
+  private final Layer combinedLayer;
   private final int numStart;
   private final int numEnd;
 
-  public VisualizationData(Collection<Layer> layers, int numStart, int numEnd) {
+  public VisualizationData(Collection<Layer> layers, Layer combinedLayer,
+          int numStart, int numEnd) {
     this.layers = new ArrayList<>(layers);
+    this.combinedLayer = combinedLayer;
     this.numStart = numStart;
     this.numEnd = numEnd;
   }
@@ -36,6 +39,10 @@ public class VisualizationData {
       }
       
       return visibleLayers;
+  }
+
+  public Layer getCombinedLayer() {
+    return combinedLayer;
   }
   
   public int getNumStart() {

@@ -23,6 +23,7 @@ public class LayerProducer {
                 commits.get(commits.size() - 1).getMaxToBranchNumber();
         
         Map<Component, Layer> layerMap = prepareLayerMap(components);
+        Layer combinedLayer = new Layer();
         
         Iterator<Measure> measureIter = sonificationData.getMeasures()
                 .iterator();
@@ -30,15 +31,15 @@ public class LayerProducer {
             Measure currentMeasure = measureIter.next();
             
             while(currentMeasure.isDaySeparator()) {
-                addDaySeparatorRow(layerMap, commit, currentMeasure);
+                addDaySeparatorRow(layerMap, combinedLayer, commit, currentMeasure);
                 currentMeasure = measureIter.next();
             }
             
-            addRow(layerMap, commit, currentMeasure);
+            addRow(layerMap, combinedLayer, commit, currentMeasure);
         }
         
-        return new VisualizationData(layerMap.values(), numStartBranches,
-                numEndBranches);
+        return new VisualizationData(layerMap.values(), combinedLayer,
+                numStartBranches, numEndBranches);
     }
     
     private Map<Component, Layer> prepareLayerMap(List<Component> components) {
@@ -51,8 +52,8 @@ public class LayerProducer {
         return layerMap;
     }
     
-    private void addRow(Map<Component, Layer> layerMap, AnnotatedCommit commit,
-            Measure currentMeasure) {
+    private void addRow(Map<Component, Layer> layerMap, Layer combinedLayer,
+            AnnotatedCommit commit, Measure currentMeasure) {
         List<Line> lines = new ArrayList<>(
                 commit.getIncomingBranches().size());
         for(AnnotatedCommitLine oldLine : commit.getIncomingBranches()) {
@@ -72,10 +73,15 @@ public class LayerProducer {
                     currentMeasure.getNumConflicts(), lines);
             layer.getRows().add(row);
         }
+        
+        Row row = new Row(commit.getAuthor(), commit.getTimestamp(),
+            commit.getBranch(), true, currentMeasure.getNumConflicts(), lines);
+        combinedLayer.getRows().add(row);
     }
 
     private void addDaySeparatorRow(Map<Component, Layer> layerMap,
-            AnnotatedCommit commit, Measure currentMeasure) {
+            Layer combinedLayer, AnnotatedCommit commit,
+            Measure currentMeasure) {
         List<Line> lines = new ArrayList<>(
             commit.getIncomingBranches().size());
         for(AnnotatedCommitLine oldLine : commit.getIncomingBranches()) {
@@ -89,5 +95,9 @@ public class LayerProducer {
                     currentMeasure.getNumConflicts(), lines);
             layer.getRows().add(row);
         }
+
+        Row row = new Row(currentMeasure.getTimestamp(),
+            currentMeasure.getNumConflicts(), lines);
+        combinedLayer.getRows().add(row);
     }
 }

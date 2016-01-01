@@ -22,6 +22,10 @@ public class GraphStringifier {
             VisualizationData visualizationData, boolean showEmptyLayers) {
         StringBuilder str = new StringBuilder();
         
+        str.append("Combined Layer:\n");
+        str.append(stringifyLayer(visualizationData.getCombinedLayer()));
+        str.append("\n\n");
+        
         int layerNum = 1;
         for(Layer layer : visualizationData.getLayers()) {
             if(showEmptyLayers || layer.hasVisibleCommits()) {
