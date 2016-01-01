@@ -9,9 +9,9 @@ import processing.core.PGraphics;
 
 /**
  * Draws a string to the screen. The string will always be left-aligned starting
- * at the bottom-left of its bounding rectangle. The string may go past the
- * right or top of its bounding rectangle - the drawing algorithm just spits out
- * the string without making any adjustments to be sure it fits the bounding
+ * at the top-left of its bounding rectangle. The string may go past the
+ * right or bottom of its bounding rectangle - the drawing algorithm just spits
+ * out the string without making any adjustments to be sure it fits the bounding
  * rectangle.
  */
 public class TextDrawable extends Drawable {
@@ -50,7 +50,7 @@ public class TextDrawable extends Drawable {
         color.apply(graphics);
         graphics.textFont(font);
         graphics.text(string, locationOnScreen.getX1(),
-                locationOnScreen.getY2());
+                locationOnScreen.getY1() + font.getSize());
     }
 
     public String getString() {

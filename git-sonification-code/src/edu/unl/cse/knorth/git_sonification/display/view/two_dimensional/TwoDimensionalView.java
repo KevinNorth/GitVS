@@ -1,14 +1,19 @@
 package edu.unl.cse.knorth.git_sonification.display.view.two_dimensional;
 
+import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.interaction.keyboard.KeyboardEvent;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import processing.core.PApplet;
-import processing.core.PGraphics;
 
-public abstract class TwoDimensionalView extends PApplet {
+public abstract class TwoDimensionalView<WindowState> extends PApplet {
     protected Camera camera;
     protected ArrayList<Drawable> drawables;
     protected Color backgroundColor;
+    protected ArrayList<KeyboardEvent<WindowState>> keyboardEvents;
+    private Set<KeyboardEvent<WindowState>> activeKeyboardEvents;
+    private long oldTime;
         
     /**
      * Called at the very beginning of <code>setup()</code> giving your
@@ -58,18 +63,41 @@ public abstract class TwoDimensionalView extends PApplet {
      * <code>backgroundColor</code> is of protected visibility.
      */
     public abstract Color getInitialBackgroundColor();    
+
     /**
-     * Runs once per frame before drawing.
+     * Gets the keyboard events that should be bound starting on the first
+     * frame. Keyboard events can be added, removed, and rebound on future
+     * frames by updating the <code>keyboardEvents</code> variable. (If you
+     * remove a keyboard event while its button is held down, it will continue
+     * to run its <code>whileKeyHeld()</code> and <code>onKeyUp()</code> methods
+     * until the key is released, at which point the keyboard event will truly
+     * be removed.)
+     */
+    public abstract ArrayList<KeyboardEvent<WindowState>>
+            getInitialKeybaordEvents();
+    
+    /**
+     * Runs once per frame before drawing and after handling held key events.
      * <p/>
      * Since the <code>drawables</code> member variable is of protected
      * visibility, you can directly modify it in this method. Don't worry about
      * having the <code>Drawable</code>s in the list in any particular order -
      * the list will be sorted after this method returns and before drawing.
+     * 
+     * @param delta The amount of time, in milliseconds, since the previous
+     * frame.
      */
-    public abstract void update();
+    public abstract void update(long delta);
+    
+    /**
+     * Gets the current state of the window. This is used to provide
+     * KeyboardEvents and the mouse event handlers with the information they can
+     * read and manipulate in order to implement their behaviors.
+     */
+    public abstract WindowState getWindowState();
     
     @Override
-    public void setup() {
+    public final void setup() {
         initialize();
         
         size(getSetupWidth(), getSetupHeight(), P2D);
@@ -80,11 +108,24 @@ public abstract class TwoDimensionalView extends PApplet {
         
         drawables = getInitialDrawables();
         backgroundColor = getInitialBackgroundColor();
+        
+        keyboardEvents = getInitialKeybaordEvents();
+        activeKeyboardEvents = new HashSet<>();
+        
+        oldTime = System.currentTimeMillis();
     }
         
     @Override
-    public void draw() {
-        update();
+    public final void draw() {
+        long time = System.currentTimeMillis();
+        long delta = time - oldTime;
+        oldTime = time;
+        
+        for(KeyboardEvent<WindowState> keyboardEvent : activeKeyboardEvents) {
+            keyboardEvent.whileKeyHeld(getWindowState(), delta);
+        }
+        
+        update(delta);
   
         backgroundColor.applyToBackground(g);
         Collections.sort(drawables);
@@ -97,5 +138,30 @@ public abstract class TwoDimensionalView extends PApplet {
                 drawable.draw(g, screenBoundingRectangle);
             }
         }
+    }
+    
+    @Override
+    public final void keyPressed() {
+        for(KeyboardEvent<WindowState> keyboardEvent : keyboardEvents) {
+            if(keyboardEvent.respondsToKey(key, keyCode)) {
+                keyboardEvent.onKeyDown(getWindowState());
+                activeKeyboardEvents.add(keyboardEvent);
+            }
+        }
+    }
+    
+    @Override
+    public final void keyReleased() {
+        ArrayList<KeyboardEvent<WindowState>> eventsToRemove
+                = new ArrayList<>();
+                
+        for(KeyboardEvent<WindowState> keyboardEvent : activeKeyboardEvents) {
+            if(keyboardEvent.respondsToKey(key, keyCode)) {
+                keyboardEvent.onKeyUp(getWindowState());
+                eventsToRemove.add(keyboardEvent);
+            }
+        }
+
+        activeKeyboardEvents.removeAll(eventsToRemove);
     }
 }

@@ -1,5 +1,6 @@
 package edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.branch_view;
 
+import edu.BranchViewState;
 import edu.unl.cse.knorth.git_sonification.GitDataProcessor;
 import edu.unl.cse.knorth.git_sonification.data_collection.components.CreateComponentTechniques;
 import edu.unl.cse.knorth.git_sonification.display.model.ViewModel;
@@ -9,13 +10,16 @@ import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Drawable
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Rectangle;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.TwoDimensionalView;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.common_drawables.java.TextDrawable;
+import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.interaction.keyboard.KeyboardEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import org.joda.time.DateTime;
 import processing.core.PApplet;
 import processing.core.PFont;
 
-public class BranchView extends TwoDimensionalView {
+public class BranchView extends TwoDimensionalView<BranchViewState> {
     private ViewModel viewModel;
     private DateTime since;
     private DateTime until;
@@ -95,7 +99,7 @@ public class BranchView extends TwoDimensionalView {
         Color textColor = Color.BLACK;
         String string = new GraphStringifier().stringifyVisualizationData(
                 viewModel.getVisualizationData(), false);
-        Rectangle location = new Rectangle(0, 20, 10, 30);
+        Rectangle location = new Rectangle(0, 20, 999999999, 999999999);
         
         Drawable stringifiedData = new TextDrawable(location, 0, string, font,
                 textColor);
@@ -117,6 +121,43 @@ public class BranchView extends TwoDimensionalView {
     }
 
     @Override
-    public void update() {
+    public void update(long delta) {
+    }
+
+    @Override
+    public ArrayList<KeyboardEvent<BranchViewState>> getInitialKeybaordEvents() {
+        ArrayList<KeyboardEvent<BranchViewState>> keyboardEvents =
+                new ArrayList<>(4);
+        
+        float scrollSpeed = 1.5f;
+        
+        List<Integer> keyCodes;
+        keyCodes = new LinkedList<>();
+        keyCodes.add(UP);
+        keyboardEvents.add(new ScrollWindowKeyboardEvent(
+                ScrollWindowKeyboardEvent.ScrollDirection.UP, scrollSpeed, null,
+                keyCodes));
+        keyCodes = new LinkedList<>();
+        keyCodes.add(DOWN);
+        keyboardEvents.add(new ScrollWindowKeyboardEvent(
+                ScrollWindowKeyboardEvent.ScrollDirection.DOWN, scrollSpeed,
+                null, keyCodes));
+        keyCodes = new LinkedList<>();
+        keyCodes.add(LEFT);
+        keyboardEvents.add(new ScrollWindowKeyboardEvent(
+                ScrollWindowKeyboardEvent.ScrollDirection.LEFT, scrollSpeed,
+                null, keyCodes));
+        keyCodes = new LinkedList<>();
+        keyCodes.add(RIGHT);
+        keyboardEvents.add(new ScrollWindowKeyboardEvent(
+                ScrollWindowKeyboardEvent.ScrollDirection.RIGHT, scrollSpeed,
+                null, keyCodes));
+
+        return keyboardEvents;
+    }
+
+    @Override
+    public BranchViewState getWindowState() {
+        return new BranchViewState(camera);
     }
 }

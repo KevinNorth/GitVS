@@ -6,11 +6,12 @@ import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Point;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Rectangle;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.TwoDimensionalView;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.common_drawables.java.TextDrawable;
+import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.interaction.keyboard.KeyboardEvent;
 import java.util.ArrayList;
 import processing.core.PApplet;
 import processing.core.PFont;
 
-public class ExperimentalView extends TwoDimensionalView {
+public class ExperimentalView extends TwoDimensionalView<ExperimentalViewState> {
     private TextDrawable screenLocationTextDrawable;
     private TextDrawable gridLocationTextDrawable;
     
@@ -66,7 +67,7 @@ public class ExperimentalView extends TwoDimensionalView {
     }
     
     @Override
-    public void update() {
+    public void update(long delta) {
         String screenLocationText =
                 "Screen location: (" + mouseX + ", " + mouseY + ")";
         Point gridLocation =
@@ -77,5 +78,15 @@ public class ExperimentalView extends TwoDimensionalView {
         
         screenLocationTextDrawable.setString(screenLocationText);
         gridLocationTextDrawable.setString(gridLocationText);
+    }
+
+    @Override
+    public ArrayList<KeyboardEvent<ExperimentalViewState>> getInitialKeybaordEvents() {
+        return new ArrayList<>(0);
+    }
+
+    @Override
+    public ExperimentalViewState getWindowState() {
+        return new ExperimentalViewState();
     }
 }
