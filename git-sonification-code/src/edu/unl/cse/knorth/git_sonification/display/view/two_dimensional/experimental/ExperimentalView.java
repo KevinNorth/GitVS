@@ -22,6 +22,10 @@ public class ExperimentalView extends TwoDimensionalView {
         PApplet.main(newArgs);
     }
 
+    @Override
+    public void initialize() {
+        // Nothing to do.
+    }
     
     @Override
     public int getSetupWidth() {

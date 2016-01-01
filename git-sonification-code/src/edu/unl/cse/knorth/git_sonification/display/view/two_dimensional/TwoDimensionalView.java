@@ -11,6 +11,16 @@ public abstract class TwoDimensionalView extends PApplet {
     protected Color backgroundColor;
         
     /**
+     * Called at the very beginning of <code>setup()</code> giving your
+     * implementation a chance to set its state before the view is rendered.
+     * <p/>
+     * This method is called before <code>this.size()</code>, so using the
+     * <code>width</code> and <code>height</code> variables is <b>NOT</b>
+     * safe in <code>initialize()</code>.
+     */
+    public abstract void initialize();
+    
+    /**
      * Gets what the width of the window should be when it's initially set up.
      * @return What the width of the window should be.
      */
@@ -59,7 +69,9 @@ public abstract class TwoDimensionalView extends PApplet {
     public abstract void update();
     
     @Override
-    public void setup() {        
+    public void setup() {
+        initialize();
+        
         size(getSetupWidth(), getSetupHeight(), P2D);
         
         Rectangle grid = getInitialGridViewport();
