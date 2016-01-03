@@ -85,6 +85,7 @@ public class Color {
     public void apply(PGraphics graphics) {
         setMode(graphics);
         graphics.fill(v1, v2, v3, alpha);
+        graphics.stroke(v1, v2, v3, alpha);
     }
 
     public void applyToBackground(PGraphics graphics) {

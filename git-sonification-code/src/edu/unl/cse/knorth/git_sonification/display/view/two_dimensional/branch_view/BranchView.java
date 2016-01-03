@@ -4,12 +4,10 @@ import edu.BranchViewState;
 import edu.unl.cse.knorth.git_sonification.GitDataProcessor;
 import edu.unl.cse.knorth.git_sonification.data_collection.components.CreateComponentTechniques;
 import edu.unl.cse.knorth.git_sonification.display.model.ViewModel;
-import edu.unl.cse.knorth.git_sonification.display.view.GraphStringifier;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Color;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Drawable;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Rectangle;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.TwoDimensionalView;
-import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.common_drawables.java.TextDrawable;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.interaction.keyboard.KeyboardEvent;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,13 +15,15 @@ import java.util.LinkedList;
 import java.util.List;
 import org.joda.time.DateTime;
 import processing.core.PApplet;
-import processing.core.PFont;
 
 public class BranchView extends TwoDimensionalView<BranchViewState> {
-    private ViewModel viewModel;
     private DateTime since;
     private DateTime until;
     private String locationOfGitRepo;
+
+    private ViewModel viewModel;
+    private ArrayList<CommitDrawable> commits;
+    private ArrayList<LineDrawable> lines;
     
     /* To hold onto the date values obtained from the command line arguments
      * until we're in a non-static context (i.e. not main()) */
@@ -95,17 +95,15 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
             return null;
         }
         
-        PFont font = createFont("Courier New", 14);
-        Color textColor = Color.BLACK;
-        String string = new GraphStringifier().stringifyVisualizationData(
-                viewModel.getVisualizationData(), false);
-        Rectangle location = new Rectangle(0, 20, 999999999, 999999999);
-        
-        Drawable stringifiedData = new TextDrawable(location, 0, string, font,
-                textColor);
+        DrawablesProducer drawablesProducer =  new DrawablesProducer();
+        DrawablesProducer.CommitsAndLines commitsAndLines =
+                drawablesProducer.produceCommitDrawables(viewModel);
+        commits = commitsAndLines.getCommits();
+        lines = commitsAndLines.getLines();
         
         ArrayList<Drawable> drawables = new ArrayList<>(1);
-        drawables.add(stringifiedData);
+        drawables.addAll(commits);
+        drawables.addAll(lines);
         return drawables;
     }
     

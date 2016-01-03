@@ -38,6 +38,14 @@ public class Rectangle {
         return new Point((x1 + x2) / 2.0f, (y1 + y2) / 2.0f);
     }
 
+    public float horizontalCenter() {
+        return (x1 + x2) / 2.0f;
+    }
+    
+    public float verticalCenter() {
+        return (y1 + y2) / 2.0f;
+    }
+    
     public float getWidth() {
         return x2 - x1;
     }
