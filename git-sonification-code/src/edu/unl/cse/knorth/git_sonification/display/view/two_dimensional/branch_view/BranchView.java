@@ -8,6 +8,7 @@ import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Color;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Drawable;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Rectangle;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.TwoDimensionalView;
+import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.common_drawables.java.TextDrawable;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.interaction.keyboard.KeyboardEvent;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,6 +25,8 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     private ViewModel viewModel;
     private ArrayList<CommitDrawable> commits;
     private ArrayList<LineDrawable> lines;
+    private ArrayList<DaySeparatorDrawable> daySeparators;
+    private ArrayList<TextDrawable> timestamps;
     
     /* To hold onto the date values obtained from the command line arguments
      * until we're in a non-static context (i.e. not main()) */
@@ -101,9 +104,17 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
         commits = commitsAndLines.getCommits();
         lines = commitsAndLines.getLines();
         
+        DrawablesProducer.DaySeparatorsAndTimestamps daySeparatorsAndTimestamps
+               = drawablesProducer.produceDaySeparatorsAndTimestamps(viewModel,
+                       this);
+        daySeparators = daySeparatorsAndTimestamps.getDaySeparators();
+        timestamps = daySeparatorsAndTimestamps.getTimestamps();
+        
         ArrayList<Drawable> drawables = new ArrayList<>(1);
         drawables.addAll(commits);
         drawables.addAll(lines);
+        drawables.addAll(timestamps);
+        drawables.addAll(daySeparators);
         return drawables;
     }
     
