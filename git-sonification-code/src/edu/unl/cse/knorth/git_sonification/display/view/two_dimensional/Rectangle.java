@@ -34,6 +34,10 @@ public class Rectangle {
         y2 = center.getY() + (height / 2.0f);
     }
 
+    public Rectangle copy() {
+        return new Rectangle(x1, y1, x2, y2);
+    }
+    
     public Point center() {
         return new Point((x1 + x2) / 2.0f, (y1 + y2) / 2.0f);
     }
@@ -52,6 +56,14 @@ public class Rectangle {
     
     public float getHeight() {
         return y2 - y1;
+    }
+    
+    public float getArea() {
+        return getWidth() * getHeight();
+    }
+    
+    public float getPerimeter() {
+        return (getWidth() * 2) + (getHeight() * 2);
     }
     
     /**

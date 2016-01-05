@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import processing.core.PApplet;
+import processing.event.MouseEvent;
 
 public abstract class TwoDimensionalView<WindowState> extends PApplet {
     protected Camera camera;
@@ -135,7 +136,8 @@ public abstract class TwoDimensionalView<WindowState> extends PApplet {
                     drawable.getBoundingRectangle());
             
             if(screenBoundingRectangle.intersects(camera.getScreenViewport())) {
-                drawable.draw(g, screenBoundingRectangle);
+                drawable.draw(g, screenBoundingRectangle,
+                        camera.calculateZoomFactor());
             }
         }
     }
@@ -164,4 +166,16 @@ public abstract class TwoDimensionalView<WindowState> extends PApplet {
 
         activeKeyboardEvents.removeAll(eventsToRemove);
     }
+    
+    @Override
+    public final void mouseWheel(MouseEvent event) {
+        int numWheelClicks = event.getCount();
+        Point screenLocation = new Point(event.getX(), event.getY());
+        Point gridLocation = camera.convertFromScreenToGrid(screenLocation);
+        handleMouseWheel(getWindowState(), gridLocation, numWheelClicks, event);
+    }
+    
+    public void handleMouseWheel(WindowState windowState,
+            Point mouseLocationOnGridViewport, int numWheelClicks,
+            MouseEvent rawMouseEvent) {}
 }

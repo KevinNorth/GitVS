@@ -14,6 +14,7 @@ public class DaySeparatorDrawable extends Drawable {
             DateTimeFormat.forPattern("E, M/d/YY");
     private DateTime day;
     private PFont font;
+    private int textSize;
     private Color textColor;
     private float dividerWeight;
     private Color dividerColor;
@@ -24,22 +25,27 @@ public class DaySeparatorDrawable extends Drawable {
         super(boundingRectangle, zOrdering);
         this.day = day;
         this.font = font;
+        this.textSize = font.getSize();
         this.textColor = textColor;
         this.dividerWeight = dividerWeight;
         this.dividerColor = dividerColor;
     }
     
     @Override
-    public void draw(PGraphics graphics, Rectangle locationOnScreen) {
+    public void draw(PGraphics graphics, Rectangle locationOnScreen,
+            float zoomFactor) {
+        float adjustedZoomFactor = adjustZoomFactorFor2dShapes(zoomFactor);
+        
         String string = DATE_FORMATTER.print(day);
         
+        float zoomedTextSize = textSize * adjustedZoomFactor;
         textColor.apply(graphics);
-        graphics.textFont(font);
+        graphics.textFont(font, zoomedTextSize);
         graphics.text(string, locationOnScreen.getX1(),
-                locationOnScreen.getY1() + font.getSize());
+                locationOnScreen.getY1() + zoomedTextSize);
         
         dividerColor.apply(graphics);
-        graphics.strokeWeight(dividerWeight);
+        graphics.strokeWeight(dividerWeight * adjustedZoomFactor);
         graphics.line(locationOnScreen.getX1(), locationOnScreen.getY1(),
                 locationOnScreen.getX2(), locationOnScreen.getY1());
     }
@@ -58,6 +64,7 @@ public class DaySeparatorDrawable extends Drawable {
 
     public void setFont(PFont font) {
         this.font = font;
+        this.textSize = font.getSize();
     }
 
     public Color getTextColor() {

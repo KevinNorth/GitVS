@@ -42,9 +42,11 @@ public class LineDrawable extends Drawable {
     }
     
     @Override
-    public void draw(PGraphics graphics, Rectangle locationOnScreen) {
+    public void draw(PGraphics graphics, Rectangle locationOnScreen,
+            float zoomFactor) {
         color.apply(graphics);
-        graphics.strokeWeight(strokeWeight);
+        graphics.strokeWeight(strokeWeight
+                * adjustZoomFactorFor2dShapes(zoomFactor));
         if(direction == Direction.STRAIGHT_DOWN) {
             graphics.line(locationOnScreen.horizontalCenter(),
                     locationOnScreen.getY1(),

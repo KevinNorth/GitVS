@@ -14,7 +14,8 @@ public class CommitDrawable extends Drawable {
     }
     
     @Override
-    public void draw(PGraphics graphics, Rectangle locationOnScreen) {
+    public void draw(PGraphics graphics, Rectangle locationOnScreen,
+            float zoomFactor) {
         color.apply(graphics);
         graphics.ellipseMode(PGraphics.CORNERS);
         graphics.ellipse(locationOnScreen.getX1(), locationOnScreen.getY1(),

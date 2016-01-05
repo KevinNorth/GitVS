@@ -6,6 +6,7 @@ import edu.unl.cse.knorth.git_sonification.data_collection.components.CreateComp
 import edu.unl.cse.knorth.git_sonification.display.model.ViewModel;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Color;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Drawable;
+import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Point;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Rectangle;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.TwoDimensionalView;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.common_drawables.java.TextDrawable;
@@ -16,6 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.joda.time.DateTime;
 import processing.core.PApplet;
+import processing.event.MouseEvent;
 
 public class BranchView extends TwoDimensionalView<BranchViewState> {
     private DateTime since;
@@ -45,6 +47,8 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
             locationOfGitRepoFromArgs = args[2];
         } else {
             // Default date range is the first 10 days of November 2009
+//            sinceFromArgs = new DateTime(2015, 1, 1, 0, 0);
+//            untilFromArgs = new DateTime(2016, 1, 5, 0, 0);
             sinceFromArgs = new DateTime(2009, 11, 1, 0, 0);
             untilFromArgs = new DateTime(2009, 11, 10, 0, 0);
             locationOfGitRepoFromArgs = "../../voldemort/.git";
@@ -168,5 +172,21 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     @Override
     public BranchViewState getWindowState() {
         return new BranchViewState(camera);
+    }
+    
+    @Override
+    public void handleMouseWheel(BranchViewState windowState,
+            Point mouseLocationOnGridViewport, int numWheelClicks,
+            MouseEvent rawMouseEvent) {
+        float changeZoom = numWheelClicks / 20.0f;
+        float zoomFactor = 1 + changeZoom;
+
+        // Make sure the zoom factor can't be negative - that would cause weird
+        // problems
+        if(zoomFactor < 0.01f) {
+            zoomFactor = 0.01f;
+        }
+        
+        camera.zoomFromCurrentView(zoomFactor, mouseLocationOnGridViewport);
     }
 }

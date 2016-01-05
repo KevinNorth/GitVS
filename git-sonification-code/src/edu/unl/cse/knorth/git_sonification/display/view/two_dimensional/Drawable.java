@@ -29,9 +29,36 @@ public abstract class Drawable implements Comparable<Drawable> {
      * an arbitrary coordinate system used just to place drawables relative to
      * each other, whereas <code>locationOnScreen</code> corresponds directly to
      * pixels on the window being drawn to.
+     * @param zoomFactor How far the camera is zoomed in or out. For some
+     * elements of a drawing, such as line thickness or font size, a Drawable
+     * should change these elements' values according to the zoom factor.
      */
-    public abstract void draw(PGraphics graphics, Rectangle locationOnScreen);
+    public abstract void draw(PGraphics graphics, Rectangle locationOnScreen,
+            float zoomFactor);
 
+    public float adjustZoomFactorFor2dShapes(float zoomFactor) {
+        return (float) Math.sqrt(zoomFactor);
+//        if(zoomFactor == 1.0f) {
+//            return 1.0f;
+//        }
+//        
+//        boolean grow = zoomFactor > 1;
+//        float changeAmount;
+//        if(grow) {
+//            changeAmount = zoomFactor - 1.0f;
+//        } else {
+//            changeAmount = 1.0f - zoomFactor;
+//        }
+//        
+//        float newChangeAmount = (float) Math.sqrt(changeAmount);
+//        
+//        if(grow) {
+//            return 1.0f + newChangeAmount;
+//        } else {
+//            return 1.0f - newChangeAmount;
+//        }
+    }
+    
     public Rectangle getBoundingRectangle() {
         return boundingRectangle;
     }

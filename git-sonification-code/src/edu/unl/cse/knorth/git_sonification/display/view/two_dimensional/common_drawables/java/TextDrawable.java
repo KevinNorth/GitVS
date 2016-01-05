@@ -16,6 +16,7 @@ import processing.core.PGraphics;
  */
 public class TextDrawable extends Drawable {
     private String string;
+    private int fontSize;
     private PFont font;
     private Color color;
 
@@ -23,6 +24,7 @@ public class TextDrawable extends Drawable {
             String string, PFont font, Color color) {
         super(boundingRectangle, zOrdering);
         this.string = string;
+        this.fontSize = font.getSize();
         this.font = font;
         this.color = color;
     }
@@ -32,6 +34,7 @@ public class TextDrawable extends Drawable {
             PApplet context) {
         super(boundingRectangle, zOrdering);
         this.string = string;
+        this.fontSize = fontSize;
         this.font = context.createFont(fontName, fontSize);
         this.color = color;
     }
@@ -41,16 +44,22 @@ public class TextDrawable extends Drawable {
             Color color, PApplet context) {
         super(boundingRectangle, zOrdering);
         this.string = string;
+        this.fontSize = fontSize;
         this.font = context.createFont(fontName, fontSize, smoothing);
         this.color = color;
     }
     
     @Override
-    public void draw(PGraphics graphics, Rectangle locationOnScreen) {
+    public void draw(PGraphics graphics, Rectangle locationOnScreen,
+            float zoomFactor) {
+        float zoomedFontSize =
+                fontSize * adjustZoomFactorFor2dShapes(zoomFactor);
+        
         color.apply(graphics);
-        graphics.textFont(font);
+        graphics.textFont(font,
+                zoomedFontSize);
         graphics.text(string, locationOnScreen.getX1(),
-                locationOnScreen.getY1() + font.getSize());
+                locationOnScreen.getY1() + zoomedFontSize);
     }
 
     public String getString() {
@@ -67,6 +76,7 @@ public class TextDrawable extends Drawable {
 
     public void setFont(PFont font) {
         this.font = font;
+        this.fontSize = font.getSize();
     }
 
     public Color getColor() {
