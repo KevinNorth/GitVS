@@ -1,6 +1,5 @@
 package edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.branch_view;
 
-import edu.BranchViewState;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Rectangle;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.interaction.keyboard.KeyboardEvent;
 import java.util.Collection;

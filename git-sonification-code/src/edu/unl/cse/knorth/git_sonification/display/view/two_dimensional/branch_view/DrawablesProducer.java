@@ -180,6 +180,31 @@ public class DrawablesProducer {
         
         return new DaySeparatorsAndTimestamps(daySeparators, timestamps);
     }
+    
+    public SonificationCursorDrawable produceSonificationCursor(
+            ViewModel viewModel) {
+        int maxNumBranches = 1;
+        
+        for(Row row :
+                viewModel.getVisualizationData().getCombinedLayer().getRows()) {
+            for(Line line : row.getIncomingLines()) {
+                if(line.fromBranch > maxNumBranches) {
+                    maxNumBranches = line.fromBranch;
+                }
+                if(line.toBranch > maxNumBranches) {
+                    maxNumBranches = line.toBranch;
+                }
+            }
+        }
+        
+        final float width = (leftMargin * 2f)
+                + (distanceBetweenLines * maxNumBranches);
+        final float height = sizeOfCommits;
+        
+        Rectangle rectangle = new Rectangle(0, 0, width, height);
+        return new SonificationCursorDrawable(Color.CYAN, rectangle,
+                Integer.MIN_VALUE);
+    }
         
     public static class CommitsAndLines {
         private final ArrayList<CommitDrawable> commits;

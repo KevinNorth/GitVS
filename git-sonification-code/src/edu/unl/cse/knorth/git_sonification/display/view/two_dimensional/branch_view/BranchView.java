@@ -1,6 +1,5 @@
 package edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.branch_view;
 
-import edu.BranchViewState;
 import edu.unl.cse.knorth.git_sonification.GitDataProcessor;
 import edu.unl.cse.knorth.git_sonification.data_collection.components.CreateComponentTechniques;
 import edu.unl.cse.knorth.git_sonification.display.model.ViewModel;
@@ -29,6 +28,7 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     private ArrayList<LineDrawable> lines;
     private ArrayList<DaySeparatorDrawable> daySeparators;
     private ArrayList<TextDrawable> timestamps;
+    private SonificationCursorDrawable sonificationCursor;
     
     /* To hold onto the date values obtained from the command line arguments
      * until we're in a non-static context (i.e. not main()) */
@@ -114,11 +114,15 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
         daySeparators = daySeparatorsAndTimestamps.getDaySeparators();
         timestamps = daySeparatorsAndTimestamps.getTimestamps();
         
+        sonificationCursor =
+                drawablesProducer.produceSonificationCursor(viewModel);
+        
         ArrayList<Drawable> drawables = new ArrayList<>(1);
         drawables.addAll(commits);
         drawables.addAll(lines);
         drawables.addAll(timestamps);
         drawables.addAll(daySeparators);
+        drawables.add(sonificationCursor);
         return drawables;
     }
     
@@ -135,6 +139,14 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
 
     @Override
     public void update(long delta) {
+        CommitDrawable highlightedCommit =
+                sonificationCursor.findCollidingCommit(commits);
+        
+        if(highlightedCommit != null) {
+            highlightedCommit.setColor(Color.createHSBColor(
+                    (char) (Math.random() * 256), Character.MAX_VALUE,
+                    Character.MAX_VALUE));
+        }
     }
 
     @Override
@@ -166,12 +178,27 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
                 ScrollWindowKeyboardEvent.ScrollDirection.RIGHT, scrollSpeed,
                 null, keyCodes));
 
+        float cursorSpeed = 50.0f;
+        
+        List<Character> keys = new LinkedList<>();
+        keys.add('w');
+        keys.add('W');
+        keyboardEvents.add(new MoveSonificationCursorKeyboardEvent(
+                MoveSonificationCursorKeyboardEvent.MoveDirection.UP,
+                cursorSpeed, keys, null));
+        keys = new LinkedList<>();
+        keys.add('s');
+        keys.add('S');
+        keyboardEvents.add(new MoveSonificationCursorKeyboardEvent(
+                MoveSonificationCursorKeyboardEvent.MoveDirection.DOWN,
+                cursorSpeed, keys, null));
+        
         return keyboardEvents;
     }
 
     @Override
     public BranchViewState getWindowState() {
-        return new BranchViewState(camera);
+        return new BranchViewState(camera, sonificationCursor);
     }
     
     @Override
