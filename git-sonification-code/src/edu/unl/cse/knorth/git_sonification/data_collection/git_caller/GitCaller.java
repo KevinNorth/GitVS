@@ -4,9 +4,11 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
@@ -60,13 +62,14 @@ public class GitCaller implements AutoCloseable, Closeable {
      * Gets a list of commits that will be processed by the rest of the Git
      * Parser component.
      * @return A list of PartialCommits for all of the commits made in this
-     * GitCaller's repository.
+     * GitCaller's repository, as well as a map indicating how many commits were
+     * made by each developer in the repository.
      * @throws IllegalStateException If you try to call this method after
      * previously calling <code>close()</code> on this GitCaller.
      * @throws IOException If there was a problem reading the master branch of
      * the repository.
      */
-    public List<PartialCommit> getPartialCommits()
+    public PartialCommitsAndAuthorCommitCounts getPartialCommits()
             throws IllegalStateException, IOException
     {
         if(closed) {
@@ -92,11 +95,20 @@ public class GitCaller implements AutoCloseable, Closeable {
         }
                         
         List<PartialCommit> partialCommits  = new LinkedList<>();
+        Map<String, Integer> authorCommitCounts = new HashMap<>();
         
         try {
             for(RevCommit commit : walk) {
                 PartialCommit partialCommit = getCommitData(commit);
                 partialCommits.add(partialCommit);
+                
+                String author = partialCommit.getAuthor();
+                if(authorCommitCounts.containsKey(author)) {
+                    int oldValue = authorCommitCounts.get(author);
+                    authorCommitCounts.put(author, oldValue + 1);
+                } else {
+                    authorCommitCounts.put(author, 1);
+                }
             }
         }
         catch(IOException err) {
@@ -105,7 +117,8 @@ public class GitCaller implements AutoCloseable, Closeable {
 
         walk.dispose();
         
-        return partialCommits;
+        return new PartialCommitsAndAuthorCommitCounts(partialCommits,
+                authorCommitCounts);
     }
         
     /**

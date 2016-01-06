@@ -3,6 +3,7 @@ package edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.branch_
 import edu.unl.cse.knorth.git_sonification.GitDataProcessor;
 import edu.unl.cse.knorth.git_sonification.data_collection.components.CreateComponentTechniques;
 import edu.unl.cse.knorth.git_sonification.display.model.ViewModel;
+import edu.unl.cse.knorth.git_sonification.display.view.deprecated3d.VisMain;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Color;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Drawable;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Point;
@@ -10,10 +11,17 @@ import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Rectangl
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.TwoDimensionalView;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.common_drawables.java.TextDrawable;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.interaction.keyboard.KeyboardEvent;
+import java.io.File;
 import java.io.IOException;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.joda.time.DateTime;
 import processing.core.PApplet;
 import processing.event.MouseEvent;
@@ -30,12 +38,20 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     private ArrayList<TextDrawable> timestamps;
     private SonificationCursorDrawable sonificationCursor;
     
+    private CommitDrawable previouslyHighlightedCommit;
+    
+    private Clip currentCommitClip;
+    private Clip[] developerClips;
+    private Clip daySeperatorClip;
+    private Clip currentConflictClip;
+    private Clip[] conflictClips;
+
     /* To hold onto the date values obtained from the command line arguments
      * until we're in a non-static context (i.e. not main()) */
     private static DateTime sinceFromArgs;
     private static DateTime untilFromArgs;
     private static String locationOfGitRepoFromArgs;
-    
+        
     public static void main(String args[]) {
         if(args.length == 2) {
             sinceFromArgs = DateTime.parse(args[0]);
@@ -66,6 +82,26 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
         since = sinceFromArgs;
         until = untilFromArgs;
         locationOfGitRepo = locationOfGitRepoFromArgs;
+        
+        try {
+            developerClips = new Clip[14];
+            conflictClips = new Clip[4];
+            
+            for (int i = 0; i < 14; i++) {
+                developerClips[i] = AudioSystem.getClip();
+                developerClips[i].open(AudioSystem.getAudioInputStream(
+                        new File("audio/dev" + (i + 1) + ".wav")));
+            }
+            daySeperatorClip = AudioSystem.getClip();
+            daySeperatorClip.open(AudioSystem.getAudioInputStream(
+                    new File("audio/day_separator.wav")));
+            for (int i = 0; i < 4; i++) {
+                conflictClips[i] = AudioSystem.getClip();
+                conflictClips[i].open(AudioSystem.getAudioInputStream(new File("audio/conflict_drums_" + (i + 1) + ".wav")));
+            }
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
+            Logger.getLogger(VisMain.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     @Override
@@ -142,13 +178,76 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
         CommitDrawable highlightedCommit =
                 sonificationCursor.findCollidingCommit(commits);
         
-        if(highlightedCommit != null) {
-            highlightedCommit.setColor(Color.createHSBColor(
-                    (char) (Math.random() * 256), Character.MAX_VALUE,
-                    Character.MAX_VALUE));
+        if(highlightedCommit != null
+                && highlightedCommit != previouslyHighlightedCommit) {
+            playSoundForCommit(highlightedCommit);
+            previouslyHighlightedCommit = highlightedCommit;
         }
     }
 
+    private void playSoundForCommit(CommitDrawable commit) {
+        if(currentCommitClip != null && currentCommitClip.isActive()) {
+            currentCommitClip.setFramePosition(0);
+            currentCommitClip.stop();
+            while(currentCommitClip.isActive()) {
+                // Wait for sound to stop
+            }
+        }
+
+        if(currentConflictClip != null && currentConflictClip.isActive()) {
+            currentConflictClip.setFramePosition(0);
+            currentConflictClip.stop();
+            while(currentConflictClip.isActive()) {
+                // Wait for sound to stop
+            }
+        }
+        
+        /*
+         * Developer sound
+         */
+        List<String> authorsInOrderOfCommitCounts = viewModel.
+                getSonificiationData().getAuthorsInOrderOfCommitCounts();
+        
+        String author = commit.getAuthor();
+        
+        Clip developerClip = null;
+        for(int i = 0; i < developerClips.length - 1
+                && i < authorsInOrderOfCommitCounts.size(); i++) {
+            if(author.equals(authorsInOrderOfCommitCounts.get(i))) {
+                developerClip = developerClips[i];
+                break;
+            }
+        }
+        if(developerClip == null) {
+            developerClip = developerClips[developerClips.length - 1];
+        }
+        
+        developerClip.setFramePosition(0);
+        developerClip.start();
+        
+        currentCommitClip = developerClip;
+        
+        /*
+         * Conflict drums
+         */
+        if(commit.getNumConflicts() > 0) {
+            Clip conflictClip = null;
+            
+            if(commit.getNumConflicts() > conflictClips.length) {
+                conflictClip = conflictClips[conflictClips.length - 1];
+            } else {
+                conflictClip = conflictClips[commit.getNumConflicts() - 1];
+            }
+            
+            conflictClip.setFramePosition(0);
+            conflictClip.start();
+            
+            currentConflictClip = conflictClip;
+        } else {
+            currentConflictClip = null;
+        }
+    }
+    
     @Override
     public ArrayList<KeyboardEvent<BranchViewState>> getInitialKeybaordEvents() {
         ArrayList<KeyboardEvent<BranchViewState>> keyboardEvents =

@@ -3,8 +3,12 @@ package edu.unl.cse.knorth.git_sonification.data_processing.sonification;
 import edu.unl.cse.knorth.git_sonification.data_collection.intermediate_data.Commit;
 import edu.unl.cse.knorth.git_sonification.display.model.sonification.Measure;
 import edu.unl.cse.knorth.git_sonification.display.model.sonification.SonificationData;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
@@ -16,7 +20,8 @@ import org.joda.time.LocalDate;
  */
 public class SonificationProcessor {
     public SonificationData
-        processSonificationData(List<Commit> commits) {
+        processSonificationData(List<Commit> commits,
+                Map<String, Integer> authorCommitCounts) {
         Queue<Measure> measures = new LinkedList<>();
         List<String> introducedConflictHashes = new LinkedList<>();
         
@@ -62,7 +67,10 @@ public class SonificationProcessor {
             previousCommit = commit;
         }
         
-        return new SonificationData(measures);
+        List<String> authorsInOrderOfCommitCounts =
+                getAuthorsInOrderOfCommitCounts(authorCommitCounts);
+        
+        return new SonificationData(measures, authorsInOrderOfCommitCounts);
     }
     
     /**
@@ -97,5 +105,22 @@ public class SonificationProcessor {
         LocalDate currentDate = commit.getTimestamp().toLocalDate();
         LocalDate previousDate = previousCommit.getTimestamp().toLocalDate();
         return Days.daysBetween(previousDate, currentDate).getDays();
+    }
+    
+    private List<String> getAuthorsInOrderOfCommitCounts(
+            Map<String, Integer> authorCommitCounts) {
+        List<String> authorsInOrderOfCommitCounts =
+                new ArrayList<String>(authorCommitCounts.keySet());
+
+        Collections.sort(authorsInOrderOfCommitCounts,
+                new Comparator<String>() {
+                    @Override
+                    public int compare(String author1, String author2) {
+                        return -(Integer.compare(authorCommitCounts.get(author1),
+                                authorCommitCounts.get(author2)));
+                    }
+        });
+        
+        return authorsInOrderOfCommitCounts;
     }
 }
