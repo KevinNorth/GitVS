@@ -186,22 +186,6 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     }
 
     private void playSoundForCommit(CommitDrawable commit) {
-        if(currentCommitClip != null && currentCommitClip.isActive()) {
-            currentCommitClip.setFramePosition(0);
-            currentCommitClip.stop();
-            while(currentCommitClip.isActive()) {
-                // Wait for sound to stop
-            }
-        }
-
-        if(currentConflictClip != null && currentConflictClip.isActive()) {
-            currentConflictClip.setFramePosition(0);
-            currentConflictClip.stop();
-            while(currentConflictClip.isActive()) {
-                // Wait for sound to stop
-            }
-        }
-        
         /*
          * Developer sound
          */
@@ -222,6 +206,13 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
             developerClip = developerClips[developerClips.length - 1];
         }
         
+        if(currentCommitClip != null && currentCommitClip.isActive()
+                && currentCommitClip != developerClip) {
+            currentCommitClip.setFramePosition(0);
+            currentCommitClip.stop();
+        }
+
+        
         developerClip.setFramePosition(0);
         developerClip.start();
         
@@ -239,11 +230,21 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
                 conflictClip = conflictClips[commit.getNumConflicts() - 1];
             }
             
+            if(currentConflictClip != null && currentConflictClip.isActive()
+                    && currentConflictClip != conflictClip) {
+                currentConflictClip.setFramePosition(0);
+                currentConflictClip.stop();
+            }
+            
             conflictClip.setFramePosition(0);
             conflictClip.start();
             
             currentConflictClip = conflictClip;
         } else {
+            if(currentConflictClip != null && currentConflictClip.isActive()) {
+                currentConflictClip.setFramePosition(0);
+                currentConflictClip.stop();
+            }
             currentConflictClip = null;
         }
     }
