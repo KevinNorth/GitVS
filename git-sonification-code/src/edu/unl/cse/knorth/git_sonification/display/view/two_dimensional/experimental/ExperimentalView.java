@@ -24,6 +24,11 @@ public class ExperimentalView extends TwoDimensionalView<ExperimentalViewState> 
     }
 
     @Override
+    public boolean shouldProgramCloseWhenWindowIsClosed() {
+        return true;
+    }
+    
+    @Override
     public void initialize() {
         // Nothing to do.
     }

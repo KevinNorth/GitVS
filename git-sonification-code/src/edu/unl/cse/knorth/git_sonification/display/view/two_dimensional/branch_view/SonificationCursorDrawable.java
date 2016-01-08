@@ -30,6 +30,15 @@ public class SonificationCursorDrawable extends Drawable {
         boundingRectangle.setY2(boundingRectangle.getY2() + distanceToMove);
     }
     
+    public void setVerticalLocation(float newYPos) {
+        Rectangle boundingRectangle = getBoundingRectangle();
+
+        final float height = boundingRectangle.getHeight();
+        
+        boundingRectangle.setY1(newYPos - (height / 2f));
+        boundingRectangle.setY2(newYPos + (height / 2f));
+    }
+    
     public CommitDrawable
         findCollidingCommit(Iterable<CommitDrawable> commits) {
         for(CommitDrawable commit : commits) {

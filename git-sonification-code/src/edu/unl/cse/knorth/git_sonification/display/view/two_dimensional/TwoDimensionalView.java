@@ -1,6 +1,9 @@
 package edu.unl.cse.knorth.git_sonification.display.view.two_dimensional;
 
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.interaction.keyboard.KeyboardEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -15,7 +18,16 @@ public abstract class TwoDimensionalView<WindowState> extends PApplet {
     protected ArrayList<KeyboardEvent<WindowState>> keyboardEvents;
     private Set<KeyboardEvent<WindowState>> activeKeyboardEvents;
     private long oldTime;
-        
+    private boolean isMouseBeingDragged;
+    Point startOfMouseDragOnGrid;
+       
+    /**
+     * @return <code>true</code> if the whole program should terminate when this
+     * TwoDimensionalView is closed. <code>false</code> if the window should
+     * close, but the rest of the program should continue to run.
+     */
+    public abstract boolean shouldProgramCloseWhenWindowIsClosed();
+    
     /**
      * Called at the very beginning of <code>setup()</code> giving your
      * implementation a chance to set its state before the view is rendered.
@@ -101,6 +113,36 @@ public abstract class TwoDimensionalView<WindowState> extends PApplet {
     public final void setup() {
         initialize();
         
+        if(!shouldProgramCloseWhenWindowIsClosed()) {
+            /*
+            * Set up the window so that when it's closed, it doesn't close the
+            * whole program.
+            *
+            * Looking at the source code for Processing, it looks to me like
+            * removing the pre-existing WindowListeners won't cause problems.
+            * (see https://github.com/processing/processing/blob/processing-0227-2.2.1/core/src/processing/core/PApplet.java
+            * Note that this.frame is a JFrame, and the only WindowListeners
+            * that PApplet adds close the program when the window is closed, or
+            * spit information to the console without any other side effects.)
+            *
+            * But there be dragons - if the window starts misbehaving, I might
+            * have removed a WindowListener that did something important.
+            */
+           final PApplet thisPApplet = this;
+
+           for(WindowListener windowListener : this.frame.getWindowListeners()) {
+               this.frame.removeWindowListener(windowListener);
+           }
+
+           this.frame.addWindowListener(new WindowAdapter() {
+               @Override
+               public void windowClosed(WindowEvent e) {
+                   thisPApplet.destroy();
+                   e.getWindow().dispose();
+               }
+           });
+        }
+                
         size(getSetupWidth(), getSetupHeight(), P2D);
         
         Rectangle grid = getInitialGridViewport();
@@ -114,6 +156,9 @@ public abstract class TwoDimensionalView<WindowState> extends PApplet {
         activeKeyboardEvents = new HashSet<>();
         
         oldTime = System.currentTimeMillis();
+        
+        isMouseBeingDragged = false;
+        startOfMouseDragOnGrid = null;
     }
         
     @Override
@@ -167,15 +212,115 @@ public abstract class TwoDimensionalView<WindowState> extends PApplet {
         activeKeyboardEvents.removeAll(eventsToRemove);
     }
     
+        @Override
+    public final void mouseClicked(MouseEvent event) {
+        Point screenLocation = new Point(event.getX(), event.getY());
+        Point gridLocation = camera.convertFromScreenToGrid(screenLocation);
+        switch(event.getButton()) {
+            case PApplet.LEFT:
+                handleLeftMouseButton(gridLocation, event);
+                break;
+            case PApplet.CENTER:
+                handleMiddleMouseButton(gridLocation, event);
+                break;
+            case PApplet.RIGHT:
+                handleRightMouseButton(gridLocation, event);
+                break;
+        }
+    }
+    
+    public void handleLeftMouseButton(Point mouseLocationOnGridViewport,
+            MouseEvent rawMouseEvent) {}
+
+    public void handleMiddleMouseButton(Point mouseLocationOnGridViewport,
+            MouseEvent rawMouseEvent) {}
+
+    public void handleRightMouseButton(Point mouseLocationOnGridViewport,
+            MouseEvent rawMouseEvent) {}
+
+    
     @Override
     public final void mouseWheel(MouseEvent event) {
         int numWheelClicks = event.getCount();
         Point screenLocation = new Point(event.getX(), event.getY());
         Point gridLocation = camera.convertFromScreenToGrid(screenLocation);
-        handleMouseWheel(getWindowState(), gridLocation, numWheelClicks, event);
+        handleMouseWheel(gridLocation, numWheelClicks, event);
     }
     
-    public void handleMouseWheel(WindowState windowState,
-            Point mouseLocationOnGridViewport, int numWheelClicks,
-            MouseEvent rawMouseEvent) {}
+    public void handleMouseWheel(Point mouseLocationOnGridViewport,
+            int numWheelClicks, MouseEvent rawMouseEvent) {}
+
+    @Override
+    public final void mouseDragged(MouseEvent event) {
+        Point mouseLocation = camera.convertFromScreenToGrid(
+                new Point(event.getX(), event.getY()));
+        
+        if(!isMouseBeingDragged) {
+            startOfMouseDragOnGrid = mouseLocation;
+            isMouseBeingDragged = true;
+        }
+        
+        float x1 = mouseLocation.getX();
+        float y1 = mouseLocation.getY();
+        float x2 = startOfMouseDragOnGrid.getX();
+        float y2 = startOfMouseDragOnGrid.getY();
+        
+        if(x1 > x2) {
+            float temp = x1;
+            x1 = x2;
+            x2 = temp;
+        }
+        
+        if(y1 > y2) {
+            float temp = y1;
+            y1 = y2;
+            y2 = temp;
+        }
+        
+        Rectangle dragArea = new Rectangle(x1, y1, x2, y2);
+        
+        whileMouseDragged(mouseLocation, startOfMouseDragOnGrid, dragArea,
+                event);
+    }
+
+    @Override
+    public final void mouseReleased(MouseEvent event) {
+        if(isMouseBeingDragged) {
+            Point mouseLocation = camera.convertFromScreenToGrid(
+                    new Point(event.getX(), event.getY()));
+            
+            float x1 = mouseLocation.getX();
+            float y1 = mouseLocation.getY();
+            float x2 = startOfMouseDragOnGrid.getX();
+            float y2 = startOfMouseDragOnGrid.getY();
+
+            if(x1 > x2) {
+                float temp = x1;
+                x1 = x2;
+                x2 = temp;
+            }
+
+            if(y1 > y2) {
+                float temp = y1;
+                y1 = y2;
+                y2 = temp;
+            }
+
+            Rectangle dragArea = new Rectangle(x1, y1, x2, y2);
+
+            whenMouseDragReleased(mouseLocation, startOfMouseDragOnGrid,
+                    dragArea, event);
+        }
+        
+        startOfMouseDragOnGrid = null;
+        isMouseBeingDragged = false;
+    }
+
+    public void whileMouseDragged(Point mouseLocationOnGridViewport,
+            Point startOfDragOnGridViewport, Rectangle dragArea,
+            MouseEvent rawEvent) {}
+    
+    public void whenMouseDragReleased(Point mouseLocationOnGridViewport,
+            Point startOfDragOnGridViewport, Rectangle dragArea,
+            MouseEvent rawEvent) {}
 }

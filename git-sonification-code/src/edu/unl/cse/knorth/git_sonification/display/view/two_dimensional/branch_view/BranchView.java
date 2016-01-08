@@ -11,6 +11,7 @@ import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Rectangl
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.TwoDimensionalView;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.common_drawables.java.TextDrawable;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.interaction.keyboard.KeyboardEvent;
+import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.patch_view.PatchView;
 import java.io.File;
 import java.io.IOException;
 import javax.sound.sampled.AudioSystem;
@@ -37,6 +38,7 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     private ArrayList<DaySeparatorDrawable> daySeparators;
     private ArrayList<TextDrawable> timestamps;
     private SonificationCursorDrawable sonificationCursor;
+    private SelectionRectangleDrawable patchSelection;
     
     private CommitDrawable previouslyHighlightedCommit;
     
@@ -77,6 +79,11 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
         PApplet.main(newArgs);
     }
 
+    @Override
+    public boolean shouldProgramCloseWhenWindowIsClosed() {
+        return true;
+    }
+    
     @Override
     public void initialize() {
         since = sinceFromArgs;
@@ -152,6 +159,8 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
         
         sonificationCursor =
                 drawablesProducer.produceSonificationCursor(viewModel);
+        
+        patchSelection = null;
         
         ArrayList<Drawable> drawables = new ArrayList<>(1);
         drawables.addAll(commits);
@@ -300,11 +309,29 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     public BranchViewState getWindowState() {
         return new BranchViewState(camera, sonificationCursor);
     }
+
+    @Override
+    public void handleLeftMouseButton(Point mouseLocationOnGridViewport,
+            MouseEvent rawMouseEvent) {
+        System.out.println("Left mouse button");
+    }
+
+    @Override
+    public void handleMiddleMouseButton(Point mouseLocationOnGridViewport,
+            MouseEvent rawMouseEvent) {
+        System.out.println("Middle mouse button");
+    }
     
     @Override
-    public void handleMouseWheel(BranchViewState windowState,
-            Point mouseLocationOnGridViewport, int numWheelClicks,
+    public void handleRightMouseButton(Point mouseLocationOnGridViewport,
             MouseEvent rawMouseEvent) {
+        sonificationCursor.setVerticalLocation(
+                mouseLocationOnGridViewport.getY());
+    }
+    
+    @Override
+    public void handleMouseWheel(Point mouseLocationOnGridViewport,
+            int numWheelClicks, MouseEvent rawMouseEvent) {
         float changeZoom = numWheelClicks / 20.0f;
         float zoomFactor = 1 + changeZoom;
 
@@ -315,5 +342,38 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
         }
         
         camera.zoomFromCurrentView(zoomFactor, mouseLocationOnGridViewport);
+    }
+
+    @Override
+    public void whileMouseDragged(Point mouseLocationOnGridViewport,
+            Point startOfDragOnGridViewport, Rectangle dragArea,
+            MouseEvent rawEvent) {
+        if(patchSelection == null) {
+            Color fillColor = Color.createRGBColor((char) 20, (char) 20,
+                    Character.MAX_VALUE, (char) 127);
+            Color borderColor = Color.createRGBColor((char) 20, (char) 20,
+                    Character.MAX_VALUE);
+            patchSelection = new SelectionRectangleDrawable(fillColor,
+                    borderColor, 1.0f, dragArea, Integer.MAX_VALUE);
+            
+            drawables.add(patchSelection);
+        } else {
+            patchSelection.setBoundingRectangle(dragArea);
+        }
+    }
+    
+    @Override
+    public void whenMouseDragReleased(Point mouseLocationOnGridViewport,
+            Point startOfDragOnGridViewport, Rectangle dragArea,
+            MouseEvent rawEvent) {
+        List<CommitDrawable> selectedCommits =
+                patchSelection.findIntersectedCommits(commits);
+        
+        if(!selectedCommits.isEmpty()) {
+            new PatchView().run(selectedCommits, viewModel);
+        }
+        
+        drawables.remove(patchSelection);
+        patchSelection = null;
     }
 }
