@@ -16,12 +16,15 @@ public class Row {
   private int branchLocation;
   private boolean isVisible;
   private int numConflicts;
+  private Commit commit;
 
   /**
    * Creates a new Row that represents a commit.
    */
   public Row(String author, DateTime commitDate, int branchLocation,
-    boolean isVisible, int numConflicts, Collection<Line> incomingLines) {
+    boolean isVisible, int numConflicts,
+    edu.unl.cse.knorth.git_sonification.display.model.visualization.Commit
+            commit, Collection<Line> incomingLines) {
     this.author = author;
     this.commitDate = commitDate;
     this.type = RowType.COMMIT;
@@ -29,15 +32,18 @@ public class Row {
     this.isVisible = isVisible;
     this.incomingLines = new ArrayList<>(incomingLines);
     this.numConflicts = numConflicts;
+    this.commit = commit;
   }
 
   /**
    * Creates a new Row that represents a commit.
    */
   public Row(String author, DateTime commitDate, int branchLocation,
-    boolean isVisible, int numConflicts, Line... incomingLines) {
+    boolean isVisible, int numConflicts,
+    edu.unl.cse.knorth.git_sonification.display.model.visualization.Commit
+            commit, Line... incomingLines) {
       this(author, commitDate, branchLocation, isVisible,
-              numConflicts, Arrays.asList(incomingLines));
+              numConflicts, commit, Arrays.asList(incomingLines));
   }
   
   /**
@@ -51,6 +57,7 @@ public class Row {
     this.branchLocation = NO_BRANCH_LOCATION;
     this.isVisible = false;
     this.numConflicts = numConflicts;
+    this.commit = null;
   }
 
     /**
@@ -89,6 +96,10 @@ public class Row {
   public boolean isVisible(){
       return isVisible;
   }
+
+    public Commit getCommit() {
+        return commit;
+    }
   
   @Override
   public String toString() {
@@ -98,6 +109,8 @@ public class Row {
             ", type=" + type +
             ", branchLocation=" + branchLocation +
             ", isVisible=" + isVisible +
-            ", numConflicts=" + numConflicts + '}';
+            ", numConflicts=" + numConflicts + 
+            ", commit=" + commit.toString() +
+            '}';
   }
 }

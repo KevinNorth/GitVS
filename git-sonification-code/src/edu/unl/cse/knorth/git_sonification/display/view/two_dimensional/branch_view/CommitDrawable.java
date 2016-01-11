@@ -1,5 +1,6 @@
 package edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.branch_view;
 
+import edu.unl.cse.knorth.git_sonification.display.model.visualization.Commit;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Color;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Drawable;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Rectangle;
@@ -7,14 +8,14 @@ import processing.core.PGraphics;
 
 public class CommitDrawable extends Drawable {
     private Color color;
-    private String author;
+    private Commit commit;
     private int numConflicts;
 
-    public CommitDrawable(Color color, String author, int numConflicts,
+    public CommitDrawable(Color color, Commit commit, int numConflicts,
             Rectangle boundingRectangle, int zOrdering) {
         super(boundingRectangle, zOrdering);
         this.color = color;
-        this.author = author;
+        this.commit = commit;
         this.numConflicts = numConflicts;
     }
     
@@ -35,12 +36,12 @@ public class CommitDrawable extends Drawable {
         this.color = color;
     }
 
-    public String getAuthor() {
-        return author;
+    public Commit getCommit() {
+        return commit;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setCommit(Commit commit) {
+        this.commit = commit;
     }
 
     public int getNumConflicts() {

@@ -57,7 +57,7 @@ public class DrawablesProducer {
                         + (distanceBetweenLines * commitBranchNum);
                 Rectangle commitRect = new Rectangle(commitLeftEdge, topOfRow,
                     commitLeftEdge + sizeOfCommits, topOfRow + sizeOfCommits);
-                commits.add(new CommitDrawable(commitColor, row.getAuthor(),
+                commits.add(new CommitDrawable(commitColor, row.getCommit(),
                         row.getNumConflicts(), commitRect, commitsZOrdering));
             }
             

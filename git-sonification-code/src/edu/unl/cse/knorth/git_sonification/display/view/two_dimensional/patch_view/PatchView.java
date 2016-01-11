@@ -1,6 +1,7 @@
 package edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.patch_view;
 
 import edu.unl.cse.knorth.git_sonification.display.model.ViewModel;
+import edu.unl.cse.knorth.git_sonification.display.model.visualization.Commit;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Color;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Drawable;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Rectangle;
@@ -13,15 +14,15 @@ import java.util.List;
 import processing.core.PApplet;
 
 public class PatchView extends TwoDimensionalView<PatchViewState> {
-    private List<CommitDrawable> commits;
+    private List<Commit> commits;
     private ViewModel viewModel;
     
-    public void run(List<CommitDrawable> commits, ViewModel viewModel) {
+    public void run(List<Commit> commits, ViewModel viewModel) {
         String[] emptyArgs = {};
         run(commits, viewModel, emptyArgs);
     }
     
-    public void run(List<CommitDrawable> commits, ViewModel viewModel,
+    public void run(List<Commit> commits, ViewModel viewModel,
             String args[]) {
         this.commits = commits;
         this.viewModel = viewModel;

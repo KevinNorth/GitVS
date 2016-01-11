@@ -5,6 +5,7 @@ import edu.unl.cse.knorth.git_sonification.data_processing.visualization.interme
 import edu.unl.cse.knorth.git_sonification.data_processing.visualization.intermediate_steps.annotated_commits.AnnotatedCommitLine;
 import edu.unl.cse.knorth.git_sonification.display.model.sonification.Measure;
 import edu.unl.cse.knorth.git_sonification.display.model.sonification.SonificationData;
+import edu.unl.cse.knorth.git_sonification.display.model.visualization.Commit;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.Layer;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.Line;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.Row;
@@ -39,7 +40,7 @@ public class LayerProducer {
         }
         
         return new VisualizationData(layerMap.values(), combinedLayer,
-                numStartBranches, numEndBranches);
+                components, numStartBranches, numEndBranches);
     }
     
     private Map<Component, Layer> prepareLayerMap(List<Component> components) {
@@ -56,6 +57,12 @@ public class LayerProducer {
             AnnotatedCommit commit, Measure currentMeasure) {
         List<Line> lines = new ArrayList<>(
                 commit.getIncomingBranches().size());
+
+        edu.unl.cse.knorth.git_sonification.
+            display.model.visualization.Commit modelCommit =
+                new Commit(commit.getHash(), commit.getAuthor(),
+                    commit.getTimestamp(), commit.getComponents());
+        
         for(AnnotatedCommitLine oldLine : commit.getIncomingBranches()) {
             lines.add(new Line(oldLine.getFromBranch(), oldLine.getToBranch(),
                     true));
@@ -70,12 +77,13 @@ public class LayerProducer {
                     commit.getComponents().contains(component);
             Row row = new Row(commit.getAuthor(), commit.getTimestamp(),
                     commit.getBranch(), isCommitVisible,
-                    currentMeasure.getNumConflicts(), lines);
+                    currentMeasure.getNumConflicts(), modelCommit, lines);
             layer.getRows().add(row);
         }
         
         Row row = new Row(commit.getAuthor(), commit.getTimestamp(),
-            commit.getBranch(), true, currentMeasure.getNumConflicts(), lines);
+            commit.getBranch(), true, currentMeasure.getNumConflicts(),
+                modelCommit, lines);
         combinedLayer.getRows().add(row);
     }
 

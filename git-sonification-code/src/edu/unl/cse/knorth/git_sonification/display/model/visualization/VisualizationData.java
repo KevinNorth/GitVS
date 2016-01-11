@@ -1,5 +1,6 @@
 package edu.unl.cse.knorth.git_sonification.display.model.visualization;
 
+import edu.unl.cse.knorth.git_sonification.data_collection.components.Component;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,13 +8,15 @@ import java.util.Collection;
 public class VisualizationData {
   private final List<Layer> layers;
   private final Layer combinedLayer;
+  private final List<Component> components;
   private final int numStart;
   private final int numEnd;
 
   public VisualizationData(Collection<Layer> layers, Layer combinedLayer,
-          int numStart, int numEnd) {
+          List<Component> components, int numStart, int numEnd) {
     this.layers = new ArrayList<>(layers);
     this.combinedLayer = combinedLayer;
+    this.components = components;
     this.numStart = numStart;
     this.numEnd = numEnd;
   }
@@ -43,6 +46,10 @@ public class VisualizationData {
 
   public Layer getCombinedLayer() {
     return combinedLayer;
+  }
+
+  public List<Component> getComponents() {
+    return components;
   }
   
   public int getNumStart() {

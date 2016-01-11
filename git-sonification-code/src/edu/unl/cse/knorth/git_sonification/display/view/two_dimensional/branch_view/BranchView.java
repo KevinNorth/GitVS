@@ -3,6 +3,7 @@ package edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.branch_
 import edu.unl.cse.knorth.git_sonification.GitDataProcessor;
 import edu.unl.cse.knorth.git_sonification.data_collection.components.CreateComponentTechniques;
 import edu.unl.cse.knorth.git_sonification.display.model.ViewModel;
+import edu.unl.cse.knorth.git_sonification.display.model.visualization.Commit;
 import edu.unl.cse.knorth.git_sonification.display.view.deprecated3d.VisMain;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Color;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Drawable;
@@ -201,7 +202,7 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
         List<String> authorsInOrderOfCommitCounts = viewModel.
                 getSonificiationData().getAuthorsInOrderOfCommitCounts();
         
-        String author = commit.getAuthor();
+        String author = commit.getCommit().getAuthor();
         
         Clip developerClip = null;
         for(int i = 0; i < developerClips.length - 1
@@ -366,8 +367,15 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     public void whenMouseDragReleased(Point mouseLocationOnGridViewport,
             Point startOfDragOnGridViewport, Rectangle dragArea,
             MouseEvent rawEvent) {
-        List<CommitDrawable> selectedCommits =
+        List<CommitDrawable> selectedCommitDrawables =
                 patchSelection.findIntersectedCommits(commits);
+        
+        List<Commit> selectedCommits = new ArrayList<Commit>(
+                selectedCommitDrawables.size());
+        
+        for(CommitDrawable commitDrawable : selectedCommitDrawables) {
+            selectedCommits.add(commitDrawable.getCommit());
+        }
         
         if(!selectedCommits.isEmpty()) {
             new PatchView().run(selectedCommits, viewModel);
