@@ -46,7 +46,7 @@ public class DrawablesProducer {
         Layer combinedLayer = visualData.getCombinedLayer();
         
         ArrayList<CommitDrawable> commits = new ArrayList<>();
-        ArrayList<LineDrawable> lines = new ArrayList<>();
+        ArrayList<BranchLineDrawable> lines = new ArrayList<>();
         
         for(Row row : combinedLayer.getRows()) {
             float topOfRow = topMargin + (distanceBetweenRows * rowNum);
@@ -73,8 +73,8 @@ public class DrawablesProducer {
                             topOfPreviousRow + radiusOfCommits,
                             bottomXCoordinate + sizeOfCommits,
                             topOfRow + radiusOfCommits);
-                    lines.add(new LineDrawable(
-                            LineDrawable.Direction.STRAIGHT_DOWN, lineColor,
+                    lines.add(new BranchLineDrawable(
+                            BranchLineDrawable.Direction.STRAIGHT_DOWN, lineColor,
                             lineWeight, lineRect, linesZOrdering));
                 } else if(line.fromBranch > line.toBranch) {
                     Rectangle lineRect = new Rectangle(
@@ -82,8 +82,8 @@ public class DrawablesProducer {
                             topOfPreviousRow + radiusOfCommits,
                             topXCoordinate + radiusOfCommits,
                             topOfRow + radiusOfCommits);
-                    lines.add(new LineDrawable(
-                            LineDrawable.Direction.TOPRIGHT_TO_BOTTOMLEFT,
+                    lines.add(new BranchLineDrawable(
+                            BranchLineDrawable.Direction.TOPRIGHT_TO_BOTTOMLEFT,
                             lineColor, lineWeight, lineRect, linesZOrdering));
                 } else {
                     Rectangle lineRect = new Rectangle(
@@ -91,8 +91,8 @@ public class DrawablesProducer {
                             topOfPreviousRow + radiusOfCommits,
                             bottomXCoordinate + radiusOfCommits,
                             topOfRow + radiusOfCommits);
-                    lines.add(new LineDrawable(
-                            LineDrawable.Direction.TOPLEFT_TO_BOTTOMRIGHT,
+                    lines.add(new BranchLineDrawable(
+                            BranchLineDrawable.Direction.TOPLEFT_TO_BOTTOMRIGHT,
                             lineColor, lineWeight, lineRect, linesZOrdering));
                 }
             }
@@ -208,9 +208,9 @@ public class DrawablesProducer {
         
     public static class CommitsAndLines {
         private final ArrayList<CommitDrawable> commits;
-        private final ArrayList<LineDrawable> lines;
+        private final ArrayList<BranchLineDrawable> lines;
 
-        public CommitsAndLines(ArrayList<CommitDrawable> commits, ArrayList<LineDrawable> lines) {
+        public CommitsAndLines(ArrayList<CommitDrawable> commits, ArrayList<BranchLineDrawable> lines) {
             this.commits = commits;
             this.lines = lines;
         }
@@ -219,7 +219,7 @@ public class DrawablesProducer {
             return commits;
         }
 
-        public ArrayList<LineDrawable> getLines() {
+        public ArrayList<BranchLineDrawable> getLines() {
             return lines;
         }
     }

@@ -5,12 +5,12 @@ import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Drawable
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Rectangle;
 import processing.core.PGraphics;
 
-public class LineDrawable extends Drawable {
+public class BranchLineDrawable extends Drawable {
     private Direction direction;
     private Color color;
     private float strokeWeight;
 
-    public LineDrawable(Direction direction, Color color, float strokeWeight, Rectangle boundingRectangle, int zOrdering) {
+    public BranchLineDrawable(Direction direction, Color color, float strokeWeight, Rectangle boundingRectangle, int zOrdering) {
         super(boundingRectangle, zOrdering);
         this.direction = direction;
         this.color = color;
@@ -45,8 +45,7 @@ public class LineDrawable extends Drawable {
     public void draw(PGraphics graphics, Rectangle locationOnScreen,
             float zoomFactor) {
         color.apply(graphics);
-        graphics.strokeWeight(strokeWeight
-                * adjustZoomFactorFor2dShapes(zoomFactor));
+        graphics.strokeWeight(strokeWeight * zoomFactor);
         if(direction == Direction.STRAIGHT_DOWN) {
             graphics.line(locationOnScreen.horizontalCenter(),
                     locationOnScreen.getY1(),

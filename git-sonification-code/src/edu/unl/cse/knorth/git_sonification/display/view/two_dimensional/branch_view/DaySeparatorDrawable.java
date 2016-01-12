@@ -34,18 +34,16 @@ public class DaySeparatorDrawable extends Drawable {
     @Override
     public void draw(PGraphics graphics, Rectangle locationOnScreen,
             float zoomFactor) {
-        float adjustedZoomFactor = adjustZoomFactorFor2dShapes(zoomFactor);
-        
         String string = DATE_FORMATTER.print(day);
         
-        float zoomedTextSize = textSize * adjustedZoomFactor;
+        float zoomedTextSize = textSize * zoomFactor;
         textColor.apply(graphics);
         graphics.textFont(font, zoomedTextSize);
         graphics.text(string, locationOnScreen.getX1(),
                 locationOnScreen.getY1() + zoomedTextSize);
         
         dividerColor.apply(graphics);
-        graphics.strokeWeight(dividerWeight * adjustedZoomFactor);
+        graphics.strokeWeight(dividerWeight * zoomFactor);
         graphics.line(locationOnScreen.getX1(), locationOnScreen.getY1(),
                 locationOnScreen.getX2(), locationOnScreen.getY1());
     }

@@ -35,7 +35,7 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
 
     private ViewModel viewModel;
     private ArrayList<CommitDrawable> commits;
-    private ArrayList<LineDrawable> lines;
+    private ArrayList<BranchLineDrawable> lines;
     private ArrayList<DaySeparatorDrawable> daySeparators;
     private ArrayList<TextDrawable> timestamps;
     private SonificationCursorDrawable sonificationCursor;

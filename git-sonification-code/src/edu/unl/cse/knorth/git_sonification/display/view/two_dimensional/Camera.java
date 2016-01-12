@@ -119,7 +119,8 @@ public class Camera {
      * is meaningful is something you'll need to decide as the developer.
      */
     public float calculateZoomFactor() {
-        return initalGridViewport.getArea() / gridViewport.getArea();
+        return (float) Math.sqrt(
+                initalGridViewport.getArea() / gridViewport.getArea());
     }
 
     public Rectangle getGridViewport() {

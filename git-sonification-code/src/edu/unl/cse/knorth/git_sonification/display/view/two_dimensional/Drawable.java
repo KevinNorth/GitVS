@@ -35,29 +35,6 @@ public abstract class Drawable implements Comparable<Drawable> {
      */
     public abstract void draw(PGraphics graphics, Rectangle locationOnScreen,
             float zoomFactor);
-
-    public float adjustZoomFactorFor2dShapes(float zoomFactor) {
-        return (float) Math.sqrt(zoomFactor);
-//        if(zoomFactor == 1.0f) {
-//            return 1.0f;
-//        }
-//        
-//        boolean grow = zoomFactor > 1;
-//        float changeAmount;
-//        if(grow) {
-//            changeAmount = zoomFactor - 1.0f;
-//        } else {
-//            changeAmount = 1.0f - zoomFactor;
-//        }
-//        
-//        float newChangeAmount = (float) Math.sqrt(changeAmount);
-//        
-//        if(grow) {
-//            return 1.0f + newChangeAmount;
-//        } else {
-//            return 1.0f - newChangeAmount;
-//        }
-    }
     
     public Rectangle getBoundingRectangle() {
         return boundingRectangle;

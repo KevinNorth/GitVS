@@ -1,4 +1,4 @@
-package edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.common_drawables.java;
+package edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.patch_view;
 
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Color;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Drawable;
@@ -9,18 +9,18 @@ import processing.core.PGraphics;
 
 /**
  * Draws a string to the screen. The string will always be left-aligned starting
- * at the top-left of its bounding rectangle. The string may go past the
- * right or bottom of its bounding rectangle - the drawing algorithm just spits
+ * at the bottom-left of its bounding rectangle. The string may go past the
+ * right or top of its bounding rectangle - the drawing algorithm just spits
  * out the string without making any adjustments to be sure it fits the bounding
  * rectangle.
  */
-public class TextDrawable extends Drawable {
+public class VerticalTextDrawable extends Drawable {
     private String string;
     private int fontSize;
     private PFont font;
     private Color color;
 
-    public TextDrawable(Rectangle boundingRectangle, int zOrdering,
+    public VerticalTextDrawable(Rectangle boundingRectangle, int zOrdering,
             String string, PFont font, Color color) {
         super(boundingRectangle, zOrdering);
         this.string = string;
@@ -29,7 +29,7 @@ public class TextDrawable extends Drawable {
         this.color = color;
     }
 
-    public TextDrawable(Rectangle boundingRectangle, int zOrdering,
+    public VerticalTextDrawable(Rectangle boundingRectangle, int zOrdering,
             String string, String fontName, int fontSize, Color color,
             PApplet context) {
         super(boundingRectangle, zOrdering);
@@ -39,7 +39,7 @@ public class TextDrawable extends Drawable {
         this.color = color;
     }
 
-        public TextDrawable(Rectangle boundingRectangle, int zOrdering,
+        public VerticalTextDrawable(Rectangle boundingRectangle, int zOrdering,
             String string, String fontName, int fontSize, boolean smoothing,
             Color color, PApplet context) {
         super(boundingRectangle, zOrdering);
@@ -54,11 +54,15 @@ public class TextDrawable extends Drawable {
             float zoomFactor) {
         float zoomedFontSize = fontSize * zoomFactor;
         
+        graphics.pushMatrix();
+        graphics.translate(locationOnScreen.getX1(), locationOnScreen.getY2());
+        graphics.rotate(-PGraphics.HALF_PI);
+        
         color.apply(graphics);
-        graphics.textFont(font,
-                zoomedFontSize);
-        graphics.text(string, locationOnScreen.getX1(),
-                locationOnScreen.getY1() + zoomedFontSize);
+        graphics.textFont(font, zoomedFontSize);
+        graphics.text(string, 0, 0);
+        
+        graphics.popMatrix();
     }
 
     public String getString() {
