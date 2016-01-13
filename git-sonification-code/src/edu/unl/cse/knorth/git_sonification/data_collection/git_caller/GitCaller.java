@@ -132,8 +132,7 @@ public class GitCaller implements AutoCloseable, Closeable {
         String hash = commit.getName();
         String author = commit.getAuthorIdent().getName();
 
-        int secondsSinceEpoch = commit.getCommitTime();
-        DateTime date = new DateTime(((long) secondsSinceEpoch) * 1000L);
+        DateTime date = new DateTime(commit.getAuthorIdent().getWhen());
         
         List<String> parentHashes = new ArrayList<>(commit.getParentCount());
         for(RevCommit parent : commit.getParents()) {
