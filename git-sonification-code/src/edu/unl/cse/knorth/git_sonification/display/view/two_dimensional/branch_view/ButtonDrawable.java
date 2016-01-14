@@ -5,7 +5,7 @@ import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Drawable
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Point;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Rectangle;
 
-public abstract class ButtonDrawable extends Drawable {
+public abstract class ButtonDrawable<WindowState> extends Drawable {
     public ButtonDrawable(Rectangle boundingRectangle, int zOrdering) {
         super(boundingRectangle, zOrdering);
     }
@@ -21,4 +21,6 @@ public abstract class ButtonDrawable extends Drawable {
         
         return buttonLocationOnScreen.contains(locationOfMouseClickOnScreen);
     }
+    
+    public abstract void onClick(WindowState windowState, float delta);
 }

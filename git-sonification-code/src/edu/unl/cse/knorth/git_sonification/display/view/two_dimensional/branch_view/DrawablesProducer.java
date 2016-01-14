@@ -14,6 +14,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import processing.core.PApplet;
 import processing.core.PFont;
+import processing.core.PImage;
 
 /**
  * Contains the logic to take a ViewModel and produce all of the Drawables
@@ -39,6 +40,8 @@ public class DrawablesProducer {
     private final int commitsZOrdering = 1;
     private final int linesZOrdering = 0;
 
+    private final float playButtonsHeight = 105f;
+    private final float playButtonsWidth = playButtonsHeight;
     
     public CommitsAndLines produceCommitDrawables(ViewModel viewModel) {
         VisualizationData visualData = viewModel.getVisualizationData();
@@ -218,6 +221,35 @@ public class DrawablesProducer {
         Rectangle rectangle = new Rectangle(0, 0, width, height);
         return new SonificationCursorDrawable(Color.CYAN, rectangle,
                 Integer.MIN_VALUE);
+    }
+    
+    public ArrayList<PlayButton> producePlayButtons(PApplet context) {
+        PImage forwardImage = context.loadImage("images/play.png");
+        PImage reverseImage = context.loadImage("images/reverse.png");
+        
+        Rectangle forwardButtonLocation = new Rectangle(
+                context.width - playButtonsWidth,
+                context.height - playButtonsHeight, context.width,
+                context.height);
+        Rectangle reverseButtonLocation = new Rectangle(
+                context.width - (playButtonsWidth * 2),
+                context.height - playButtonsHeight,
+                context.width - playButtonsWidth,
+                context.height);
+
+        float playSpeed = 60.0f;
+        
+        PlayButton forwardButton = new PlayButton(
+                PlayButton.PlayDirection.FORWARDS, playSpeed, forwardImage,
+                forwardButtonLocation, Integer.MAX_VALUE);
+        PlayButton reverseButton = new PlayButton(
+                PlayButton.PlayDirection.REVERSE, playSpeed, reverseImage,
+                reverseButtonLocation, Integer.MAX_VALUE);
+        
+        ArrayList<PlayButton> playButtons = new ArrayList<>(2);
+        playButtons.add(forwardButton);
+        playButtons.add(reverseButton);
+        return playButtons;
     }
         
     public static class CommitsAndLines {

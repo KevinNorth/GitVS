@@ -177,8 +177,12 @@ public abstract class TwoDimensionalView<WindowState> extends PApplet {
         Collections.sort(drawables);
         
         for(Drawable drawable : drawables) {
-            Rectangle screenBoundingRectangle = camera.convertFromGridToScreen(
-                    drawable.getBoundingRectangle());
+            Rectangle screenBoundingRectangle = drawable.getBoundingRectangle();
+            
+            if(!drawable.attachedToCamera()) {
+                screenBoundingRectangle = camera.convertFromGridToScreen(
+                    screenBoundingRectangle);
+            }
             
             if(screenBoundingRectangle.intersects(camera.getScreenViewport())) {
                 drawable.draw(g, screenBoundingRectangle,

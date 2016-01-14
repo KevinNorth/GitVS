@@ -40,6 +40,7 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     private ArrayList<TextDrawable> timestamps;
     private SonificationCursorDrawable sonificationCursor;
     private SelectionRectangleDrawable patchSelection;
+    private ArrayList<PlayButton> playButtons;
     
     private CommitDrawable previouslyHighlightedCommit;
     
@@ -163,12 +164,15 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
         
         patchSelection = null;
         
+        playButtons = drawablesProducer.producePlayButtons(this);
+        
         ArrayList<Drawable> drawables = new ArrayList<>(1);
         drawables.addAll(commits);
         drawables.addAll(lines);
         drawables.addAll(timestamps);
         drawables.addAll(daySeparators);
         drawables.add(sonificationCursor);
+        drawables.addAll(playButtons);
         return drawables;
     }
     
@@ -185,6 +189,17 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
 
     @Override
     public void update(long delta) {
+        if(mousePressed) {
+            Point mouseLocation = new Point(mouseX, mouseY);
+            
+            for(PlayButton playButton : playButtons) {
+                if(playButton.isClicked(mouseLocation, camera)) {                
+                    BranchViewState state = getWindowState();
+                    playButton.onClick(state, delta);
+                }
+            }
+        }
+        
         CommitDrawable highlightedCommit =
                 sonificationCursor.findCollidingCommit(commits);
         
@@ -288,7 +303,7 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
                 ScrollWindowKeyboardEvent.ScrollDirection.RIGHT, scrollSpeed,
                 null, keyCodes));
 
-        float cursorSpeed = 50.0f;
+        float cursorSpeed = 60.0f;
         
         List<Character> keys = new LinkedList<>();
         keys.add('w');
@@ -309,18 +324,6 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     @Override
     public BranchViewState getWindowState() {
         return new BranchViewState(camera, sonificationCursor);
-    }
-
-    @Override
-    public void handleLeftMouseButton(Point mouseLocationOnGridViewport,
-            MouseEvent rawMouseEvent) {
-        System.out.println("Left mouse button");
-    }
-
-    @Override
-    public void handleMiddleMouseButton(Point mouseLocationOnGridViewport,
-            MouseEvent rawMouseEvent) {
-        System.out.println("Middle mouse button");
     }
     
     @Override
