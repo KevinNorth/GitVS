@@ -28,6 +28,11 @@ public class CommitDrawable extends Drawable {
                 locationOnScreen.getX2(), locationOnScreen.getY2());
     }
 
+    @Override
+    public boolean attachedToCamera() {
+        return false;
+    }
+
     public Color getColor() {
         return color;
     }

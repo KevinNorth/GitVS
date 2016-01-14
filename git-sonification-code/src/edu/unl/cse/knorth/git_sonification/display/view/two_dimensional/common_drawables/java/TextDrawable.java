@@ -61,6 +61,11 @@ public class TextDrawable extends Drawable {
                 locationOnScreen.getY1() + zoomedFontSize);
     }
 
+    @Override
+    public boolean attachedToCamera() {
+        return false;
+    }
+
     public String getString() {
         return string;
     }

@@ -48,6 +48,11 @@ public class DaySeparatorDrawable extends Drawable {
                 locationOnScreen.getX2(), locationOnScreen.getY1());
     }
 
+    @Override
+    public boolean attachedToCamera() {
+        return false;
+    }
+
     public DateTime getDay() {
         return day;
     }

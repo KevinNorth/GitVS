@@ -23,6 +23,11 @@ public class SonificationCursorDrawable extends Drawable {
                 locationOnScreen.getX2(), locationOnScreen.getY2());
     }
 
+    @Override
+    public boolean attachedToCamera() {
+        return false;
+    }
+
     public void moveVertically(float distanceToMove) {
         Rectangle boundingRectangle = getBoundingRectangle();
         

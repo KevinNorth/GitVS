@@ -65,6 +65,11 @@ public class VerticalTextDrawable extends Drawable {
         graphics.popMatrix();
     }
 
+    @Override
+    public boolean attachedToCamera() {
+        return false;
+    }
+
     public String getString() {
         return string;
     }

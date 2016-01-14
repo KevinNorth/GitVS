@@ -36,6 +36,20 @@ public abstract class Drawable implements Comparable<Drawable> {
     public abstract void draw(PGraphics graphics, Rectangle locationOnScreen,
             float zoomFactor);
     
+    /**
+     * Determines whether the bounding rectangle's coordinates are relative to
+     * the actual location on screen, or to the arbitrary grid that the Camera
+     * looks at.
+     * <p/>
+     * This method is called once per frame, so the Drawable can change whether
+     * it's attached to the camera at different points in time.
+     * @return <code>true</code> if the bounding rectangle's coordinates should
+     * be interpreted as coordinates on the actual window. <code>false</code> if
+     * the bounding rectangle's coordinates should be interpreted as coordinates
+     * on the grid and translated into screen coordinates before drawing.
+     */
+    public abstract boolean attachedToCamera();
+    
     public Rectangle getBoundingRectangle() {
         return boundingRectangle;
     }

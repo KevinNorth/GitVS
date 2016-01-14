@@ -30,6 +30,11 @@ public class LineDrawable extends Drawable {
                     locationOnScreen.getX2(), locationOnScreen.getY1());
         }
     }
+
+    @Override
+    public boolean attachedToCamera() {
+        return false;
+    }
     
     public static enum Direction {
         TOPRIGHT_TO_BOTTOMLEFT, TOPLEFT_TO_BOTTOMRIGHT;

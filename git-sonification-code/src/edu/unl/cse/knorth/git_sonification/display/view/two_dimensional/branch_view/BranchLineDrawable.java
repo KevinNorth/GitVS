@@ -56,6 +56,11 @@ public class BranchLineDrawable extends Drawable {
         }
     }
     
+    @Override
+    public boolean attachedToCamera() {
+        return false;
+    }
+
     private void drawSCurve(PGraphics graphics, Rectangle locationOnScreen) {
         if(direction == Direction.TOPLEFT_TO_BOTTOMRIGHT) {
         graphics.line(locationOnScreen.getX1(), locationOnScreen.getY1(),

@@ -43,6 +43,11 @@ public class SelectionRectangleDrawable extends Drawable {
         graphics.line(locationOnScreen.getX2(), locationOnScreen.getY1(),
                 locationOnScreen.getX2(), locationOnScreen.getY2());
     }
+
+    @Override
+    public boolean attachedToCamera() {
+        return false;
+    }
     
     public List<CommitDrawable> findIntersectedCommits(
             List<CommitDrawable> commits) {

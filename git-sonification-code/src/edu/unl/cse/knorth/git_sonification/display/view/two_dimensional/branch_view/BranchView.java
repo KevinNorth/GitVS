@@ -355,7 +355,7 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
             Color borderColor = Color.createRGBColor((char) 20, (char) 20,
                     Character.MAX_VALUE);
             patchSelection = new SelectionRectangleDrawable(fillColor,
-                    borderColor, 1.0f, dragArea, Integer.MAX_VALUE);
+                    borderColor, 1.0f, dragArea, Integer.MAX_VALUE - 1);
             
             drawables.add(patchSelection);
         } else {
