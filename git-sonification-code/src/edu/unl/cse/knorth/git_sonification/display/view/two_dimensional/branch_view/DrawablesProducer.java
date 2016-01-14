@@ -28,8 +28,13 @@ public class DrawablesProducer {
     private final float distanceBetweenLines = 50;
     private final float sizeOfCommits = 20;
     private final float radiusOfCommits = sizeOfCommits / 2.0f;
-        
-    private final float lineWeight = 10;
+    
+    private final float minCommitSize = sizeOfCommits / 2f;
+    private final float maxCommitSize = sizeOfCommits * 2f;
+    private final float commitSizeIncrement = (maxCommitSize - minCommitSize)
+            / 20f;
+    
+    private final float lineWeight = 8;
         
     private final int commitsZOrdering = 1;
     private final int linesZOrdering = 0;
@@ -52,11 +57,20 @@ public class DrawablesProducer {
             float topOfRow = topMargin + (distanceBetweenRows * rowNum);
             
             if(row.getType() == RowType.COMMIT) {
+                int numCommits = row.getCommit().getComponentsModified().size();
                 int commitBranchNum = row.getBranchLocation();
+
+                float commitSize = Math.min(minCommitSize +
+                        (commitSizeIncrement * numCommits), maxCommitSize);
+                float commitRadius = commitSize / 2f;
+                float commitOffset = radiusOfCommits - commitRadius;
+                
                 float commitLeftEdge = leftMargin
                         + (distanceBetweenLines * commitBranchNum);
-                Rectangle commitRect = new Rectangle(commitLeftEdge, topOfRow,
-                    commitLeftEdge + sizeOfCommits, topOfRow + sizeOfCommits);
+                Rectangle commitRect = new Rectangle(
+                    commitLeftEdge + commitOffset, topOfRow + commitOffset,
+                    commitLeftEdge + commitSize + commitOffset,
+                    topOfRow + commitSize + commitOffset);
                 commits.add(new CommitDrawable(commitColor, row.getCommit(),
                         row.getNumConflicts(), commitRect, commitsZOrdering));
             }
