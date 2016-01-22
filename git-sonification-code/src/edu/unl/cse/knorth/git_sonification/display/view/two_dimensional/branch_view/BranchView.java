@@ -4,7 +4,6 @@ import edu.unl.cse.knorth.git_sonification.GitDataProcessor;
 import edu.unl.cse.knorth.git_sonification.data_collection.components.CreateComponentTechniques;
 import edu.unl.cse.knorth.git_sonification.display.model.ViewModel;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.Commit;
-import edu.unl.cse.knorth.git_sonification.display.view.deprecated3d.VisMain;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Color;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Drawable;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Point;
@@ -109,7 +108,7 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
                 conflictClips[i].open(AudioSystem.getAudioInputStream(new File("audio/conflict_drums_" + (i + 1) + ".wav")));
             }
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
-            Logger.getLogger(VisMain.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BranchView.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
