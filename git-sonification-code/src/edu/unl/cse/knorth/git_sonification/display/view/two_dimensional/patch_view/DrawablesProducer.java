@@ -33,7 +33,6 @@ public class DrawablesProducer {
     private final String headerFontName = "Arial";
     
     private final float cellMargin = 6f;
-    private final float columnWidth = bodyTextSize + (cellMargin * 2f);
     
     private final int numCharsToPrintInHash = 8;
     
@@ -84,7 +83,7 @@ public class DrawablesProducer {
         int lengthOfLongestComponent =
                 getNumCharsInLongestString(componentNames);
         
-        float heightOfHeader = lengthOfLongestComponent * headerTextSize;
+        float heightOfHeader = lengthOfLongestComponent * headerTextSize * 0.6f;
         
         float hashColWidth = numCharsToPrintInHash * (bodyTextSize * 0.6f);
         float authorColWidth = lengthOfLongestAuthor * (bodyTextSize * 0.6f);
@@ -94,13 +93,14 @@ public class DrawablesProducer {
         
         float heightOfVerticalLines =
                 (numBodyRows * ((bodyTextSize) + (2 * cellMargin)))
-                + heightOfHeader + ((headerTextSize) + cellMargin);
+                + heightOfHeader + (cellMargin * 2);
         float widthOfHorizontalLines = checkmarksLeftMargin +
-                (numBodyColumns * ((bodyTextSize) + (2 * cellMargin)));
+                (numBodyColumns * ((bodyTextSize) + (2 * cellMargin)))
+                - tableLineWidth;
         
         /* Add header */
         noninteractiveDrawables.add(
-                new TextDrawable(new Rectangle(0, 0, hashColWidth,
+                new TextDrawable(new Rectangle(cellMargin, 0, hashColWidth,
                         headerTextSize), 0, "Commit",
                         headerFontName, headerTextSize, headerColor, context));
         noninteractiveDrawables.add(
@@ -133,6 +133,10 @@ public class DrawablesProducer {
         
             noninteractiveDrawables.add(new LineDrawable(
                     LineDrawable.Direction.TOPRIGHT_TO_BOTTOMLEFT, tableLineWidth,
+                    lineColor, new Rectangle(0,
+                    y1, 0, y2), 2));
+            noninteractiveDrawables.add(new LineDrawable(
+                    LineDrawable.Direction.TOPRIGHT_TO_BOTTOMLEFT, tableLineWidth,
                     lineColor, new Rectangle(hashColWidth + (cellMargin),
                     y1, hashColWidth + (cellMargin), y2), 2));
             noninteractiveDrawables.add(new LineDrawable(
@@ -141,7 +145,9 @@ public class DrawablesProducer {
                     hashColWidth + authorColWidth + (cellMargin * 3),
                     y1, hashColWidth + authorColWidth + (cellMargin * 3), y2),
                     2));
-            for(int i = 0; i < selectedComponents.size(); i++) {
+            for(int i = 0;
+                i < selectedComponents.size() + 1 /* for outer border line */;
+                i++) {
                 noninteractiveDrawables.add(new LineDrawable(
                         LineDrawable.Direction.TOPRIGHT_TO_BOTTOMLEFT,
                         tableLineWidth,
@@ -149,7 +155,7 @@ public class DrawablesProducer {
                                 + (cellMargin * 2 * i - 1) + (bodyTextSize * i),
                         y1, checkmarksLeftMargin
                                 + (cellMargin * 2 * i - 1) + (bodyTextSize * i),
-                        y2 + heightOfVerticalLines), 2));
+                        y2), 2));
             }
         }
         
@@ -162,7 +168,7 @@ public class DrawablesProducer {
             float rowBottom = rowTop + bodyTextSize;
             
             noninteractiveDrawables.add(
-                    new TextDrawable(new Rectangle(0, rowTop, hashColWidth,
+                    new TextDrawable(new Rectangle(cellMargin, rowTop, hashColWidth,
                             rowBottom), 0, commit.getHash()
                                     .substring(0, numCharsToPrintInHash - 1),
                             bodyFixedWithFontName, bodyTextSize, bodyColor,
@@ -207,6 +213,15 @@ public class DrawablesProducer {
                     tableLineWidth, lineColor,
                     new Rectangle(0, y, widthOfHorizontalLines, y), 2));
         }
+        float bottomLineY = -heightOfHeader + headerTextSize
+                + heightOfVerticalLines;
+        noninteractiveDrawables.add(new LineDrawable(
+                LineDrawable.Direction.TOPRIGHT_TO_BOTTOMLEFT,
+                tableLineWidth, lineColor,
+                new Rectangle(0, bottomLineY, widthOfHorizontalLines,
+                        bottomLineY), 2));
+        
+
         
         return new PatchViewDrawables(checkmarks, noninteractiveDrawables);
    }
