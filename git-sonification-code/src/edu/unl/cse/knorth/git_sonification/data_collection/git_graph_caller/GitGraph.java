@@ -26,7 +26,7 @@ public class GitGraph {
                 int hash1pos = self.rowsPositionTable.get(hash1);
                 int hash2pos = self.rowsPositionTable.get(hash2);
                 
-                return Integer.compare(hash1pos, hash2pos);
+                return -Integer.compare(hash1pos, hash2pos);
             }
         };
     }

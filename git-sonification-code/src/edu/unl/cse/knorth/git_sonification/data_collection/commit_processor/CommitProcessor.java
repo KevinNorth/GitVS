@@ -5,6 +5,7 @@ import edu.unl.cse.knorth.git_sonification.data_collection.commit_processor.comm
 import edu.unl.cse.knorth.git_sonification.data_collection.components.Component;
 import edu.unl.cse.knorth.git_sonification.data_collection.conflict_data.Conflict;
 import edu.unl.cse.knorth.git_sonification.data_collection.git_caller.PartialCommit;
+import edu.unl.cse.knorth.git_sonification.data_collection.git_graph_caller.GitGraph;
 import edu.unl.cse.knorth.git_sonification.data_collection.intermediate_data.Commit;
 import edu.unl.cse.knorth.git_sonification.data_collection.intermediate_data.CommitTimestampComparator;
 import java.util.ArrayList;
@@ -22,21 +23,24 @@ public class CommitProcessor {
      * sonified.
      * @param conflicts A list of <code>Conflict</code>s which will be used to
      * add conflict metadata to the <code>Commit</code>s this method returns.
+     * @param components A list of all components that appear in the commits.
      * @param since The earliest a commit can have been made and still appear in
      * the list of fully processed <code>Commit</code>s that this method
      * returns.
      * @param until The latest a commit can have been made and still appear in
      * the list of fully processed <code>Commit</code>s that this method
      * returns.
+     * @param gitGraph A <code>GitGraph</code> object representing the data from
+     * <code>git log --graph</code>.
      * @return A list of fully processed <code>Commit</code>s that are ready to
      * be sonified, filtered according to <code>since</code> and
      * <code>until</code> and sorted in ascending order of commit timestamp.
      */
     public List<Commit> processCommits(List<PartialCommit> partialCommits,
             List<Conflict> conflicts, List<Component> components,
-            DateTime since, DateTime until) {
+            DateTime since, DateTime until, GitGraph gitGraph) {
         return processCommits(partialCommits, conflicts, components,
-                new DateCommitFilter(since, until));
+                new DateCommitFilter(since, until), gitGraph);
     }
     
     /**
@@ -46,17 +50,28 @@ public class CommitProcessor {
      * sonified.
      * @param conflicts A list of <code>Conflict</code>s which will be used to
      * add conflict metadata to the <code>Commit</code>s this method returns.
+     * @param components A list of all components that appear in the commits.
      * @param commitFilter A <code>CommitFilter</code> that will determine which
      * particular commits will be sonified.
+     * @param gitGraph A <code>GitGraph</code> object representing the data from
+     * <code>git log --graph</code>.
      * @return A list of fully processed <code>Commit</code>s that are ready to
      * be sonified, filtered according to <code>commitFilter</code> and sorted
      * in ascending order of commit timestamp.
      */
     public List<Commit> processCommits(List<PartialCommit> partialCommits,
             List<Conflict> conflicts, List<Component> components,
-            CommitFilter commitFilter) {
+            CommitFilter commitFilter, GitGraph gitGraph) {
+        Comparator<Commit> commitComparator = new Comparator<Commit>() {
+            @Override
+            public int compare(Commit c1, Commit c2) {
+                return gitGraph.getHashComparator().compare(c1.getHash(),
+                        c2.getHash());
+            }
+        };
+        
         return processCommits(partialCommits, conflicts, components,
-                commitFilter, new CommitTimestampComparator());
+                commitFilter, commitComparator);
     }
     
     /**
@@ -65,6 +80,7 @@ public class CommitProcessor {
      * sonified.
      * @param conflicts A list of <code>Conflict</code>s which will be used to
      * add conflict metadata to the <code>Commit</code>s this method returns.
+     * @param components A list of all components that appear in the commits.
      * @param commitFilter A <code>CommitFilter</code> that will determine which
      * particular commits will be sonified.
      * @param commitComparator A <code>Comparator</code> that will be used to
