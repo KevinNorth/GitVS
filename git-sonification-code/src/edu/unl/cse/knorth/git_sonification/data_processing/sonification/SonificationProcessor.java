@@ -41,6 +41,16 @@ public class SonificationProcessor {
 
             // Add day separators
             if(previousCommit != null) {
+                // Adding day separators: THERE BE DRAGONS
+                // This algorithm is broken since the change to add commits that
+                // are out of chronological order to the visualization. It
+                // doesn't handle it well when a commit has an earlier timestamp
+                // than its parents. However, this algorithm's incorrect results
+                // are discarded by the algorithm that produces the visual data,
+                // so right now, fixing it isn't a priority. Just be aware that
+                // there be dragons in this code, and if you want to work with
+                // it, you're going to need to understand what's wrong. (I'm not
+                // taking the time to investigate the proper solution now.)
                 int daysSincePreviousCommit =
                     calculateDaysSinceLastCommit(commit, previousCommit);
                 
