@@ -7,9 +7,10 @@ import edu.unl.cse.knorth.git_sonification.data_collection.conflict_data.Conflic
 import edu.unl.cse.knorth.git_sonification.data_collection.git_caller.PartialCommit;
 import edu.unl.cse.knorth.git_sonification.data_collection.git_graph_caller.GitGraph;
 import edu.unl.cse.knorth.git_sonification.data_collection.intermediate_data.Commit;
-import edu.unl.cse.knorth.git_sonification.data_collection.intermediate_data.CommitTimestampComparator;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import org.joda.time.DateTime;
 import java.util.List;
@@ -62,16 +63,8 @@ public class CommitProcessor {
     public List<Commit> processCommits(List<PartialCommit> partialCommits,
             List<Conflict> conflicts, List<Component> components,
             CommitFilter commitFilter, GitGraph gitGraph) {
-        Comparator<Commit> commitComparator = new Comparator<Commit>() {
-            @Override
-            public int compare(Commit c1, Commit c2) {
-                return gitGraph.getHashComparator().compare(c1.getHash(),
-                        c2.getHash());
-            }
-        };
-        
         return processCommits(partialCommits, conflicts, components,
-                commitFilter, commitComparator);
+                commitFilter, gitGraph.getCommitComparator(), gitGraph);
     }
     
     /**
@@ -93,7 +86,8 @@ public class CommitProcessor {
      */
     public List<Commit> processCommits(List<PartialCommit> partialCommits,
             List<Conflict> conflicts, List<Component> components,
-            CommitFilter commitFilter, Comparator<Commit> commitComparator) {
+            CommitFilter commitFilter, Comparator<Commit> commitComparator,
+            GitGraph gitGraph) {
         List<PartialCommit> filteredCommits =
                 commitFilter.filterCommits(partialCommits);
 
@@ -106,6 +100,12 @@ public class CommitProcessor {
                     processPartialCommit(filteredCommit, conflicts,
                             components));
         }
+        
+        List<Commit> commitsCaughtInGraph =
+                findCommitsCaughtInGraph(partialCommits, processedCommits,
+                        conflicts, components, gitGraph);
+        
+        processedCommits.addAll(commitsCaughtInGraph);
         
         processedCommits.sort(commitComparator);
         return processedCommits;
@@ -175,5 +175,48 @@ public class CommitProcessor {
         }
         
         return matchedComponents;
+    }
+
+    private List<Commit>
+        findCommitsCaughtInGraph(List<PartialCommit> partialCommits,
+                List<Commit> processedCommits, List<Conflict> conflicts,
+                List<Component> components, GitGraph gitGraph) {
+            List<Commit> commitsCaughtInGraph = new LinkedList<>();
+            
+            HashMap<String, PartialCommit> partialCommitsByHashes =
+                    new HashMap<>(partialCommits.size());
+            for(PartialCommit partialCommit : partialCommits) {
+                String hash = partialCommit.getHash();
+                partialCommitsByHashes.put(hash, partialCommit);
+            }
+            
+            HashSet<String> existingHashes = new HashSet<>();
+            for(Commit processedCommit : processedCommits) {
+                existingHashes.add(processedCommit.getHash());
+            }
+
+            processedCommits.sort(gitGraph.getCommitComparator());
+            String startingHash = processedCommits.get(0).getHash();
+            String endingHash =
+                    processedCommits.get(processedCommits.size() - 1)
+                    .getHash();
+            
+            int startingIndex = gitGraph.getPositionOfCommit(startingHash);
+            int endingIndex = gitGraph.getPositionOfCommit(endingHash);
+            
+            for(int i = startingIndex; i >= endingIndex; i--) {
+                String hashFromGraph =
+                        gitGraph.getRows().get(i).getCommitHash();
+                
+                if(!existingHashes.contains(hashFromGraph)) {
+                    PartialCommit partialCommit =
+                            partialCommitsByHashes.get(hashFromGraph);
+                    Commit commit = processPartialCommit(partialCommit,
+                            conflicts, components);
+                    commitsCaughtInGraph.add(commit);
+                }
+            }
+
+            return commitsCaughtInGraph;
     }
 }
