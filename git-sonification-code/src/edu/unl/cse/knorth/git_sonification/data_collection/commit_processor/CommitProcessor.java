@@ -177,12 +177,62 @@ public class CommitProcessor {
         return matchedComponents;
     }
 
+    /**
+     * Since our visualization shows the branching and merging graph of a Git
+     * history, it needs to include all of the commits within those branching
+     * and merging patterns. However, the filter we used may have omitted some
+     * of the commits that are in the graph. Without these commits, there is no
+     * way to correctly represent the graph, because some commits will be
+     * missing their parents.
+     * <p/>
+     * This function rectifies the situation by adding all of the commits that
+     * are in the graph, but were filtered out previously. These commits can
+     * then be added to the visualization, or existing commits can be edited to
+     * cover up the holes that the omitted commits included.
+     * <p/>
+     * The main reason we need this function is because the default commit
+     * filter gets the commits in a date range, which means we implicitly assume
+     * that all commits are in chronological order. This is not true when we
+     * look at real-world data. For some reason, many repositories will have
+     * commits that are timestamped as earlier than their parents, meaning that
+     * we risk filtering some commits' parents out of the visualization.
+     * @param partialCommits A list of all of the commits in the Git history.
+     * This function will select some of them and process them from
+     * <code>PartialCommit</code>s into <code>Commit</code>s.
+     * @param processedCommits A list of all of the commits that have been
+     * processed to be included in the history so far.
+     * @param conflicts A list of all of the conflicts in the history. Used to
+     * convert <code>PartialCommit</code>s into <code>Commit</code>s.
+     * @param components A list of all of the <code>Component</code>s in the
+     * history. Used to convert <code>PartialCommit</code>s into
+     * <code>Commit</code>s.
+     * @param gitGraph The <code>GitGraph</code> representing the full graph
+     * output by <code>git log --graph</code>.
+     * @return A list of commits that need to be added to
+     * <code>processedCommits</code> or otherwise processed further in order to
+     * have enough information to correctly represent the branching and merging
+     * patterns in the final visualization.
+     */
     private List<Commit>
         findCommitsCaughtInGraph(List<PartialCommit> partialCommits,
                 List<Commit> processedCommits, List<Conflict> conflicts,
                 List<Component> components, GitGraph gitGraph) {
+            /*
+             * This function runs in O(n) time with respect to the number of
+             * commits. (If the number of conflicts or components is large, it's
+             * O(commits * conflicts * components).) To keep the algorithmic
+             * complexity low, we have to pick our data structures carefully.
+             * That's why we copy several of the lists into HashMaps and
+             * HashSets.
+             */
             List<Commit> commitsCaughtInGraph = new LinkedList<>();
             
+            // Creating a map of hashes to partial commits increases the amount
+            // of memory we need by a constant factor, but allows us to look up
+            // commits later in O(1) time. If we had to scan a list each time
+            // we looked a commit, this would take O(n) time per commit and make
+            // the entire function O(n^2). Copying the list into a map takes
+            // O(n) time, but this isn't any worse than the primary loop below.
             HashMap<String, PartialCommit> partialCommitsByHashes =
                     new HashMap<>(partialCommits.size());
             for(PartialCommit partialCommit : partialCommits) {
@@ -190,20 +240,40 @@ public class CommitProcessor {
                 partialCommitsByHashes.put(hash, partialCommit);
             }
             
+            // Likewise, creating a hashset of the commits we've already
+            // processed increases the amout of memeory we use by a constant
+            // factor but lets us look them up in O(1) time.
             HashSet<String> existingHashes = new HashSet<>();
             for(Commit processedCommit : processedCommits) {
                 existingHashes.add(processedCommit.getHash());
             }
 
-            processedCommits.sort(gitGraph.getCommitComparator());
-            String startingHash = processedCommits.get(0).getHash();
-            String endingHash =
-                    processedCommits.get(processedCommits.size() - 1)
-                    .getHash();
+            // We need to find the commits that appear first and last in the
+            // graph so we know which portion of the graph to look over. Running
+            // through the list of processed commits one at a time may seem
+            // naive, but it's O(n). This is better than i.e. sorting the list
+            // and taking the first and last elements, which is O(n log n).
+            String startingHash = null;
+            String endingHash = null;
+            int startingIndex = Integer.MIN_VALUE;
+            int endingIndex = Integer.MAX_VALUE;
+            for(Commit commit : processedCommits) {
+                String commitHash = commit.getHash();
+                int commitIndex = gitGraph.getPositionOfCommit(commitHash);
+                if(commitIndex > startingIndex) {
+                    startingHash = commitHash;
+                    startingIndex = commitIndex;
+                }
+                if(commitIndex < endingIndex) {
+                    endingHash = commitHash;
+                    endingIndex = commitIndex;
+                }
+            }
             
-            int startingIndex = gitGraph.getPositionOfCommit(startingHash);
-            int endingIndex = gitGraph.getPositionOfCommit(endingHash);
-            
+            // Now we scan through the portion of th egraph that we've
+            // identified as being relevant. Because we moved everything into
+            // hashes in previous steps, each iteration of this loop is O(1)!
+            // Overall, it is O(n).
             for(int i = startingIndex; i >= endingIndex; i--) {
                 String hashFromGraph =
                         gitGraph.getRows().get(i).getCommitHash();
