@@ -1,10 +1,8 @@
 package edu.unl.cse.knorth.git_sonification;
 
-import edu.unl.cse.knorth.git_sonification.data_collection.components.CreateComponentTechniques;
-import edu.unl.cse.knorth.git_sonification.display.model.ViewModel;
-import edu.unl.cse.knorth.git_sonification.display.model.visualization.Layer;
-import edu.unl.cse.knorth.git_sonification.display.model.visualization.VisualizationData;
-import edu.unl.cse.knorth.git_sonification.display.view.GraphStringifier;
+import edu.unl.cse.knorth.git_sonification.data_collection.git_graph_caller.GitGraph;
+import edu.unl.cse.knorth.git_sonification.data_collection.git_graph_caller.GitGraphProducer;
+import edu.unl.cse.knorth.git_sonification.data_collection.git_graph_caller.Row;
 import java.io.IOException;
 import org.joda.time.DateTime;
 
@@ -16,21 +14,29 @@ public class Main {
 //        cal.set(2010, 0, 6);
         DateTime until = new DateTime(2009, 11, 9, 0, 0);
         
-        ViewModel viewModel =
-                new GitDataProcessor().processGitData("../../voldemort/.git",
-                        since, until,
-                        CreateComponentTechniques.EACH_INDIVIDUAL_FILE);
+        GitGraph graph = new GitGraphProducer()
+                .produceGitGraph("../../voldemort/.git");
+        
+        for(Row row : graph.getRows()) {
+            System.out.println(row.getCommitHash());
+        }
         
         
-        
-        VisualizationData visualizationData = viewModel.getVisualizationData();
-                
-//        for(Layer layer : visualizationData.getLayers()) {
-//            System.out.println(layer);
-//        }
-        
-        System.out.println(
-                new GraphStringifier().stringifyVisualizationData(
-                        visualizationData, false));
+//        ViewModel viewModel =
+//                new GitDataProcessor().processGitData("../../voldemort/.git",
+//                        since, until,
+//                        CreateComponentTechniques.EACH_INDIVIDUAL_FILE);
+//        
+//        
+//        
+//        VisualizationData visualizationData = viewModel.getVisualizationData();
+//                
+////        for(Layer layer : visualizationData.getLayers()) {
+////            System.out.println(layer);
+////        }
+//        
+//        System.out.println(
+//                new GraphStringifier().stringifyVisualizationData(
+//                        visualizationData, false));
     }
 }

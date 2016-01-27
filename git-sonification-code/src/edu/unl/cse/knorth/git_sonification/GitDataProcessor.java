@@ -9,6 +9,8 @@ import edu.unl.cse.knorth.git_sonification.data_collection.conflict_data.Conflic
 import edu.unl.cse.knorth.git_sonification.data_collection.git_caller.GitCaller;
 import edu.unl.cse.knorth.git_sonification.data_collection.git_caller.PartialCommit;
 import edu.unl.cse.knorth.git_sonification.data_collection.git_caller.PartialCommitsAndAuthorCommitCounts;
+import edu.unl.cse.knorth.git_sonification.data_collection.git_graph_caller.GitGraph;
+import edu.unl.cse.knorth.git_sonification.data_collection.git_graph_caller.GitGraphProducer;
 import edu.unl.cse.knorth.git_sonification.data_collection.intermediate_data.Commit;
 import edu.unl.cse.knorth.git_sonification.data_processing.sonification.SonificationProcessor;
 import edu.unl.cse.knorth.git_sonification.data_processing.visualization.VisualizationProcessor;
@@ -42,9 +44,12 @@ public class GitDataProcessor {
                 .createComponents(componentTechnique,
                         gitRepoRoot, "data/components.txt");
         
+        GitGraph gitGraph = new GitGraphProducer()
+                .produceGitGraph(targetGitRepoLocation);
+        
         List<Commit> commits = new CommitProcessor()
                 .processCommits(partialCommits, conflicts, components,
-                        startDate, endDate);
+                        startDate, endDate, gitGraph);
                 
         SonificationProcessor sonificationProcessor = new SonificationProcessor();
         SonificationData sonificationData =

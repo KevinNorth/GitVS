@@ -30,11 +30,18 @@ public class LayerProducer {
                 .iterator();
         for(AnnotatedCommit commit : commits) {
             Measure currentMeasure = measureIter.next();
-            
-            while(currentMeasure.isDaySeparator()) {
-                addDaySeparatorRow(layerMap, combinedLayer, commit, currentMeasure);
-                currentMeasure = measureIter.next();
+
+            if(currentMeasure.isDaySeparator()) {
+                Measure lastDaySeparator;
+                do {
+                    lastDaySeparator = currentMeasure;
+                    currentMeasure = measureIter.next();
+                } while(currentMeasure.isDaySeparator());
+                
+                addDaySeparatorRow(layerMap, combinedLayer, commit,
+                        lastDaySeparator);
             }
+
             
             addRow(layerMap, combinedLayer, commit, currentMeasure);
         }
