@@ -80,6 +80,8 @@ public class CommitProcessor {
      * sort the <code>Commit</code>s before they are sonified. Remember, the
      * <code>Sonifier</code> sonifies the commits in the order it receives them;
      * it does not order commits itself.
+     * @param gitGraph A <code>GitGraph</code> object representing the data from
+     * <code>git log --graph</code>.
      * @return A list of fully processed <code>Commit</code>s that are ready to
      * be sonified, filtered according to <code>commitFilter</code> and sorted
      * according to <code>commitComparator</code>.
