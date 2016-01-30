@@ -26,7 +26,9 @@ import org.joda.time.DateTime;
 public class GitDataProcessor {
     public ViewModel processGitData(String targetGitRepoLocation,
             DateTime startDate, DateTime endDate,
-            CreateComponentTechniques componentTechnique) throws IOException {
+            CreateComponentTechniques componentTechnique,
+            String conflictsLocation, String componentsLocation)
+            throws IOException {
         List<PartialCommit> partialCommits;
         Map<String, Integer> authorCommitCounts;
         try(GitCaller gitCaller = new GitCaller(targetGitRepoLocation)) {
@@ -37,12 +39,12 @@ public class GitDataProcessor {
         }
         
         List<Conflict> conflicts = new ConflictDataParser()
-                .parseConflictData("data/conflict_data.dat");
+                .parseConflictData(conflictsLocation);
         
         File gitRepoRoot = new File(targetGitRepoLocation).getParentFile();
         List<Component> components = new ComponentFactory()
                 .createComponents(componentTechnique,
-                        gitRepoRoot, "data/components.txt");
+                        gitRepoRoot, componentsLocation);
         
         GitGraph gitGraph = new GitGraphProducer()
                 .produceGitGraph(targetGitRepoLocation);

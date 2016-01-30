@@ -31,6 +31,8 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     private DateTime since;
     private DateTime until;
     private String locationOfGitRepo;
+    private static String locationOfConflicts;
+    private static String locationOfComponents;
 
     private ViewModel viewModel;
     private ArrayList<CommitDrawable> commits;
@@ -54,16 +56,34 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     private static DateTime sinceFromArgs;
     private static DateTime untilFromArgs;
     private static String locationOfGitRepoFromArgs;
+    private static String locationOfConflictsFromArgs;
+    private static String locationOfComponentsFromArgs;
         
     public static void main(String args[]) {
         if(args.length == 2) {
             sinceFromArgs = DateTime.parse(args[0]);
             untilFromArgs = DateTime.parse(args[1]);
             locationOfGitRepoFromArgs = "../../voldemort/.git";
+            locationOfConflictsFromArgs = "data/conflict_data.dat";
+            locationOfComponentsFromArgs = "data/components.txt";
         } else if(args.length == 3) {
             sinceFromArgs = DateTime.parse(args[0]);
             untilFromArgs = DateTime.parse(args[1]);
             locationOfGitRepoFromArgs = args[2];
+            locationOfConflictsFromArgs = "data/conflict_data.dat";
+            locationOfComponentsFromArgs = "data/components.txt";
+        } else if(args.length == 4) {
+            sinceFromArgs = DateTime.parse(args[0]);
+            untilFromArgs = DateTime.parse(args[1]);
+            locationOfGitRepoFromArgs = args[2];
+            locationOfConflictsFromArgs = args[3];
+            locationOfComponentsFromArgs = "data/components.txt";
+        } else if(args.length == 5) {
+            sinceFromArgs = DateTime.parse(args[0]);
+            untilFromArgs = DateTime.parse(args[1]);
+            locationOfGitRepoFromArgs = args[2];
+            locationOfConflictsFromArgs = args[3];
+            locationOfComponentsFromArgs = args[4];
         } else {
             // Default date range is the first 10 days of November 2009
 //            sinceFromArgs = new DateTime(2015, 1, 1, 0, 0);
@@ -71,6 +91,8 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
             sinceFromArgs = new DateTime(2009, 11, 1, 0, 0);
             untilFromArgs = new DateTime(2009, 11, 10, 0, 0);
             locationOfGitRepoFromArgs = "../../voldemort/.git";
+            locationOfConflictsFromArgs = "data/conflict_data.dat";
+            locationOfComponentsFromArgs = "data/components.txt";
         }
         
         String[] newArgs = new String[args.length + 1];
@@ -90,6 +112,8 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
         since = sinceFromArgs;
         until = untilFromArgs;
         locationOfGitRepo = locationOfGitRepoFromArgs;
+        locationOfConflicts = locationOfConflictsFromArgs;
+        locationOfComponents = locationOfComponentsFromArgs;
         
         try {
             developerClips = new Clip[14];
@@ -178,7 +202,8 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     private ViewModel calculateViewModel() throws IOException {
         return new GitDataProcessor().processGitData(
                         locationOfGitRepo, since, until,
-                        CreateComponentTechniques.EACH_INDIVIDUAL_FILE);
+                        CreateComponentTechniques.EACH_INDIVIDUAL_FILE,
+                        locationOfConflicts, locationOfComponents);
     }
 
     @Override
