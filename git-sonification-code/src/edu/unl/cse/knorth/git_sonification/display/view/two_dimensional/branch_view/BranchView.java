@@ -47,9 +47,11 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     
     private Clip currentCommitClip;
     private Clip[] developerClips;
+    private Clip[] developerClipCopies;
     private Clip daySeperatorClip;
     private Clip currentConflictClip;
     private Clip[] conflictClips;
+    private Clip[] conflictClipCopies;
 
     /* To hold onto the date values obtained from the command line arguments
      * until we're in a non-static context (i.e. not main()) */
@@ -117,11 +119,16 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
         
         try {
             developerClips = new Clip[14];
+            developerClipCopies = new Clip[14];
             conflictClips = new Clip[4];
+            conflictClipCopies = new Clip[4];
             
             for (int i = 0; i < 14; i++) {
                 developerClips[i] = AudioSystem.getClip();
                 developerClips[i].open(AudioSystem.getAudioInputStream(
+                        new File("audio/dev" + (i + 1) + ".wav")));
+                developerClipCopies[i] = AudioSystem.getClip();
+                developerClipCopies[i].open(AudioSystem.getAudioInputStream(
                         new File("audio/dev" + (i + 1) + ".wav")));
             }
             daySeperatorClip = AudioSystem.getClip();
@@ -130,6 +137,8 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
             for (int i = 0; i < 4; i++) {
                 conflictClips[i] = AudioSystem.getClip();
                 conflictClips[i].open(AudioSystem.getAudioInputStream(new File("audio/conflict_drums_" + (i + 1) + ".wav")));
+                conflictClipCopies[i] = AudioSystem.getClip();
+                conflictClipCopies[i].open(AudioSystem.getAudioInputStream(new File("audio/conflict_drums_" + (i + 1) + ".wav")));
             }
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
             Logger.getLogger(BranchView.class.getName()).log(Level.SEVERE, null, ex);
@@ -248,6 +257,14 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
                 && i < authorsInOrderOfCommitCounts.size(); i++) {
             if(author.equals(authorsInOrderOfCommitCounts.get(i))) {
                 developerClip = developerClips[i];
+                if(developerClip == currentCommitClip) {
+                    // If we are already playing a dev's earcon, stopping and
+                    // immediately restarting the clip can cause the clip not to
+                    // play at all. This happens randomly but frequently. So to
+                    // prevent it, we instead play another instance of the same
+                    // sound.
+                    developerClip = developerClipCopies[i];
+                }
                 break;
             }
         }
@@ -275,8 +292,20 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
             
             if(commit.getNumConflicts() > conflictClips.length) {
                 conflictClip = conflictClips[conflictClips.length - 1];
+                if(conflictClip == currentConflictClip) {
+                    // If we are already playing a conflict's earcon, stopping
+                    // and immediately restarting the clip can cause the clip
+                    // not to play at all. This happens randomly but frequently.
+                    // So to prevent it, we instead play another instance of the
+                    // same sound.
+                    // Same thing in the else statement immedaitely below.
+                    conflictClip = conflictClipCopies[conflictClips.length - 1];
+                }
             } else {
                 conflictClip = conflictClips[commit.getNumConflicts() - 1];
+                if(conflictClip == currentConflictClip) {
+                    conflictClip = conflictClipCopies[commit.getNumConflicts() - 1];
+                }
             }
             
             if(currentConflictClip != null && currentConflictClip.isActive()
