@@ -356,7 +356,7 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
                 ScrollWindowKeyboardEvent.ScrollDirection.RIGHT, scrollSpeed,
                 null, keyCodes));
 
-        float cursorSpeed = 60.0f;
+        float cursorSpeed = 150.0f;
         
         List<Character> keys = new LinkedList<>();
         keys.add('w');
