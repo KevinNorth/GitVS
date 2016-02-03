@@ -237,7 +237,7 @@ public class DrawablesProducer {
                 context.width - playButtonsWidth,
                 context.height);
 
-        float playSpeed = 60.0f;
+        float playSpeed = 150.0f;
         
         PlayButton forwardButton = new PlayButton(
                 PlayButton.PlayDirection.FORWARDS, playSpeed, forwardImage,
