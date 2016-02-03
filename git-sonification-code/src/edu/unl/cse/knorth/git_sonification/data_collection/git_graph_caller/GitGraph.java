@@ -8,11 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 
 public class GitGraph {
-    private final List<Row> rows;
+    private final List<GitGraphRow> rows;
     private final HashMap<String, Integer> rowsPositionTable;
     private final Comparator<Commit> commitComparator;
     
-    public GitGraph(Collection<Row> rows) {
+    public GitGraph(Collection<GitGraphRow> rows) {
         this.rows = new ArrayList<>(rows);
         this.rowsPositionTable = new HashMap<>(rows.size());
         
@@ -29,7 +29,7 @@ public class GitGraph {
         };
     }
     
-    public List<Row> getRows() {
+    public List<GitGraphRow> getRows() {
         return rows;
     }
     
