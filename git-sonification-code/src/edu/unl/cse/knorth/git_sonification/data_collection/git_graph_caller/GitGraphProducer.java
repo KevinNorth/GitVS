@@ -208,9 +208,52 @@ public class GitGraphProducer {
     }
 
     private ArrayList<GitGraphLine> updateCurrentLinesWithNewLines(
-            ArrayList<GitGraphLine> currentLines,
-            ArrayList<GitGraphLine> newLines) {
+            ArrayList<GitGraphLine> topLines,
+            ArrayList<GitGraphLine> bottomLines) {
+        // In this algorithm, we do a lot of operations that are O(n^2), but the
+        // overwhelming majority of Git repositories have at the most 20-30
+        // simulaneous branches in any row of their Git graph, so the actual
+        // cost in this situation is negligable.
+        ArrayList<GitGraphLine> unusedTopLines = new ArrayList<>(topLines);
+        ArrayList<GitGraphLine> unusedBottomLines =
+                new ArrayList<>(bottomLines);
+        ArrayList<GitGraphLine> updatedLines = new ArrayList<>(topLines.size()
+                + bottomLines.size());
         
+        LinkedList<GitGraphLine> topLinesToRemove = new LinkedList<>();
+        LinkedList<GitGraphLine> bottomLinesToRemove = new LinkedList<>();
+        for(GitGraphLine topLine : unusedTopLines) {
+            if(topLine.getFromBranch() == topLine.getToBranch()) {
+                int branchNum = topLine.getToBranch();
+                for(GitGraphLine bottomLine : unusedBottomLines) {
+                    if((bottomLine.getFromBranch() == bottomLine.getToBranch())
+                           && (bottomLine.getToBranch() == branchNum)) {
+                        updatedLines.add(topLine);
+                        topLinesToRemove.add(topLine);
+                        bottomLinesToRemove.add(bottomLine);
+                    }
+                }
+            }
+        }
+        
+        for(GitGraphLine topLine : topLinesToRemove) {
+            unusedTopLines.remove(topLine);
+        }
+        for(GitGraphLine bottomLine : bottomLinesToRemove) {
+            unusedBottomLines.remove(bottomLine);
+        }
+        
+        for(GitGraphLine bottomLine : unusedBottomLines) {
+            for(GitGraphLine topLine : unusedTopLines) {
+                if(bottomLine.getToBranch() == topLine.getFromBranch()) {
+                    GitGraphLine newLine = new GitGraphLine(
+                            bottomLine.getFromBranch(), topLine.getToBranch());
+                    updatedLines.add(newLine);
+                }
+            }
+        }
+        
+        return updatedLines;
     }
     
     private static class HashPositionAndLines {
