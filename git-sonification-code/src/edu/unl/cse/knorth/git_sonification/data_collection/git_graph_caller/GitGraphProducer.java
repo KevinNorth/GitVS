@@ -18,6 +18,10 @@ public class GitGraphProducer {
         return new GitGraph(rows);
     }
     
+    public GitGraph produceGitGraph(List<String> rawGraphData) {
+        return new GitGraph(processRows(rawGraphData));
+    }
+    
     private List<String> callGitLog(String repositoryLocation)
             throws IOException {
         File workingDirectory = new File(repositoryLocation);
@@ -55,13 +59,13 @@ public class GitGraphProducer {
         LinkedList<GitGraphRow> rows = new LinkedList<>();
         
         String currentHash = null;
-        int currentPosition = 0;
+        int currentPosition = 1;
         ArrayList<GitGraphLine> currentLines = null;
         
         for(String rawRow : rawGraphData) {
             String[] split = rawRow.split("\\s+");
             String hash = split[split.length - 1];
-            if(hash.matches("[a-f0-9]+")) {
+            if(hash.matches("[a-fA-F0-9]+")) {
                 HashPositionAndLines result =
                         processRawRowWithHash(rawRow, hash);
                 
@@ -80,13 +84,17 @@ public class GitGraphProducer {
                 ArrayList<GitGraphLine> newLines =
                         processRawRowWithoutHash(rawRow);
                 currentLines = updateCurrentLinesWithNewLines(currentLines,
-                        newLines);
+                        newLines, currentPosition);
             }
         }
 
         // Be sure to include the final row
         if(currentHash != null) {
-                    rows.add(new GitGraphRow(currentHash, currentPosition, currentLines));
+            // Because it's the last row, the final row won't have any incoming
+            // lines!
+            currentLines = new ArrayList<>();
+            rows.add(new GitGraphRow(currentHash, currentPosition,
+                    currentLines));
         }
         
         return rows;
@@ -177,7 +185,7 @@ public class GitGraphProducer {
                     lines.add(new GitGraphLine(incomingBranchPosition,
                             outgoingBranchPosition));
                 }
-            } else if(c == '_') {
+            } else if(c == '_' || c == '-') {
                 int leftBranchPosition = ((i - 1) / 2) + 1;
                 int rightBranchPosition = ((i + 1) / 2) + 1;
                 // Underscores continue horizontal lines
@@ -192,6 +200,30 @@ public class GitGraphProducer {
                     horizontalLine = new GitGraphLine(leftBranchPosition,
                             rightBranchPosition);
                     isHorizonalLineOutgoingPositionSet = false;
+                }
+            } else if(c == '.') {
+                // In rare cases, git log --graph will use a '.' and '-'s to
+                // indicate the end of a horizontal line, i.e.
+                // | |-.
+                // instead of
+                // | |\_
+                if(processingHorizontalLine) {
+                    // A space can indicate the end of a horizontal line, i.e.
+                    // | | \_|_|_| |
+                    processingHorizontalLine = false;
+                    lines.add(horizontalLine);
+                } else {
+                    // If a period starts a horizontal line, treat it like a
+                    // forward slash, i.e.
+                    // | .-|
+                    // is the same as
+                    // |  /|
+                    //(|/  |)
+                    processingHorizontalLine = true;                    
+                    isHorizonalLineOutgoingPositionSet = false;
+                    int branchPosition = (i / 2) + 1;
+                    horizontalLine = new GitGraphLine(branchPosition,
+                            branchPosition);
                 }
             }
         }
@@ -209,7 +241,8 @@ public class GitGraphProducer {
 
     private ArrayList<GitGraphLine> updateCurrentLinesWithNewLines(
             ArrayList<GitGraphLine> topLines,
-            ArrayList<GitGraphLine> bottomLines) {
+            ArrayList<GitGraphLine> bottomLines,
+            int branchWithCommit) {
         // In this algorithm, we do a lot of operations that are O(n^2), but the
         // overwhelming majority of Git repositories have at the most 20-30
         // simulaneous branches in any row of their Git graph, so the actual
@@ -244,12 +277,40 @@ public class GitGraphProducer {
         }
         
         for(GitGraphLine bottomLine : unusedBottomLines) {
+            boolean usedBottomLine = false;
             for(GitGraphLine topLine : unusedTopLines) {
                 if(bottomLine.getToBranch() == topLine.getFromBranch()) {
                     GitGraphLine newLine = new GitGraphLine(
                             bottomLine.getFromBranch(), topLine.getToBranch());
                     updatedLines.add(newLine);
+                    usedBottomLine = true;
+                    break;
                 }
+            }
+            
+            if(!usedBottomLine) {
+                // Whenever there's a merge of more than 2 commits at once,
+                // the top line will have one long horizontal line for all of
+                // the multimerged branches, but the next line will have
+                // multiple slashes. We detect this situation by finding bottom
+                // lines that don't match to anything in the top line, then
+                // putting them all into the merged branch.
+                /* i.e.
+                   *-----.    <-------
+                   |\ \ \ \   <-------
+                   | | | | *
+                   | | | * |
+                   | | | |/
+                   | | * |
+                   | | |/
+                   | * |
+                   | |/
+                   * |
+                   |/ 
+                   * */
+                GitGraphLine newLine = new GitGraphLine(
+                            bottomLine.getFromBranch(), branchWithCommit);
+                    updatedLines.add(newLine);
             }
         }
         
