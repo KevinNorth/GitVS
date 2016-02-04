@@ -61,4 +61,12 @@ public class GitGraphRow {
         }
         return true;
     }
+
+    @Override
+    public String toString() {
+        return "GitGraphRow{"
+                + "commitHash=" + commitHash
+                + ", commitBranchPosition=" + commitBranchPosition
+                + ", incomingLines=" + incomingLines + '}';
+    }
 }

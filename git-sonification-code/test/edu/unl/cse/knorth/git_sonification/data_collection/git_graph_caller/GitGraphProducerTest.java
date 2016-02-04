@@ -41,12 +41,16 @@ public class GitGraphProducerTest {
         rawGraphData.add("| * 81f4594cd22c1ecaeedd302fb872df8b90429601");
         rawGraphData.add("* | 5d3792fa4e454e99a743127ce129e81f73cb523a");
         rawGraphData.add("|/  ");
-        rawGraphData.add("* 573c7ad54c2d40790964fe8781ebe535bf919fad)");
+        rawGraphData.add("* 573c7ad54c2d40790964fe8781ebe535bf919fad");
         
         GitGraph gitGraph =
                 new GitGraphProducer().produceGitGraph(rawGraphData);
         
         List<GitGraphRow> rows = gitGraph.getRows();
+        
+        for(GitGraphRow row : gitGraph.getRows()) {
+            System.out.println(row.toString());
+        }
         
         Assert.assertEquals(16, rows.size());
         
@@ -103,7 +107,7 @@ public class GitGraphProducerTest {
         expectedLines.add(new GitGraphLine(1, 1));
         expectedLines.add(new GitGraphLine(2, 2));
         expectedLines.add(new GitGraphLine(3, 3));
-        expectedLines.add(new GitGraphLine(4, 4));
+        expectedLines.add(new GitGraphLine(3, 4));
         Assert.assertTrue(validateRowContents(row, expectedHash,
                 expectedPosition, expectedLines));
         

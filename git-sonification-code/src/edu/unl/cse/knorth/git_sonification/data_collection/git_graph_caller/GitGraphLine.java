@@ -24,4 +24,9 @@ public class GitGraphLine {
     public void setToBranch(int toBranch) {
         this.toBranch = toBranch;
     }
+    
+    @Override
+    public String toString() {
+        return "[" + fromBranch + " -> " + toBranch + "]";
+    }
 }

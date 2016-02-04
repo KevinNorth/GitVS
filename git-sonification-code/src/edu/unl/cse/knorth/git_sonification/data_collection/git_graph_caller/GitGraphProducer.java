@@ -196,10 +196,24 @@ public class GitGraphProducer {
                         horizontalLine.setToBranch(rightBranchPosition);
                     }
                 } else {
-                    processingHorizontalLine = true;
-                    horizontalLine = new GitGraphLine(leftBranchPosition,
-                            rightBranchPosition);
-                    isHorizonalLineOutgoingPositionSet = false;
+                    // When '_' shows up without a backslash in front of it,
+                    // the line goes to the right, i.e.
+                    // | |_|_|/
+                    //
+                    // But when '-' shows up without a '.' in front of it, the
+                    // line goes to the left, i.e.
+                    // |----.
+                    if(c == '_') {
+                        processingHorizontalLine = true;
+                        horizontalLine = new GitGraphLine(leftBranchPosition,
+                                rightBranchPosition);
+                        isHorizonalLineOutgoingPositionSet = false;
+                    } else {
+                        processingHorizontalLine = true;
+                        horizontalLine = new GitGraphLine(rightBranchPosition,
+                                leftBranchPosition);
+                        isHorizonalLineOutgoingPositionSet = true;                        
+                    }
                 }
             } else if(c == '.') {
                 // In rare cases, git log --graph will use a '.' and '-'s to
@@ -208,8 +222,6 @@ public class GitGraphProducer {
                 // instead of
                 // | |\_
                 if(processingHorizontalLine) {
-                    // A space can indicate the end of a horizontal line, i.e.
-                    // | | \_|_|_| |
                     processingHorizontalLine = false;
                     lines.add(horizontalLine);
                 } else {
