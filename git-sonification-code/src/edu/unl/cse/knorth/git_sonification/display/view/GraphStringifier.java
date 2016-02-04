@@ -26,18 +26,6 @@ public class GraphStringifier {
         str.append(stringifyLayer(visualizationData.getCombinedLayer()));
         str.append("\n\n");
         
-        int layerNum = 1;
-        for(Layer layer : visualizationData.getLayers()) {
-            if(showEmptyLayers || layer.hasVisibleCommits()) {
-                str.append("Layer ");
-                str.append(layerNum);
-                str.append(":\n");
-                str.append(stringifyLayer(layer));
-                str.append("\n\n");
-            }
-            layerNum++;
-        }
-        
         return str.toString();
     }
     
@@ -145,11 +133,7 @@ public class GraphStringifier {
                 // Commits that are "visible" on the layer are *s. "Invisible"
                 // commits as Os.
                 if(rowNum == (row.getBranchLocation() - 1) * 2) {
-                    if(row.isVisible()) {
-                        str.append('*');
-                    } else {
-                        str.append('O');
-                    }
+                    str.append('*');
                 } else {
                     str.append('|');
                 }

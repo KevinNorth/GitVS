@@ -7,20 +7,17 @@ import java.util.Set;
 public class Line {
   public int fromBranch;
   public int toBranch;
-  public boolean isVisible;
   public Set<Component> modifiedComponents;
 
-  public Line(int fromBranch, int toBranch, boolean isVisible) {
+  public Line(int fromBranch, int toBranch) {
     this.fromBranch = fromBranch;
     this.toBranch = toBranch;
-    this.isVisible = isVisible;
     this.modifiedComponents = new HashSet<>();
   }
 
     @Override
     public String toString() {
         return "Line{" + "fromBranch=" + fromBranch +
-                ", toBranch=" + toBranch +
-                ", isVisible=" + isVisible + '}';
+                ", toBranch=" + toBranch + '}';
     }
 }
