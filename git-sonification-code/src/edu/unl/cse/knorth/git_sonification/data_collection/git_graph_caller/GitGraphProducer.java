@@ -68,8 +68,10 @@ public class GitGraphProducer {
         for(String rawRow : rawGraphData) {
             String[] split = rawRow.split("\\s+");
             String hash = split[split.length - 1];
-            if(hash.matches("[a-fA-F0-9]+")) {
-                
+             if(hash.equals("6e76d4b")) {
+                 int checkForError = 0;
+             }
+             if(hash.matches("[a-fA-F0-9]+")) {
                 HashPositionAndLines result =
                         processRawRowWithHash(rawRow, hash);
                 
@@ -137,18 +139,25 @@ public class GitGraphProducer {
         for(int i = 0; i < rawRow.length(); i++) {
             char c = rawRow.charAt(i);
 
-            if(c == ' ') {
+            if((c == '|')
+                    || ((c == '/' || c == '\\') && (i % 2 == 0))) {
+                // A pipe indicates that a branch continues along the same
+                // position. A slash on en even column indicates the same thing,
+                // i.e.
+                // | * | | | |
+                // |/ / / / /
+                // * / / / /    <-----
+                // |/ / / /
+                // * | | |
+                int branchPosition = (i / 2) + 1;
+                lines.add(new GitGraphLine(branchPosition, branchPosition));
+            } else if(c == ' ') {
                 if(processingHorizontalLine) {
                     // A space can indicate the end of a horizontal line, i.e.
                     // | | \_|_|_| |
                     processingHorizontalLine = false;
                     lines.add(horizontalLine);
                 }
-            } else if(c == '|') {
-                // A pipe indicates that a branch continues along the same
-                // position
-                int branchPosition = (i / 2) + 1;
-                lines.add(new GitGraphLine(branchPosition, branchPosition));
             } else if(c == '\\') {
                 // A backslash can mean one of two things:
                 // 1. A branch is moving (or merging) one position to the left,
@@ -300,6 +309,7 @@ public class GitGraphProducer {
             unusedBottomLines.remove(bottomLine);
         }
         
+        topLinesToRemove = new LinkedList<>();
         for(GitGraphLine bottomLine : unusedBottomLines) {
             boolean usedBottomLine = false;
             for(GitGraphLine topLine : unusedTopLines) {
@@ -309,6 +319,7 @@ public class GitGraphProducer {
                     newLine.setMarkerLine(bottomLine);
                     topLine.setMarkerLine(bottomLine);
                     updatedLines.add(newLine);
+                    topLinesToRemove.add(topLine);
                     usedBottomLine = true;
                     break;
                 }
@@ -339,6 +350,19 @@ public class GitGraphProducer {
                 newLine.setMarkerLine(bottomLine);
                 updatedLines.add(newLine);
             }
+        }
+
+        // If there are any top lines left over, they must have branched off
+        // one of the straight lines on the bottom row that we removed at the
+        // beginning of the algorithm. Put them back in.
+        for(GitGraphLine topLine : topLinesToRemove) {
+            unusedTopLines.remove(topLine);
+        }
+        for(GitGraphLine topLine : unusedTopLines) {
+            GitGraphLine virtualBottomLine = new GitGraphLine(
+                    topLine.getFromBranch(), topLine.getFromBranch());
+            topLine.setMarkerLine(virtualBottomLine);
+            updatedLines.add(virtualBottomLine);
         }
         
         if(maintainAggregateLines) {
