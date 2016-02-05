@@ -1018,7 +1018,7 @@ public class GitGraphProducerTest {
         expectedLines.add(new GitGraphLine(12, 12));
         expectedLines.add(new GitGraphLine(13, 13));
         Assert.assertTrue(printAndValidateRowContents(row, expectedHash,
-                expectedPosition, expectedLines));        
+                expectedPosition, expectedLines));
 
         
         // * | | | | | | | | | | | |   ce2d49b  23
@@ -1039,6 +1039,27 @@ public class GitGraphProducerTest {
         // |\ \ \ \ \ \ \ \ \ \ \ \ \
         // | |_|_|/ / / / / / / / / /
         // |/| | | | | | | | | | | |
+        row = rows.get(32);
+        expectedHash = "cd00dde";
+        expectedPosition = 1;
+        expectedLines = new LinkedList<>();
+        expectedLines.add(new GitGraphLine(1, 1));
+        expectedLines.add(new GitGraphLine(1, 4));
+        expectedLines.add(new GitGraphLine(2, 1));
+        expectedLines.add(new GitGraphLine(3, 2));
+        expectedLines.add(new GitGraphLine(4, 3));
+        expectedLines.add(new GitGraphLine(5, 5));
+        expectedLines.add(new GitGraphLine(6, 6));
+        expectedLines.add(new GitGraphLine(7, 7));
+        expectedLines.add(new GitGraphLine(8, 8));
+        expectedLines.add(new GitGraphLine(9, 9));
+        expectedLines.add(new GitGraphLine(10, 10));
+        expectedLines.add(new GitGraphLine(11, 11));
+        expectedLines.add(new GitGraphLine(12, 12));
+        expectedLines.add(new GitGraphLine(13, 13));
+        Assert.assertTrue(printAndValidateRowContents(row, expectedHash,
+                expectedPosition, expectedLines));
+        
         // | | * | | | | | | | | | | c661e98    33
         // | |/ / / / / / / / / / /
         // |/| | | | | | | | | | |
@@ -1053,6 +1074,28 @@ public class GitGraphProducerTest {
         // |\ \ \ \ \ \ \ \ \ \ \ \ \ \
         // | |_|_|_|_|_|_|_|_|_|_|/ / /
         // |/| | | | | | | | | | | | |
+        row = rows.get(39);
+        expectedHash = "5d22270";
+        expectedPosition = 1;
+        expectedLines = new LinkedList<>();
+        expectedLines.add(new GitGraphLine(1, 1));
+        expectedLines.add(new GitGraphLine(1, 12));
+        expectedLines.add(new GitGraphLine(2, 1));
+        expectedLines.add(new GitGraphLine(3, 2));
+        expectedLines.add(new GitGraphLine(4, 3));
+        expectedLines.add(new GitGraphLine(5, 4));
+        expectedLines.add(new GitGraphLine(6, 5));
+        expectedLines.add(new GitGraphLine(7, 6));
+        expectedLines.add(new GitGraphLine(8, 7));
+        expectedLines.add(new GitGraphLine(9, 8));
+        expectedLines.add(new GitGraphLine(10, 9));
+        expectedLines.add(new GitGraphLine(11, 10));
+        expectedLines.add(new GitGraphLine(12, 11));
+        expectedLines.add(new GitGraphLine(13, 13));
+        expectedLines.add(new GitGraphLine(14, 14));
+        Assert.assertTrue(printAndValidateRowContents(row, expectedHash,
+                expectedPosition, expectedLines));
+        
         // | | | | | * | | | | | | | | 6687bed  40
         // | | | | | * | | | | | | | | 57240b4  41
         // | | | | | * | | | | | | | | 7029aee  42
@@ -1061,8 +1104,51 @@ public class GitGraphProducerTest {
         // * | | | | | | | | | | | | 0acc1ce    43
         // * | | | | | | | | | | | |   b082e85     44
         // |\ \ \ \ \ \ \ \ \ \ \ \ \
+        row = rows.get(44);
+        expectedHash = "b082e85";
+        expectedPosition = 1;
+        expectedLines = new LinkedList<>();
+        expectedLines.add(new GitGraphLine(1, 1));
+        expectedLines.add(new GitGraphLine(2, 1));
+        expectedLines.add(new GitGraphLine(3, 2));
+        expectedLines.add(new GitGraphLine(4, 3));
+        expectedLines.add(new GitGraphLine(5, 4));
+        expectedLines.add(new GitGraphLine(6, 5));
+        expectedLines.add(new GitGraphLine(7, 6));
+        expectedLines.add(new GitGraphLine(8, 7));
+        expectedLines.add(new GitGraphLine(9, 8));
+        expectedLines.add(new GitGraphLine(10, 9));
+        expectedLines.add(new GitGraphLine(11, 10));
+        expectedLines.add(new GitGraphLine(12, 11));
+        expectedLines.add(new GitGraphLine(13, 12));
+        expectedLines.add(new GitGraphLine(14, 13));
+        Assert.assertTrue(printAndValidateRowContents(row, expectedHash,
+                expectedPosition, expectedLines));
+
         // * \ \ \ \ \ \ \ \ \ \ \ \ \   cf4407f    45
         // |\ \ \ \ \ \ \ \ \ \ \ \ \ \
+        row = rows.get(45);
+        expectedHash = "cf4407f";
+        expectedPosition = 1;
+        expectedLines = new LinkedList<>();
+        expectedLines.add(new GitGraphLine(1, 1));
+        expectedLines.add(new GitGraphLine(2, 1));
+        expectedLines.add(new GitGraphLine(3, 2));
+        expectedLines.add(new GitGraphLine(4, 3));
+        expectedLines.add(new GitGraphLine(5, 4));
+        expectedLines.add(new GitGraphLine(6, 5));
+        expectedLines.add(new GitGraphLine(7, 6));
+        expectedLines.add(new GitGraphLine(8, 7));
+        expectedLines.add(new GitGraphLine(9, 8));
+        expectedLines.add(new GitGraphLine(10, 9));
+        expectedLines.add(new GitGraphLine(11, 10));
+        expectedLines.add(new GitGraphLine(12, 11));
+        expectedLines.add(new GitGraphLine(13, 12));
+        expectedLines.add(new GitGraphLine(14, 13));
+        expectedLines.add(new GitGraphLine(15, 14));
+        Assert.assertTrue(printAndValidateRowContents(row, expectedHash,
+                expectedPosition, expectedLines));
+
         // * | | | | | | | | | | | | | | 2181433    46
         // | * | | | | | | | | | | | | |   63026ee  47
         // | |\ \ \ \ \ \ \ \ \ \ \ \ \ \
@@ -1084,6 +1170,30 @@ public class GitGraphProducerTest {
         // | | | * | | | | | | | | | | | | | fc8c296    57
         // | |_|/ / / / / / / / / / / / / /
         // |/| | | | | | | | | | | | | | |
+        row = rows.get(57);
+        expectedHash = "fc8c296";
+        expectedPosition = 4;
+        expectedLines = new LinkedList<>();
+        expectedLines.add(new GitGraphLine(1, 1));
+        expectedLines.add(new GitGraphLine(1, 4));
+        expectedLines.add(new GitGraphLine(2, 2));
+        expectedLines.add(new GitGraphLine(3, 3));
+        expectedLines.add(new GitGraphLine(4, 5));
+        expectedLines.add(new GitGraphLine(5, 6));
+        expectedLines.add(new GitGraphLine(6, 7));
+        expectedLines.add(new GitGraphLine(7, 8));
+        expectedLines.add(new GitGraphLine(8, 9));
+        expectedLines.add(new GitGraphLine(9, 10));
+        expectedLines.add(new GitGraphLine(10, 11));
+        expectedLines.add(new GitGraphLine(11, 12));
+        expectedLines.add(new GitGraphLine(12, 13));
+        expectedLines.add(new GitGraphLine(13, 14));
+        expectedLines.add(new GitGraphLine(14, 15));
+        expectedLines.add(new GitGraphLine(15, 16));
+        expectedLines.add(new GitGraphLine(16, 17));
+        Assert.assertTrue(printAndValidateRowContents(row, expectedHash,
+                expectedPosition, expectedLines));
+        
         // * | | | | | | | | | | | | | | |   20a864d    58
         // |\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \
         // * \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \   5a71ea0  59
@@ -1240,6 +1350,33 @@ public class GitGraphProducerTest {
         // | |\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \
         // | | |_|_|_|_|_|_|_|_|_|/ / / / / / /
         // | |/| | | | | | | | | | | | | | | |
+        // 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8
+        row = rows.get(159);
+        expectedHash = "fb31f95";
+        expectedPosition = 2;
+        expectedLines = new LinkedList<>();
+        expectedLines.add(new GitGraphLine(1, 1));
+        expectedLines.add(new GitGraphLine(2, 2));
+        expectedLines.add(new GitGraphLine(2, 12));
+        expectedLines.add(new GitGraphLine(3, 2));
+        expectedLines.add(new GitGraphLine(4, 3));
+        expectedLines.add(new GitGraphLine(5, 4));
+        expectedLines.add(new GitGraphLine(6, 5));
+        expectedLines.add(new GitGraphLine(7, 6));
+        expectedLines.add(new GitGraphLine(8, 7));
+        expectedLines.add(new GitGraphLine(9, 8));
+        expectedLines.add(new GitGraphLine(10, 9));
+        expectedLines.add(new GitGraphLine(11, 10));
+        expectedLines.add(new GitGraphLine(12, 11));
+        expectedLines.add(new GitGraphLine(13, 13));
+        expectedLines.add(new GitGraphLine(14, 14));
+        expectedLines.add(new GitGraphLine(15, 15));
+        expectedLines.add(new GitGraphLine(16, 16));
+        expectedLines.add(new GitGraphLine(17, 17));
+        expectedLines.add(new GitGraphLine(18, 18));
+        Assert.assertTrue(printAndValidateRowContents(row, expectedHash,
+                expectedPosition, expectedLines));
+        
         // | | | | * | | | | | | | | | | | | | 515722d  160
         // | | * | | | | | | | | | | | | | | | 0f8d119  161
         // | | | | * | | | | | | | | | | | | | 89fff44  162
