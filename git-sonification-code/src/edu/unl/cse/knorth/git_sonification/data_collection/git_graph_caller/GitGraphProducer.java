@@ -62,14 +62,13 @@ public class GitGraphProducer {
         String currentHash = null;
         int currentPosition = 1;
         ArrayList<GitGraphLine> currentLines = null;
+        ArrayList<GitGraphLine> previousLines = null;
+        boolean maintainingAggregateLines = false;
         
         for(String rawRow : rawGraphData) {
             String[] split = rawRow.split("\\s+");
             String hash = split[split.length - 1];
             if(hash.matches("[a-fA-F0-9]+")) {
-                if(hash.equals("bdbec85")) {
-                    int i = 0;
-                }
                 
                 HashPositionAndLines result =
                         processRawRowWithHash(rawRow, hash);
@@ -86,11 +85,16 @@ public class GitGraphProducer {
                 currentHash = result.getHash();
                 currentPosition = result.getPosition();
                 currentLines = result.getLines();
+                previousLines = result.getLines();
+                maintainingAggregateLines = false;
             } else {
                 ArrayList<GitGraphLine> newLines =
                         processRawRowWithoutHash(rawRow);
                 currentLines = updateCurrentLinesWithNewLines(currentLines,
-                        newLines, currentPosition);
+                        previousLines, newLines, currentPosition,
+                        maintainingAggregateLines);
+                previousLines = newLines;
+                maintainingAggregateLines = true;
             }
         }
 
@@ -258,9 +262,10 @@ public class GitGraphProducer {
     }
 
     private ArrayList<GitGraphLine> updateCurrentLinesWithNewLines(
+            ArrayList<GitGraphLine> aggregateLines,
             ArrayList<GitGraphLine> topLines,
             ArrayList<GitGraphLine> bottomLines,
-            int branchWithCommit) {
+            int branchWithCommit, boolean maintainAggregateLines) {
         // In this algorithm, we do a lot of operations that are O(n^2), but the
         // overwhelming majority of Git repositories have at the most 20-30
         // simulaneous branches in any row of their Git graph, so the actual
@@ -279,9 +284,10 @@ public class GitGraphProducer {
                 for(GitGraphLine bottomLine : unusedBottomLines) {
                     if((bottomLine.getFromBranch() == bottomLine.getToBranch())
                            && (bottomLine.getToBranch() == branchNum)) {
-                        updatedLines.add(topLine);
+                        topLine.setMarkerLine(bottomLine);
                         topLinesToRemove.add(topLine);
                         bottomLinesToRemove.add(bottomLine);
+                        updatedLines.add(topLine);
                     }
                 }
             }
@@ -300,6 +306,8 @@ public class GitGraphProducer {
                 if(bottomLine.getToBranch() == topLine.getFromBranch()) {
                     GitGraphLine newLine = new GitGraphLine(
                             bottomLine.getFromBranch(), topLine.getToBranch());
+                    newLine.setMarkerLine(bottomLine);
+                    topLine.setMarkerLine(bottomLine);
                     updatedLines.add(newLine);
                     usedBottomLine = true;
                     break;
@@ -328,11 +336,36 @@ public class GitGraphProducer {
                    * */
                 GitGraphLine newLine = new GitGraphLine(
                             bottomLine.getFromBranch(), branchWithCommit);
-                    updatedLines.add(newLine);
+                newLine.setMarkerLine(bottomLine);
+                updatedLines.add(newLine);
             }
         }
         
-        return updatedLines;
+        if(maintainAggregateLines) {
+            for(GitGraphLine aggregateLine : aggregateLines) {
+                GitGraphLine aggregateMarkerLine =
+                        aggregateLine.getMarkerLine();
+                for(GitGraphLine topLine : topLines) {
+                    if((aggregateMarkerLine.getFromBranch()
+                            == topLine.getFromBranch())
+                            && (aggregateMarkerLine.getToBranch()
+                            == topLine.getToBranch())) {
+                        GitGraphLine topMarkerLine = topLine.getMarkerLine();
+                        if(topMarkerLine == null) {
+                            int stopHereToCheckError = 0;
+                        }
+                        aggregateLine.setFromBranch(
+                                topMarkerLine.getFromBranch());
+                        aggregateLine.setMarkerLine(topMarkerLine);
+                        break;
+                    }
+                }
+            }
+            
+            return aggregateLines;
+        } else {
+            return updatedLines;
+        }
     }
 
 //    private void removeDuplicateLines(ArrayList<GitGraphLine> currentLines) {
