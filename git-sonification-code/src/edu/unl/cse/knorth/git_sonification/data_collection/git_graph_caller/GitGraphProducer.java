@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -66,6 +67,10 @@ public class GitGraphProducer {
             String[] split = rawRow.split("\\s+");
             String hash = split[split.length - 1];
             if(hash.matches("[a-fA-F0-9]+")) {
+                if(hash.equals("bdbec85")) {
+                    int i = 0;
+                }
+                
                 HashPositionAndLines result =
                         processRawRowWithHash(rawRow, hash);
                 
@@ -73,6 +78,7 @@ public class GitGraphProducer {
                 // lines are, which isn't possible until we've reached the next
                 // row with a hash.
                 if(currentHash != null) {
+//                    removeDuplicateLines(currentLines);
                     rows.add(new GitGraphRow(currentHash, currentPosition,
                             currentLines));
                 }
@@ -328,6 +334,32 @@ public class GitGraphProducer {
         
         return updatedLines;
     }
+
+//    private void removeDuplicateLines(ArrayList<GitGraphLine> currentLines) {
+//        Iterator<GitGraphLine> iter = currentLines.iterator();
+//
+//        int i = 0;
+//        while(iter.hasNext()) {
+//            GitGraphLine line1 = iter.next();
+//            boolean foundMatch = false;
+//            
+//            for(int j = i + 1; j < currentLines.size(); j++) {
+//                GitGraphLine line2 = currentLines.get(j);
+//                
+//                if((line1.getFromBranch() == line2.getFromBranch())
+//                        && (line1.getToBranch() == line2.getToBranch())) {
+//                    foundMatch = true;
+//                    break;
+//                }
+//            }
+//            
+//            if(foundMatch) {
+//                iter.remove();
+//            }
+//            
+//            i++;
+//        }
+//    }
     
     private static class HashPositionAndLines {
         private String hash;
