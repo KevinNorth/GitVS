@@ -2,7 +2,7 @@ package edu.unl.cse.knorth.git_sonification;
 
 import edu.unl.cse.knorth.git_sonification.data_collection.git_graph_caller.GitGraph;
 import edu.unl.cse.knorth.git_sonification.data_collection.git_graph_caller.GitGraphProducer;
-import edu.unl.cse.knorth.git_sonification.data_collection.git_graph_caller.Row;
+import edu.unl.cse.knorth.git_sonification.data_collection.git_graph_caller.GitGraphRow;
 import java.io.IOException;
 import org.joda.time.DateTime;
 
@@ -17,7 +17,7 @@ public class Main {
         GitGraph graph = new GitGraphProducer()
                 .produceGitGraph("../../voldemort/.git");
         
-        for(Row row : graph.getRows()) {
+        for(GitGraphRow row : graph.getRows()) {
             System.out.println(row.getCommitHash());
         }
         

@@ -7,16 +7,12 @@ import java.util.Set;
 public class AnnotatedCommitLine {
     private int fromBranch;
     private int toBranch;
-    private String parentHash;
-    private Set<Component> componentsModified;
 
     public AnnotatedCommitLine() {}
     
-    public AnnotatedCommitLine(int fromBranch, int toBranch, String parentHash) {
+    public AnnotatedCommitLine(int fromBranch, int toBranch) {
         this.fromBranch = fromBranch;
         this.toBranch = toBranch;
-        this.parentHash = parentHash;
-        this.componentsModified = new HashSet<>();
     }
 
     public int getFromBranch() {
@@ -35,26 +31,9 @@ public class AnnotatedCommitLine {
         this.toBranch = toBranch;
     }
 
-    public String getParentHash() {
-        return parentHash;
-    }
-
-    public void setParentHash(String parentHash) {
-        this.parentHash = parentHash;
-    }
-
-    public Set<Component> getComponentsModified() {
-        return componentsModified;
-    }
-
-    public void setComponentsModified(Set<Component> componentsModified) {
-        this.componentsModified = componentsModified;
-    }
-    
     @Override
     public String toString() {
-        return "AnnotatedCommitLine{" + "fromBranch=" + fromBranch +
-                ", toBranch=" + toBranch +
-                ", parentHash=" + parentHash + '}';
+        return "AnnotatedCommitLine{" + "fromBranch=" + fromBranch
+                + ", toBranch=" + toBranch + '}';
     }
 }

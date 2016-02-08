@@ -60,7 +60,7 @@ public class GitDataProcessor {
                 
         VisualizationData visualizationData =
                 new VisualizationProcessor().produceVisualizationData(commits,
-                        components, sonificationData);
+                        components, sonificationData, gitGraph);
         
         return new ViewModel(visualizationData, sonificationData);
     }

@@ -14,7 +14,6 @@ public class Row {
   private List<Line> incomingLines;
   private RowType type;
   private int branchLocation;
-  private boolean isVisible;
   private int numConflicts;
   private Commit commit;
 
@@ -22,14 +21,11 @@ public class Row {
    * Creates a new Row that represents a commit.
    */
   public Row(String author, DateTime commitDate, int branchLocation,
-    boolean isVisible, int numConflicts,
-    edu.unl.cse.knorth.git_sonification.display.model.visualization.Commit
-            commit, Collection<Line> incomingLines) {
+    int numConflicts, Commit commit, Collection<Line> incomingLines) {
     this.author = author;
     this.commitDate = commitDate;
     this.type = RowType.COMMIT;
     this.branchLocation = branchLocation;
-    this.isVisible = isVisible;
     this.incomingLines = new ArrayList<>(incomingLines);
     this.numConflicts = numConflicts;
     this.commit = commit;
@@ -39,11 +35,9 @@ public class Row {
    * Creates a new Row that represents a commit.
    */
   public Row(String author, DateTime commitDate, int branchLocation,
-    boolean isVisible, int numConflicts,
-    edu.unl.cse.knorth.git_sonification.display.model.visualization.Commit
-            commit, Line... incomingLines) {
-      this(author, commitDate, branchLocation, isVisible,
-              numConflicts, commit, Arrays.asList(incomingLines));
+    int numConflicts, Commit commit, Line... incomingLines) {
+      this(author, commitDate, branchLocation, numConflicts, commit,
+              Arrays.asList(incomingLines));
   }
   
   /**
@@ -55,7 +49,6 @@ public class Row {
     this.incomingLines = new ArrayList<>(incomingLines);
     this.type = RowType.DAY_SEPARATOR;
     this.branchLocation = NO_BRANCH_LOCATION;
-    this.isVisible = false;
     this.numConflicts = numConflicts;
     this.commit = null;
   }
@@ -92,10 +85,6 @@ public class Row {
   public int getNumConflicts() {
     return numConflicts;
   }
-  
-  public boolean isVisible(){
-      return isVisible;
-  }
 
     public Commit getCommit() {
         return commit;
@@ -108,7 +97,6 @@ public class Row {
             ", incomingLines=" + incomingLines +
             ", type=" + type +
             ", branchLocation=" + branchLocation +
-            ", isVisible=" + isVisible +
             ", numConflicts=" + numConflicts + 
             ", commit=" + commit.toString() +
             '}';

@@ -8,16 +8,20 @@ import java.util.HashMap;
 import java.util.List;
 
 public class GitGraph {
-    private final List<Row> rows;
+    private final List<GitGraphRow> rows;
+    private final HashMap<String, GitGraphRow> rowsTable;
     private final HashMap<String, Integer> rowsPositionTable;
     private final Comparator<Commit> commitComparator;
     
-    public GitGraph(Collection<Row> rows) {
+    public GitGraph(Collection<GitGraphRow> rows) {
         this.rows = new ArrayList<>(rows);
+        this.rowsTable = new HashMap<>(rows.size());
         this.rowsPositionTable = new HashMap<>(rows.size());
         
         for(int i = 0; i < rows.size(); i++) {
-            rowsPositionTable.put(this.rows.get(i).getCommitHash(), i);
+            GitGraphRow row = this.rows.get(i);
+            rowsTable.put(row.getCommitHash(), row);
+            rowsPositionTable.put(row.getCommitHash(), i);
         }
         
         final GitGraph self = this;
@@ -29,7 +33,7 @@ public class GitGraph {
         };
     }
     
-    public List<Row> getRows() {
+    public List<GitGraphRow> getRows() {
         return rows;
     }
     
@@ -42,6 +46,14 @@ public class GitGraph {
             return rowsPositionTable.get(hash);
         } else {
             return -1;
+        }
+    }
+    
+    public GitGraphRow getRowForCommit(String hash) {
+        if(rowsPositionTable.containsKey(hash)) {
+            return rowsTable.get(hash);
+        } else {
+            return null;
         }
     }
 }

@@ -19,7 +19,8 @@ public class AnnotatedCommit {
     }
 
     public AnnotatedCommit(DateTime timestamp, String hash, String author,
-            int branch, List<AnnotatedCommitLine> incomingBranches) {
+            int branch, List<AnnotatedCommitLine> incomingBranches,
+            List<Component> components) {
         this.timestamp = timestamp;
         this.hash = hash;
         this.author = author;

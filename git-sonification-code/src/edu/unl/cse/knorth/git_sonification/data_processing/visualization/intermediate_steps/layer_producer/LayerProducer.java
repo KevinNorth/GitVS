@@ -11,10 +11,8 @@ import edu.unl.cse.knorth.git_sonification.display.model.visualization.Line;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.Row;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.VisualizationData;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public class LayerProducer {
     public VisualizationData produceLayers(List<AnnotatedCommit> commits,
@@ -23,7 +21,6 @@ public class LayerProducer {
         final int numEndBranches =
                 commits.get(commits.size() - 1).getMaxToBranchNumber();
         
-        Map<Component, Layer> layerMap = prepareLayerMap(components);
         Layer combinedLayer = new Layer();
         
         Iterator<Measure> measureIter = sonificationData.getMeasures()
@@ -38,30 +35,20 @@ public class LayerProducer {
                     currentMeasure = measureIter.next();
                 } while(currentMeasure.isDaySeparator());
                 
-                addDaySeparatorRow(layerMap, combinedLayer, commit,
+                addDaySeparatorRow(combinedLayer, commit,
                         lastDaySeparator);
             }
 
             
-            addRow(layerMap, combinedLayer, commit, currentMeasure);
+            addRow(combinedLayer, commit, currentMeasure);
         }
         
-        return new VisualizationData(layerMap.values(), combinedLayer,
-                components, numStartBranches, numEndBranches);
+        return new VisualizationData(combinedLayer, components,
+                numStartBranches, numEndBranches);
     }
-    
-    private Map<Component, Layer> prepareLayerMap(List<Component> components) {
-        Map<Component, Layer> layerMap = new HashMap<>(components.size());
         
-        for(Component component : components) {
-            layerMap.put(component, new Layer());
-        }
-        
-        return layerMap;
-    }
-    
-    private void addRow(Map<Component, Layer> layerMap, Layer combinedLayer,
-            AnnotatedCommit commit, Measure currentMeasure) {
+    private void addRow(Layer combinedLayer, AnnotatedCommit commit,
+            Measure currentMeasure) {
         List<Line> lines = new ArrayList<>(
                 commit.getIncomingBranches().size());
 
@@ -71,44 +58,22 @@ public class LayerProducer {
                     commit.getTimestamp(), commit.getComponents());
         
         for(AnnotatedCommitLine oldLine : commit.getIncomingBranches()) {
-            lines.add(new Line(oldLine.getFromBranch(), oldLine.getToBranch(),
-                    true));
+            lines.add(new Line(oldLine.getFromBranch(), oldLine.getToBranch()));
         }
-        
-        for(Map.Entry<Component, Layer> componentAndLayer : layerMap.entrySet())
-        {
-            Component component = componentAndLayer.getKey();
-            Layer layer = componentAndLayer.getValue();
-            
-            boolean isCommitVisible =
-                    commit.getComponents().contains(component);
-            Row row = new Row(commit.getAuthor(), commit.getTimestamp(),
-                    commit.getBranch(), isCommitVisible,
-                    currentMeasure.getNumConflicts(), modelCommit, lines);
-            layer.getRows().add(row);
-        }
-        
+                
         Row row = new Row(commit.getAuthor(), commit.getTimestamp(),
-            commit.getBranch(), true, currentMeasure.getNumConflicts(),
+            commit.getBranch(), currentMeasure.getNumConflicts(),
                 modelCommit, lines);
         combinedLayer.getRows().add(row);
     }
 
-    private void addDaySeparatorRow(Map<Component, Layer> layerMap,
-            Layer combinedLayer, AnnotatedCommit commit,
+    private void addDaySeparatorRow(Layer combinedLayer, AnnotatedCommit commit,
             Measure currentMeasure) {
         List<Line> lines = new ArrayList<>(
             commit.getIncomingBranches().size());
         for(AnnotatedCommitLine oldLine : commit.getIncomingBranches()) {
-            lines.add(new Line(oldLine.getFromBranch(), oldLine.getFromBranch(),
-                true));
-        }
-
-        for(Layer layer : layerMap.values())
-        {
-            Row row = new Row(currentMeasure.getTimestamp(),
-                    currentMeasure.getNumConflicts(), lines);
-            layer.getRows().add(row);
+            lines.add(new Line(oldLine.getFromBranch(),
+                    oldLine.getFromBranch()));
         }
 
         Row row = new Row(currentMeasure.getTimestamp(),
