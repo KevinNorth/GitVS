@@ -55,12 +55,11 @@ public class GitDataProcessor {
                 
         SonificationProcessor sonificationProcessor = new SonificationProcessor();
         SonificationData sonificationData =
-                sonificationProcessor.processSonificationData(commits,
-                        authorCommitCounts);
+            sonificationProcessor.processSonificationData(authorCommitCounts);
                 
         VisualizationData visualizationData =
                 new VisualizationProcessor().produceVisualizationData(commits,
-                        components, sonificationData, gitGraph);
+                        components, sonificationData, conflicts, gitGraph);
         
         return new ViewModel(visualizationData, sonificationData);
     }
