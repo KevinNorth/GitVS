@@ -1,7 +1,7 @@
 package edu.unl.cse.knorth.git_sonification.data_collection.commit_processor;
 
+import edu.unl.cse.knorth.git_sonification.data_collection.commit_processor.commit_filter.BetweenHashesCommitFilter;
 import edu.unl.cse.knorth.git_sonification.data_collection.commit_processor.commit_filter.CommitFilter;
-import edu.unl.cse.knorth.git_sonification.data_collection.commit_processor.commit_filter.DateCommitFilter;
 import edu.unl.cse.knorth.git_sonification.data_collection.components.Component;
 import edu.unl.cse.knorth.git_sonification.data_collection.conflict_data.Conflict;
 import edu.unl.cse.knorth.git_sonification.data_collection.git_caller.PartialCommit;
@@ -12,7 +12,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import org.joda.time.DateTime;
 import java.util.List;
 
 public class CommitProcessor {
@@ -25,12 +24,12 @@ public class CommitProcessor {
      * @param conflicts A list of <code>Conflict</code>s which will be used to
      * add conflict metadata to the <code>Commit</code>s this method returns.
      * @param components A list of all components that appear in the commits.
-     * @param since The earliest a commit can have been made and still appear in
-     * the list of fully processed <code>Commit</code>s that this method
-     * returns.
-     * @param until The latest a commit can have been made and still appear in
-     * the list of fully processed <code>Commit</code>s that this method
-     * returns.
+     * @param firstHash The hash of the first commit in the
+     * <code>gitGraph</code> that will also appear in the list of fully
+     * processed <code>Commit</code>s that this method returns.
+     * @param lastHash The hash of the first commit in the
+     * <code>gitGraph</code> that will also appear in the list of fully
+     * processed <code>Commit</code>s that this method returns.
      * @param gitGraph A <code>GitGraph</code> object representing the data from
      * <code>git log --graph</code>.
      * @return A list of fully processed <code>Commit</code>s that are ready to
@@ -39,9 +38,10 @@ public class CommitProcessor {
      */
     public List<Commit> processCommits(List<PartialCommit> partialCommits,
             List<Conflict> conflicts, List<Component> components,
-            DateTime since, DateTime until, GitGraph gitGraph) {
+            String firstHash, String lastHash, GitGraph gitGraph) {
         return processCommits(partialCommits, conflicts, components,
-                new DateCommitFilter(since, until), gitGraph);
+                new BetweenHashesCommitFilter(firstHash, lastHash, gitGraph),
+                gitGraph);
     }
     
     /**

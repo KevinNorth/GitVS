@@ -23,16 +23,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.joda.time.DateTime;
 import processing.core.PApplet;
 import processing.event.MouseEvent;
 
 public class BranchView extends TwoDimensionalView<BranchViewState> {
-    private DateTime since;
-    private DateTime until;
+    private String firstHash;
+    private String lastHash;
     private String locationOfGitRepo;
-    private static String locationOfConflicts;
-    private static String locationOfComponents;
+    private String locationOfConflicts;
+    private String locationOfComponents;
 
     private ViewModel viewModel;
     private ArrayList<CommitDrawable> commits;
@@ -55,34 +54,34 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
 
     /* To hold onto the date values obtained from the command line arguments
      * until we're in a non-static context (i.e. not main()) */
-    private static DateTime sinceFromArgs;
-    private static DateTime untilFromArgs;
+    private static String firstHashFromArgs;
+    private static String lastHashFromArgs;
     private static String locationOfGitRepoFromArgs;
     private static String locationOfConflictsFromArgs;
     private static String locationOfComponentsFromArgs;
         
     public static void main(String args[]) {
         if(args.length == 2) {
-            sinceFromArgs = DateTime.parse(args[0]);
-            untilFromArgs = DateTime.parse(args[1]);
+            firstHashFromArgs = args[0];
+            lastHashFromArgs = args[1];
             locationOfGitRepoFromArgs = "../../voldemort/.git";
             locationOfConflictsFromArgs = "data/conflict_data.dat";
             locationOfComponentsFromArgs = "data/components.txt";
         } else if(args.length == 3) {
-            sinceFromArgs = DateTime.parse(args[0]);
-            untilFromArgs = DateTime.parse(args[1]);
+            firstHashFromArgs = args[0];
+            lastHashFromArgs = args[1];
             locationOfGitRepoFromArgs = args[2];
             locationOfConflictsFromArgs = "data/conflict_data.dat";
             locationOfComponentsFromArgs = "data/components.txt";
         } else if(args.length == 4) {
-            sinceFromArgs = DateTime.parse(args[0]);
-            untilFromArgs = DateTime.parse(args[1]);
+            firstHashFromArgs = args[0];
+            lastHashFromArgs = args[1];
             locationOfGitRepoFromArgs = args[2];
             locationOfConflictsFromArgs = args[3];
             locationOfComponentsFromArgs = "data/components.txt";
         } else if(args.length == 5) {
-            sinceFromArgs = DateTime.parse(args[0]);
-            untilFromArgs = DateTime.parse(args[1]);
+            firstHashFromArgs = args[0];
+            lastHashFromArgs = args[1];
             locationOfGitRepoFromArgs = args[2];
             locationOfConflictsFromArgs = args[3];
             locationOfComponentsFromArgs = args[4];
@@ -90,8 +89,8 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
             // Default date range is the first 10 days of November 2009
 //            sinceFromArgs = new DateTime(2015, 1, 1, 0, 0);
 //            untilFromArgs = new DateTime(2016, 1, 5, 0, 0);
-            sinceFromArgs = new DateTime(2009, 11, 1, 0, 0);
-            untilFromArgs = new DateTime(2009, 11, 10, 0, 0);
+            firstHashFromArgs = null;
+            lastHashFromArgs = null;
             locationOfGitRepoFromArgs = "../../voldemort/.git";
             locationOfConflictsFromArgs = "data/conflict_data.dat";
             locationOfComponentsFromArgs = "data/components.txt";
@@ -111,8 +110,8 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     
     @Override
     public void initialize() {
-        since = sinceFromArgs;
-        until = untilFromArgs;
+        firstHash = firstHashFromArgs;
+        lastHash = lastHashFromArgs;
         locationOfGitRepo = locationOfGitRepoFromArgs;
         locationOfConflicts = locationOfConflictsFromArgs;
         locationOfComponents = locationOfComponentsFromArgs;
@@ -210,7 +209,7 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     
     private ViewModel calculateViewModel() throws IOException {
         return new GitDataProcessor().processGitData(
-                        locationOfGitRepo, since, until,
+                        locationOfGitRepo, firstHash, lastHash,
                         CreateComponentTechniques.EACH_INDIVIDUAL_FILE,
                         locationOfConflicts, locationOfComponents);
     }

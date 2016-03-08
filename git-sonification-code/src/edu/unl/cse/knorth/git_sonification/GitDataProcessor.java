@@ -21,11 +21,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import org.joda.time.DateTime;
 
 public class GitDataProcessor {
     public ViewModel processGitData(String targetGitRepoLocation,
-            DateTime startDate, DateTime endDate,
+            String firstHash, String lastHash,
             CreateComponentTechniques componentTechnique,
             String conflictsLocation, String componentsLocation)
             throws IOException {
@@ -51,7 +50,7 @@ public class GitDataProcessor {
         
         List<Commit> commits = new CommitProcessor()
                 .processCommits(partialCommits, conflicts, components,
-                        startDate, endDate, gitGraph);
+                        firstHash, lastHash, gitGraph);
                 
         SonificationProcessor sonificationProcessor = new SonificationProcessor();
         SonificationData sonificationData =

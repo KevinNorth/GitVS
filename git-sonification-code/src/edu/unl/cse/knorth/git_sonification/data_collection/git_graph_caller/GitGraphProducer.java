@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -41,7 +40,7 @@ public class GitGraphProducer {
         errorGobbler.start();
         
         try {            
-            List<String> rawGraphData = new LinkedList<String>();
+            List<String> rawGraphData = new LinkedList<>();
             InputStreamReader isr = new InputStreamReader(pr.getInputStream());
             BufferedReader br = new BufferedReader(isr);
             String line;
@@ -391,32 +390,6 @@ public class GitGraphProducer {
             return updatedLines;
         }
     }
-
-//    private void removeDuplicateLines(ArrayList<GitGraphLine> currentLines) {
-//        Iterator<GitGraphLine> iter = currentLines.iterator();
-//
-//        int i = 0;
-//        while(iter.hasNext()) {
-//            GitGraphLine line1 = iter.next();
-//            boolean foundMatch = false;
-//            
-//            for(int j = i + 1; j < currentLines.size(); j++) {
-//                GitGraphLine line2 = currentLines.get(j);
-//                
-//                if((line1.getFromBranch() == line2.getFromBranch())
-//                        && (line1.getToBranch() == line2.getToBranch())) {
-//                    foundMatch = true;
-//                    break;
-//                }
-//            }
-//            
-//            if(foundMatch) {
-//                iter.remove();
-//            }
-//            
-//            i++;
-//        }
-//    }
     
     private static class HashPositionAndLines {
         private String hash;
