@@ -66,11 +66,21 @@ public class DrawablesProducer {
         
         List<String> authors = new LinkedList<>();
         Map<Commit, String> timestamps = new HashMap<>(selectedCommits.size());
+        Map<Commit, Integer> numsFilesModified =
+                new HashMap<>(selectedCommits.size());
         List<String> componentNames = new LinkedList<>();
+        int maxFilesModified = 0;
         
         for(Commit commit : selectedCommits) {
+            int numFilesModified = commit.getComponentsModified().size();
+            
             authors.add(commit.getAuthor());
             timestamps.put(commit, DATE_FORMATTER.print(commit.getTimestamp()));
+            numsFilesModified.put(commit, numFilesModified);
+
+            if(numFilesModified > numFilesModified) { 
+                maxFilesModified = numFilesModified;
+            }
             
             for(Component component : commit.getComponentsModified()) {
                 componentNames.add(component.getName());
@@ -82,14 +92,20 @@ public class DrawablesProducer {
                 getNumCharsInLongestString(timestamps.values());
         int lengthOfLongestComponent =
                 getNumCharsInLongestString(componentNames);
+        int lengthOfLongestFilesModified =
+                Math.max(Integer.toString(maxFilesModified).length(),
+                        "# of Files".length());
         
         float heightOfHeader = lengthOfLongestComponent * headerTextSize * 0.6f;
         
         float hashColWidth = numCharsToPrintInHash * (bodyTextSize * 0.6f);
         float authorColWidth = lengthOfLongestAuthor * (bodyTextSize * 0.6f);
         float timestampColWidth = lengthOfLongestTimestamp *(bodyTextSize*0.6f);
+        float lengthOfNumFilesModifiedWidth = lengthOfLongestFilesModified
+                * (bodyTextSize*0.6f);
         float checkmarksLeftMargin = hashColWidth + authorColWidth
-                + timestampColWidth + (cellMargin * 5);
+                + timestampColWidth + lengthOfNumFilesModifiedWidth +
+                (cellMargin * 7);
         
         float heightOfVerticalLines =
                 (numBodyRows * ((bodyTextSize) + (2 * cellMargin)))
@@ -111,7 +127,12 @@ public class DrawablesProducer {
         noninteractiveDrawables.add(
                 new TextDrawable(new Rectangle(
                         hashColWidth + authorColWidth + (cellMargin * 4),
-                        0, checkmarksLeftMargin, headerTextSize), 0, "Timestamp",
+                        0, hashColWidth + authorColWidth + timestampColWidth + (cellMargin * 4), headerTextSize), 0, "Timestamp",
+                        headerFontName, headerTextSize, headerColor, context));
+        noninteractiveDrawables.add(
+                new TextDrawable(new Rectangle(
+                        hashColWidth + authorColWidth + timestampColWidth + (cellMargin * 6),
+                        0, checkmarksLeftMargin, headerTextSize), 0, "# of Files",
                         headerFontName, headerTextSize, headerColor, context));
         for(int i = 0; i < selectedComponents.size(); i++) {
             Component component = selectedComponents.get(i);
@@ -144,6 +165,12 @@ public class DrawablesProducer {
                     lineColor, new Rectangle(
                     hashColWidth + authorColWidth + (cellMargin * 3),
                     y1, hashColWidth + authorColWidth + (cellMargin * 3), y2),
+                    2));
+            noninteractiveDrawables.add(new LineDrawable(
+                    LineDrawable.Direction.TOPRIGHT_TO_BOTTOMLEFT, tableLineWidth,
+                    lineColor, new Rectangle(
+                    hashColWidth + authorColWidth + timestampColWidth + (cellMargin * 5),
+                    y1, hashColWidth + authorColWidth + timestampColWidth + (cellMargin * 5), y2),
                     2));
             for(int i = 0;
                 i < selectedComponents.size() + 1 /* for outer border line */;
@@ -182,8 +209,14 @@ public class DrawablesProducer {
             noninteractiveDrawables.add(
                     new TextDrawable(new Rectangle(
                             hashColWidth + authorColWidth + (cellMargin * 4),
-                            rowTop, checkmarksLeftMargin, rowBottom), 0,
+                            rowTop, hashColWidth + authorColWidth + (cellMargin * 4) + timestampColWidth, rowBottom), 0,
                             timestamps.get(commit), bodyFontName, bodyTextSize,
+                            bodyColor, context));
+            noninteractiveDrawables.add(
+                    new TextDrawable(new Rectangle(
+                            hashColWidth + authorColWidth + (cellMargin * 6) + timestampColWidth,
+                            rowTop, checkmarksLeftMargin, rowBottom), 0,
+                            Integer.toString(numsFilesModified.get(commit)), bodyFontName, bodyTextSize,
                             bodyColor, context));
             for(int i = 0; i < selectedComponents.size(); i++) {
                 Component component = selectedComponents.get(i);
