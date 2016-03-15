@@ -10,6 +10,9 @@ import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Color;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Rectangle;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.common_drawables.java.TextDrawable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import processing.core.PApplet;
@@ -45,11 +48,11 @@ public class DrawablesProducer {
     
     public CommitsAndLines produceCommitDrawables(ViewModel viewModel) {
         VisualizationData visualData = viewModel.getVisualizationData();
-        
+
         int rowNum = 1;
                 
         Color commitColor = Color.BLUE;
-        Color lineColor = Color.RED;
+        Map<Integer, Color> lineColors = determineLineColors(visualData);
         
         Layer combinedLayer = visualData.getCombinedLayer();
         
@@ -80,6 +83,8 @@ public class DrawablesProducer {
             
             float topOfPreviousRow = topOfRow - distanceBetweenRows;
             for(Line line : row.getIncomingLines()) {
+                Color lineColor = lineColors.get(line.color);
+                
                 float topXCoordinate = leftMargin
                         + (distanceBetweenLines * line.fromBranch);
                 float bottomXCoordinate = leftMargin
@@ -250,6 +255,46 @@ public class DrawablesProducer {
         playButtons.add(forwardButton);
         playButtons.add(reverseButton);
         return playButtons;
+    }
+
+    private Map<Integer, Color> determineLineColors(VisualizationData visualData) {
+        List<Row> rows = visualData.getCombinedLayer().getRows();
+        
+        int maxColor = 0;
+        for(Row row : rows) {
+            for(Line line : row.getIncomingLines()) {
+                if(line.color > maxColor) {
+                    maxColor = line.color;
+                }
+            }
+        }
+        
+        Map<Integer, Color> colorMap = new HashMap<>();
+        int maxColorThird = (maxColor / 9) + 1;
+        int colorNum = 1;
+        for(int saturationNum = 0; saturationNum <= maxColorThird;
+                saturationNum++) {
+            for(int brightnessNum = 0; brightnessNum <= maxColorThird;
+                    brightnessNum++) {
+                for(int hueNum = 0; hueNum <= maxColorThird; hueNum++) {
+                    char hue = (char) ((((float)(maxColorThird + 1 - hueNum))
+                            / (float) (maxColorThird + 1)) * (char) 255);
+                    char brightness =
+                            (char) (((((float)(maxColorThird - brightnessNum))
+                            / (float) (maxColorThird)) * 155) + 100);
+                    char saturation =
+                            (char) (((((float)(maxColorThird - saturationNum))
+                            / (float) (maxColorThird)) * 155) + 100);
+                    Color color = Color.createHSBColor(hue, saturation,
+                            brightness);
+                    colorMap.put(colorNum, color);
+                    colorNum++;
+                }
+            }
+        }
+
+        
+        return colorMap;
     }
         
     public static class CommitsAndLines {
