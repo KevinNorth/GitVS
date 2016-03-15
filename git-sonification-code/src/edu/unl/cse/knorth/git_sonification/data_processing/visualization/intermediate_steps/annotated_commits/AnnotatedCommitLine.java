@@ -15,6 +15,7 @@ public class AnnotatedCommitLine {
     public AnnotatedCommitLine(int fromBranch, int toBranch, int color) {
         this.fromBranch = fromBranch;
         this.toBranch = toBranch;
+        this.color = color;
     }
     
     public int getFromBranch() {

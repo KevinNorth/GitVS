@@ -64,6 +64,7 @@ public class CommitAnnotator {
         GitGraphRow row = gitGraph.getRowForCommit(commit.getHash());
         
         Map<Integer, Integer> newBranchColors = new HashMap<>();
+        newBranchColors.putAll(branchColors);
         
         DateTime timestamp = commit.getTimestamp();
         String hash = commit.getHash();
@@ -113,7 +114,7 @@ public class CommitAnnotator {
                } else {
                    color = branchColors.get(fromBranch);
                }
-            }
+            }            
             
             lines.add(new AnnotatedCommitLine(rowLine.getFromBranch(), 
                     rowLine.getToBranch(), color));
@@ -143,6 +144,10 @@ public class CommitAnnotator {
             branchColors.put(branch, branch);
         }
         
+        if(branchColors.isEmpty()) {
+            branchColors.put(1, 1);
+        }
+        
         return branchColors;
     }
 
@@ -151,8 +156,11 @@ public class CommitAnnotator {
         GitGraphLine closestLeftLine = null;
         for(GitGraphLine line : row.getIncomingLines()) {
             if(line.getToBranch() == toBranch) {
+                if(line.getToBranch() > line.getFromBranch()) {
+                    continue;
+                }
                 if(closestLeftLine != null) {
-                    if(line.getFromBranch() <= closestLeftLine.getFromBranch()) {
+                    if(line.getFromBranch() < closestLeftLine.getFromBranch()) {
                         closestLeftLine = line;
                     }
                 } else {
