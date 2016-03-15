@@ -270,12 +270,29 @@ public class DrawablesProducer {
         }
         
         Map<Integer, Color> colorMap = new HashMap<>();
-        for(int colorNum = 0; colorNum < maxColor; colorNum++) {
-            float hueFactor = (float) (colorNum) / (float) (maxColor);
-            char hue = (char) (hueFactor * (char) 255);
-            colorMap.put(colorNum + 1, Color.createHSBColor(hue,
-                    (char) 255, (char) 255));
+        int maxColorThird = (maxColor / 9) + 1;
+        int colorNum = 1;
+        for(int saturationNum = 0; saturationNum <= maxColorThird;
+                saturationNum++) {
+            for(int brightnessNum = 0; brightnessNum <= maxColorThird;
+                    brightnessNum++) {
+                for(int hueNum = 0; hueNum <= maxColorThird; hueNum++) {
+                    char hue = (char) ((((float)(maxColorThird + 1 - hueNum))
+                            / (float) (maxColorThird + 1)) * (char) 255);
+                    char brightness =
+                            (char) (((((float)(maxColorThird - brightnessNum))
+                            / (float) (maxColorThird)) * 155) + 100);
+                    char saturation =
+                            (char) (((((float)(maxColorThird - saturationNum))
+                            / (float) (maxColorThird)) * 155) + 100);
+                    Color color = Color.createHSBColor(hue, saturation,
+                            brightness);
+                    colorMap.put(colorNum, color);
+                    colorNum++;
+                }
+            }
         }
+
         
         return colorMap;
     }
