@@ -6,7 +6,9 @@ import edu.unl.cse.knorth.git_sonification.data_collection.git_graph_caller.GitG
 import edu.unl.cse.knorth.git_sonification.data_collection.git_graph_caller.GitGraphRow;
 import edu.unl.cse.knorth.git_sonification.data_collection.intermediate_data.Commit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.joda.time.DateTime;
 
 /**
@@ -43,17 +45,25 @@ public class CommitAnnotator {
     {
         List<AnnotatedCommit> annotatedCommits =
                 new ArrayList<>(commitsToAnnotate.size());
-                
+
+        Map<Integer, Integer> branchColors =
+                getInitialBranchColors(commitsToAnnotate.get(0), gitGraph);
+        
         for(Commit commit : commitsToAnnotate) {
-            AnnotatedCommit result = annotateCommit(commit, gitGraph);
-            annotatedCommits.add(result);
+            AnnotatedCommitAndBranchColors result = annotateCommit(commit,
+                    gitGraph, branchColors);
+            annotatedCommits.add(result.getAnnotatedCommit());
+            branchColors = result.getBranchColors();
         }
         
         return annotatedCommits;
     }
 
-    private AnnotatedCommit annotateCommit(Commit commit, GitGraph gitGraph) {
+    private AnnotatedCommitAndBranchColors annotateCommit(Commit commit,
+            GitGraph gitGraph, Map<Integer, Integer> branchColors) {
         GitGraphRow row = gitGraph.getRowForCommit(commit.getHash());
+        
+        Map<Integer, Integer> newBranchColors = new HashMap<>();
         
         DateTime timestamp = commit.getTimestamp();
         String hash = commit.getHash();
@@ -65,11 +75,147 @@ public class CommitAnnotator {
         List<GitGraphLine> rowLines = row.getIncomingLines();
         List<AnnotatedCommitLine> lines = new ArrayList<>(rowLines.size());
         for(GitGraphLine rowLine : rowLines) {
+            int color = 1;
+            final int toBranch = rowLine.getToBranch();
+            final int fromBranch = rowLine.getFromBranch();
+            
+            if(toBranch == fromBranch) {
+                color = branchColors.get(toBranch);
+                newBranchColors.put(toBranch, color);
+            } else if(toBranch > fromBranch) /* going to the right */ {
+               GitGraphLine closestLeftLine = getClosestLineGoingToLeft(toBranch,
+                       row);
+               
+               if(closestLeftLine != null) {
+                   // The line is merging to the right
+                   // Match the color of the branch being pulled into
+                   color = branchColors.get(toBranch);
+                   newBranchColors.put(toBranch, color);
+               } else {
+                   // The line is going to the right, but it's not merging
+                   // See whether to generate a new color
+                   GitGraphLine leftmostLine = getLeftmostLine(fromBranch, row);
+                   if(rowLine == leftmostLine) {
+                       color = branchColors.get(fromBranch);
+                       newBranchColors.put(toBranch, color);
+                   } else {
+                       color = newColor(branchColors, newBranchColors);
+                       newBranchColors.put(toBranch, color);
+                   }
+               }
+            } else /* going to the left */ {
+               GitGraphLine closestLeftLine = getClosestLineGoingToLeft(toBranch,
+                       row);
+               
+               if(closestLeftLine == rowLine) {
+                   color = branchColors.get(fromBranch);
+                   newBranchColors.put(toBranch, color);
+               } else {
+                   color = branchColors.get(fromBranch);
+               }
+            }
+            
             lines.add(new AnnotatedCommitLine(rowLine.getFromBranch(), 
-                    rowLine.getToBranch()));
+                    rowLine.getToBranch(), color));
         }
         
-        return new AnnotatedCommit(timestamp, hash, author, branch, lines,
-                components);
+        AnnotatedCommit annotatedCommit = new AnnotatedCommit(timestamp, hash,
+                author, branch, lines, components);
+        return new AnnotatedCommitAndBranchColors(annotatedCommit,
+                newBranchColors);
+    }
+
+    private Map<Integer, Integer> getInitialBranchColors(Commit firstCommit,
+            GitGraph gitGraph) {
+        Map<Integer, Integer> branchColors = new HashMap<>();
+        
+        GitGraphRow firstRow = gitGraph.getRowForCommit(firstCommit.getHash());
+
+        int maxFromBranch = 0;
+        for(GitGraphLine line : firstRow.getIncomingLines()) {
+            int fromBranch = line.getFromBranch();
+            if(fromBranch > maxFromBranch) {
+                maxFromBranch = fromBranch;
+            }
+        }
+        
+        for(int branch = 1; branch <= maxFromBranch; branch++) {
+            branchColors.put(branch, branch);
+        }
+        
+        return branchColors;
+    }
+
+    private GitGraphLine getClosestLineGoingToLeft(int toBranch,
+            GitGraphRow row) {
+        GitGraphLine closestLeftLine = null;
+        for(GitGraphLine line : row.getIncomingLines()) {
+            if(line.getToBranch() == toBranch) {
+                if(closestLeftLine != null) {
+                    if(line.getFromBranch() <= closestLeftLine.getFromBranch()) {
+                        closestLeftLine = line;
+                    }
+                } else {
+                    closestLeftLine = line;
+                }
+            }
+        }
+        
+        return closestLeftLine;
+    }
+
+    private GitGraphLine getLeftmostLine(int fromBranch, GitGraphRow row) {
+        GitGraphLine leftmostLine = null;
+        for(GitGraphLine line : row.getIncomingLines()) {
+            if(line.getFromBranch() == fromBranch) {
+                if(leftmostLine != null) {
+                    if(line.getToBranch() < leftmostLine.getToBranch()) {
+                        leftmostLine = line;
+                    }
+                } else {
+                    leftmostLine = line;
+                }
+            }
+        }
+        
+        return leftmostLine;
+    }
+
+    private int newColor(Map<Integer, Integer> branchColors,
+            Map<Integer, Integer> newBranchColors) {
+        int maxColor = 0;
+        
+        for(int color : branchColors.values()) {
+            if(color > maxColor) {
+                maxColor = color;
+            }
+        }
+
+        for(int color : newBranchColors.values()) {
+            if(color > maxColor) {
+                maxColor = color;
+            }
+        }
+            
+        return maxColor + 1;
+    }
+    
+    private static class AnnotatedCommitAndBranchColors {
+        private final AnnotatedCommit annotatedCommit;
+        private final Map<Integer, Integer> branchColors;
+
+        public AnnotatedCommitAndBranchColors(AnnotatedCommit annotatedCommit,
+                Map<Integer, Integer> branchColors) {
+            this.annotatedCommit = annotatedCommit;
+            this.branchColors = branchColors;
+        }
+
+        public AnnotatedCommit getAnnotatedCommit() {
+            return annotatedCommit;
+        }
+
+        public Map<Integer, Integer> getBranchColors() {
+            return branchColors;
+        }
     }
 }
