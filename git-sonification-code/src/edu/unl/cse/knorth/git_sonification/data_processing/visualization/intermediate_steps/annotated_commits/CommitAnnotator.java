@@ -7,8 +7,10 @@ import edu.unl.cse.knorth.git_sonification.data_collection.git_graph_caller.GitG
 import edu.unl.cse.knorth.git_sonification.data_collection.intermediate_data.Commit;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.joda.time.DateTime;
 
 /**
@@ -191,21 +193,27 @@ public class CommitAnnotator {
 
     private int newColor(Map<Integer, Integer> branchColors,
             Map<Integer, Integer> newBranchColors) {
-        int maxColor = 0;
+        Set<Integer> usedColors = new HashSet<>();
         
         for(int color : branchColors.values()) {
-            if(color > maxColor) {
-                maxColor = color;
-            }
+            usedColors.add(color);
         }
 
         for(int color : newBranchColors.values()) {
-            if(color > maxColor) {
-                maxColor = color;
-            }
+            usedColors.add(color);
         }
-            
-        return maxColor + 1;
+        
+        long newColor = 1; // Use a long to prevent a degenerate case where
+                           // there are so many colors that the next loop can
+                           // never exit because all possible int values are
+                           // being used. (This case is exceedingly unlikely,
+                           // but we might as well account for it now.)
+        
+        while(usedColors.contains((int) newColor)) {
+            newColor++;
+        }
+        
+        return (int) newColor;
     }
     
     private static class AnnotatedCommitAndBranchColors {
