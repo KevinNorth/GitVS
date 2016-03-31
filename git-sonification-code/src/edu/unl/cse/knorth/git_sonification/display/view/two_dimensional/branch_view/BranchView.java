@@ -37,6 +37,7 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     private ArrayList<CommitDrawable> commits;
     private ArrayList<BranchLineDrawable> lines;
     private ArrayList<DaySeparatorDrawable> daySeparators;
+    private ArrayList<ConflictDrawable> conflicts;
     private ArrayList<TextDrawable> timestamps;
     private SonificationCursorDrawable sonificationCursor;
     private SelectionRectangleDrawable patchSelection;
@@ -184,11 +185,13 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
         commits = commitsAndLines.getCommits();
         lines = commitsAndLines.getLines();
         
-        DrawablesProducer.DaySeparatorsAndTimestamps daySeparatorsAndTimestamps
+        DrawablesProducer.DaySeparatorsTimestampsAndConflicts
+                daySeparatorsTimestampsAndConflicts
                = drawablesProducer.produceDaySeparatorsAndTimestamps(viewModel,
                        this);
-        daySeparators = daySeparatorsAndTimestamps.getDaySeparators();
-        timestamps = daySeparatorsAndTimestamps.getTimestamps();
+        daySeparators = daySeparatorsTimestampsAndConflicts.getDaySeparators();
+        timestamps = daySeparatorsTimestampsAndConflicts.getTimestamps();
+        conflicts = daySeparatorsTimestampsAndConflicts.getConflicts();
         
         sonificationCursor =
                 drawablesProducer.produceSonificationCursor(viewModel);
@@ -202,6 +205,7 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
         drawables.addAll(lines);
         drawables.addAll(timestamps);
         drawables.addAll(daySeparators);
+        drawables.addAll(conflicts);
         drawables.add(sonificationCursor);
         drawables.addAll(playButtons);
         return drawables;
