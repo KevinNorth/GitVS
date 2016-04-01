@@ -25,11 +25,14 @@ public class GitGraph {
         }
         
         final GitGraph self = this;
-        this.commitComparator = (Commit c1, Commit c2) -> {
-            int c1pos = self.rowsPositionTable.get(c1.getHash());
-            int c2pos = self.rowsPositionTable.get(c2.getHash());
-            
-            return -Integer.compare(c1pos, c2pos);
+        this.commitComparator = new Comparator<Commit>() {
+            @Override
+            public int compare(Commit c1, Commit c2) {
+                int c1pos = self.rowsPositionTable.get(c1.getHash());
+                int c2pos = self.rowsPositionTable.get(c2.getHash());
+
+                return -Integer.compare(c1pos, c2pos);
+            }
         };
     }
     
