@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
 cd git-sonification-code
-java -jar dist/GitVS.jar fdb763861c534937d13611842307aefebe585608 788aa246bf20ad4a2995be559948c65e009f898c ../../voldemort/.git
+java -jar dist/GitVS.jar 2a42e63e7ea8ed06facf9b7e68671bcd2345c8a6 d7153c957785c8236b43030385e479b6f788e897 ../../voldemort/.git data/voldemort_conflicts.dat

@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
 cd git-sonification-code
-java -jar dist/GitVS.jar dbcb138603f55fc9f234d2d3b2404a2bfc92e4d9 4c097329187412f75e80a657effa997e2656923f ../../storm/.git data/storm_conflicts_new.dat
+java -jar dist/GitVS.jar 96372fa7a3c5a87eef9a97acada44ea17deb9306 21f56e91efd4af4a8b2c54d6ba6b50b717f2aca7 ../../storm/.git data/storm_conflicts.dat
