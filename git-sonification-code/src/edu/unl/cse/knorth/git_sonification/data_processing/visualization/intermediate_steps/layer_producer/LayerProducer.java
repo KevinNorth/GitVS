@@ -32,7 +32,7 @@ public class LayerProducer {
         for(AnnotatedCommit commit : commits) {
             if((previousCommit != null) && (areTimestampsOnDifferentDays(
                     previousCommit.getTimestamp(), commit.getTimestamp()))) {
-                addDaySeparatorRow(combinedLayer, previousCommit,
+                addDaySeparatorRow(combinedLayer, previousCommit, commit,
                         currentConflicts.size());
             }
             
@@ -73,11 +73,12 @@ public class LayerProducer {
         combinedLayer.getRows().add(row);
     }
 
-    private void addDaySeparatorRow(Layer combinedLayer, AnnotatedCommit commit,
+    private void addDaySeparatorRow(Layer combinedLayer,
+            AnnotatedCommit previousCommit, AnnotatedCommit commit,
             int numConflicts) {
         List<Line> lines = new ArrayList<>(
-            commit.getIncomingBranches().size());
-        for(AnnotatedCommitLine oldLine : commit.getIncomingBranches()) {
+            previousCommit.getIncomingBranches().size());
+        for(AnnotatedCommitLine oldLine : previousCommit.getIncomingBranches()) {
             lines.add(new Line(oldLine.getToBranch(),
                     oldLine.getToBranch(), oldLine.getColor()));
         }
