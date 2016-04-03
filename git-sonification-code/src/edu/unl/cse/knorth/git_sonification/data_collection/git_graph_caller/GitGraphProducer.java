@@ -27,7 +27,7 @@ public class GitGraphProducer {
         File workingDirectory = new File(repositoryLocation);
         
         String commandLineString = "git log --format=%H --graph"
-                + " --author-date-order --no-color";
+                + " --no-color";
         Runtime rt = Runtime.getRuntime();
         Process pr = rt.exec(commandLineString.trim().split("\\s+"), null,
                 workingDirectory);
