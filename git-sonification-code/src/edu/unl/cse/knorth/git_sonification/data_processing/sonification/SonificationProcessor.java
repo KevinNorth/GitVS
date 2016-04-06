@@ -3,6 +3,7 @@ package edu.unl.cse.knorth.git_sonification.data_processing.sonification;
 import edu.unl.cse.knorth.git_sonification.display.model.sonification.SonificationData;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -18,14 +19,18 @@ public class SonificationProcessor {
     }
     
     private List<String> getAuthorsInOrderOfCommitCounts(
-            Map<String, Integer> authorCommitCounts) {
+            final Map<String, Integer> authorCommitCounts) {
         List<String> authorsInOrderOfCommitCounts =
                 new ArrayList<>(authorCommitCounts.keySet());
 
         Collections.sort(authorsInOrderOfCommitCounts,
-                (String author1, String author2) ->
-                        -(Integer.compare(authorCommitCounts.get(author1),
-                            authorCommitCounts.get(author2))));
+                new Comparator<String>() {
+            @Override
+            public int compare(String author1, String author2) {
+                return -(Integer.compare(authorCommitCounts.get(author1),
+                            authorCommitCounts.get(author2)));
+            }
+        });
         
         return authorsInOrderOfCommitCounts;
     }

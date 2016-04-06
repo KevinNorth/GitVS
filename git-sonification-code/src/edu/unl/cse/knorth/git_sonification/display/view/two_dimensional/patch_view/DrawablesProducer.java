@@ -10,6 +10,7 @@ import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.common_d
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.common_drawables.java.TextDrawable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -58,8 +59,12 @@ public class DrawablesProducer {
         
         List<Component> selectedComponents =
                 new ArrayList<>(selectedComponentsSet);
-        Collections.sort(selectedComponents, (Component c1, Component c2) ->
-                        c1.getName().compareTo(c2.getName()));
+        Collections.sort(selectedComponents, new Comparator<Component>() {
+            @Override
+            public int compare(Component c1, Component c2) {
+                return c1.getName().compareTo(c2.getName());
+            }
+        });
         
         final int numBodyColumns = selectedComponentsSet.size();
         final int numBodyRows = selectedCommits.size();

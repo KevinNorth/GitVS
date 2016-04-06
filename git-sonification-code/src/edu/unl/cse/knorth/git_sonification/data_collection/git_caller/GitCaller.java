@@ -130,10 +130,11 @@ public class GitCaller implements AutoCloseable, Closeable {
      */
     private PartialCommit getCommitData(RevCommit commit) throws IOException {
         String hash = commit.getName();
-        String author = commit.getAuthorIdent().getName();
+        String author = commit.getCommitterIdent().getName();
 
-        DateTime date = new DateTime(commit.getAuthorIdent().getWhen());
-        
+        int secondsSinceEpoch = commit.getCommitTime();
+        DateTime date = new DateTime(((long) secondsSinceEpoch) * 1000L);
+
         List<String> parentHashes = new ArrayList<>(commit.getParentCount());
         for(RevCommit parent : commit.getParents()) {
             parentHashes.add(parent.getName());

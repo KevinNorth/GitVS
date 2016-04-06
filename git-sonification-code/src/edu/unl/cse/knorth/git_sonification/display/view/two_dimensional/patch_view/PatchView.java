@@ -82,7 +82,7 @@ public class PatchView extends TwoDimensionalView<PatchViewState> {
         
         checkmarks = patchViewDrawables.getCheckmarks();
         
-        ArrayList<Drawable> drawables = new ArrayList<>(checkmarks);
+        ArrayList<Drawable> drawables = new ArrayList<Drawable>(checkmarks);
         drawables.addAll(patchViewDrawables.getNoninteractiveDrawables());
         return drawables;
     }

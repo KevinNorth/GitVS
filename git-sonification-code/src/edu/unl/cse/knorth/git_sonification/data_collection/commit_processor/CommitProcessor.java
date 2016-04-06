@@ -8,6 +8,7 @@ import edu.unl.cse.knorth.git_sonification.data_collection.git_caller.PartialCom
 import edu.unl.cse.knorth.git_sonification.data_collection.git_graph_caller.GitGraph;
 import edu.unl.cse.knorth.git_sonification.data_collection.intermediate_data.Commit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -109,7 +110,7 @@ public class CommitProcessor {
         
         processedCommits.addAll(commitsCaughtInGraph);
         
-        processedCommits.sort(commitComparator);
+        Collections.sort(processedCommits, commitComparator);
         return processedCommits;
     }
     
