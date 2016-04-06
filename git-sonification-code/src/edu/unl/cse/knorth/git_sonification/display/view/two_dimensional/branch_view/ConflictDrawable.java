@@ -30,7 +30,9 @@ public class ConflictDrawable extends Drawable {
         final float centerX = locationOnScreen.center().getX();
         final float centerY = locationOnScreen.center().getY();
         
-        for(int conflict = 0; conflict < numConflicts; conflict++) {
+        for(int conflict = 0; conflict < numConflicts
+                && conflict < 4; // same limitation as the sonification
+                conflict++) {
             
             float radius = locationOnScreen.getWidth()
                     - (conflict * 13f * zoomFactor);
