@@ -1,5 +1,6 @@
 package edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.branch_view;
 
+import com.jogamp.opengl.math.geom.AABBox;
 import edu.unl.cse.knorth.git_sonification.display.model.ViewModel;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.Layer;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.Line;
@@ -37,6 +38,7 @@ public class DrawablesProducer {
     private final float maxCommitSize = sizeOfCommits * 2f;
     private final float commitSizeIncrement = (maxCommitSize - minCommitSize)
             / 20f;
+    private final float conflictSize = maxCommitSize * 1.25f;
     
     private final float lineWeight = 8;
         
@@ -83,8 +85,10 @@ public class DrawablesProducer {
                     topOfRow + commitSize + commitOffset);
                 commits.add(new CommitDrawable(commitColor, row.getCommit(),
                         row.getNumConflicts(), commitRect, commitsZOrdering));
+                Rectangle conflictRect = new Rectangle(commitRect.center(),
+                        conflictSize, conflictSize);
                 conflicts.add(new ConflictDrawable(numConflicts, conflictColor,
-                        commitRect, commitsZOrdering + 1));
+                        conflictRect, commitsZOrdering + 1));
             }
             
             float topOfPreviousRow = topOfRow - distanceBetweenRows;

@@ -25,16 +25,17 @@ public class ConflictDrawable extends Drawable {
         color.apply(graphics);
         graphics.ellipseMode(PGraphics.CENTER);
         graphics.fill = false;
-        graphics.strokeWeight = 4f * zoomFactor;
+        graphics.strokeWeight = 4.5f * zoomFactor;
 
         final float centerX = locationOnScreen.center().getX();
         final float centerY = locationOnScreen.center().getY();
         
         for(int conflict = 0; conflict < numConflicts; conflict++) {
             
-            float radius = locationOnScreen.getWidth() - (conflict * 6f);
+            float radius = locationOnScreen.getWidth()
+                    - (conflict * 13f * zoomFactor);
             
-            graphics.ellipse(centerX, centerY, radius * 2, radius * 2);
+            graphics.ellipse(centerX, centerY, radius, radius);
         }
     }
 
