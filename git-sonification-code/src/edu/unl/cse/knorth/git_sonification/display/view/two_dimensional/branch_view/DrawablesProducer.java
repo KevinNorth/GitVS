@@ -46,24 +46,28 @@ public class DrawablesProducer {
     private final float playButtonsHeight = 105f;
     private final float playButtonsWidth = playButtonsHeight;
     
-    public CommitsAndLines produceCommitDrawables(ViewModel viewModel) {
+    public CommitsConflictsAndLines produceCommitDrawables(ViewModel viewModel) {
         VisualizationData visualData = viewModel.getVisualizationData();
 
         int rowNum = 1;
                 
         Color commitColor = Color.BLUE;
+        Color conflictColor = // bright red to contrast with commits' deep blue
+                Color.createHSBColor((char)0, (char)127, (char)255);
         Map<Integer, Color> lineColors = determineLineColors(visualData);
         
         Layer combinedLayer = visualData.getCombinedLayer();
         
         ArrayList<CommitDrawable> commits = new ArrayList<>();
         ArrayList<BranchLineDrawable> lines = new ArrayList<>();
+        ArrayList<ConflictDrawable> conflicts = new ArrayList<>();
         
         for(Row row : combinedLayer.getRows()) {
             float topOfRow = topMargin + (distanceBetweenRows * rowNum);
             
             if(row.getType() == RowType.COMMIT) {
                 int numCommits = row.getCommit().getComponentsModified().size();
+                int numConflicts = row.getNumConflicts();
                 int commitBranchNum = row.getBranchLocation();
 
                 float commitSize = Math.min(minCommitSize +
@@ -79,6 +83,8 @@ public class DrawablesProducer {
                     topOfRow + commitSize + commitOffset);
                 commits.add(new CommitDrawable(commitColor, row.getCommit(),
                         row.getNumConflicts(), commitRect, commitsZOrdering));
+                conflicts.add(new ConflictDrawable(numConflicts, conflictColor,
+                        commitRect, commitsZOrdering + 1));
             }
             
             float topOfPreviousRow = topOfRow - distanceBetweenRows;
@@ -122,10 +128,10 @@ public class DrawablesProducer {
             rowNum++;
         }
         
-        return new CommitsAndLines(commits, lines);
+        return new CommitsConflictsAndLines(commits, conflicts, lines);
     }
     
-    public DaySeparatorsTimestampsAndConflicts
+    public DaySeparatorsAndTimestamps
         produceDaySeparatorsAndTimestamps(ViewModel viewModel, PApplet
                 context) {
         VisualizationData visualData = viewModel.getVisualizationData();
@@ -146,7 +152,6 @@ public class DrawablesProducer {
         
         ArrayList<DaySeparatorDrawable> daySeparators = new ArrayList<>();
         ArrayList<TextDrawable> timestamps = new ArrayList<>();
-        ArrayList<ConflictDrawable> conflicts = new ArrayList<>();
         
         final PFont daySeparatorFont = context.createFont("Arial", 16);
         final PFont timestampFont = context.createFont("Arial", 14);
@@ -160,9 +165,6 @@ public class DrawablesProducer {
         
         final float daySeparatorWidth = (leftMargin * 2)
                 + (distanceBetweenLines * maxNumBranches);
-        
-        final float conflictLeftEdge = daySeparatorWidth + 10;
-        final float conflictWidth = 60;
         
         final DateTimeFormatter timestampFormatter =
             DateTimeFormat.forPattern("h:mm a");
@@ -192,11 +194,6 @@ public class DrawablesProducer {
                         timestampString, timestampFont, timestampTextColor));
             }
             
-            conflicts.add(new ConflictDrawable(row.getNumConflicts(),
-                    conflictColor, new Rectangle(conflictLeftEdge, topOfRow,
-                    conflictLeftEdge + conflictWidth,
-                    topOfRow + distanceBetweenRows - 10), 0));
-            
             rowNum++;
         }
 
@@ -211,8 +208,8 @@ public class DrawablesProducer {
                     daySeparatorRect, 3));
         }
         
-        return new DaySeparatorsTimestampsAndConflicts(daySeparators,
-                timestamps, conflicts);
+        return new DaySeparatorsAndTimestamps(daySeparators,
+                timestamps);
     }
     
     public SonificationCursorDrawable produceSonificationCursor(
@@ -309,13 +306,17 @@ public class DrawablesProducer {
         return colorMap;
     }
         
-    public static class CommitsAndLines {
+    public static class CommitsConflictsAndLines {
         private final ArrayList<CommitDrawable> commits;
         private final ArrayList<BranchLineDrawable> lines;
+        private final ArrayList<ConflictDrawable> conflicts;
 
-        public CommitsAndLines(ArrayList<CommitDrawable> commits, ArrayList<BranchLineDrawable> lines) {
+        public CommitsConflictsAndLines(ArrayList<CommitDrawable> commits,
+                ArrayList<ConflictDrawable> conflicts,
+                ArrayList<BranchLineDrawable> lines) {
             this.commits = commits;
             this.lines = lines;
+            this.conflicts = conflicts;
         }
 
         public ArrayList<CommitDrawable> getCommits() {
@@ -325,20 +326,21 @@ public class DrawablesProducer {
         public ArrayList<BranchLineDrawable> getLines() {
             return lines;
         }
+
+        public ArrayList<ConflictDrawable> getConflicts() {
+            return conflicts;
+        }
     }
     
-    public static class DaySeparatorsTimestampsAndConflicts {
+    public static class DaySeparatorsAndTimestamps {
         private final ArrayList<DaySeparatorDrawable> daySeparators;
         private final ArrayList<TextDrawable> timestamps;
-        private final ArrayList<ConflictDrawable> conflicts;
 
-        public DaySeparatorsTimestampsAndConflicts(
+        public DaySeparatorsAndTimestamps(
                 ArrayList<DaySeparatorDrawable> daySeparators,
-                ArrayList<TextDrawable> timestamps,
-                ArrayList<ConflictDrawable> conflicts) {
+                ArrayList<TextDrawable> timestamps) {
             this.daySeparators = daySeparators;
             this.timestamps = timestamps;
-            this.conflicts = conflicts;
         }
 
         public ArrayList<DaySeparatorDrawable> getDaySeparators() {
@@ -347,10 +349,6 @@ public class DrawablesProducer {
 
         public ArrayList<TextDrawable> getTimestamps() {
             return timestamps;
-        }
-
-        public ArrayList<ConflictDrawable> getConflicts() {
-            return conflicts;
         }
     }
 }

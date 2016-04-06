@@ -23,18 +23,18 @@ public class ConflictDrawable extends Drawable {
         float widthOfRectangle = locationOnScreen.getWidth() / 8;
 
         color.apply(graphics);
-        graphics.rectMode(PGraphics.CORNERS);
-        graphics.strokeWeight = 1.0f;
+        graphics.ellipseMode(PGraphics.CENTER);
+        graphics.fill = false;
+        graphics.strokeWeight = 4f * zoomFactor;
+
+        final float centerX = locationOnScreen.center().getX();
+        final float centerY = locationOnScreen.center().getY();
         
         for(int conflict = 0; conflict < numConflicts; conflict++) {
-            float x1 = locationOnScreen.getX1() +
-                    (widthOfRectangle * conflict * 2);
-            float x2 = x1 + widthOfRectangle;
             
-            float y1 = locationOnScreen.getY1();
-            float y2 = locationOnScreen.getY2();
+            float radius = locationOnScreen.getWidth() - (conflict * 6f);
             
-            graphics.rect(x1, y1, x2, y2);
+            graphics.ellipse(centerX, centerY, radius * 2, radius * 2);
         }
     }
 

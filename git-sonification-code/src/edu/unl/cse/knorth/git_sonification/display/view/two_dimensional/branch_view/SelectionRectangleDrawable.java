@@ -24,6 +24,7 @@ public class SelectionRectangleDrawable extends Drawable {
     public void draw(PGraphics graphics, Rectangle locationOnScreen,
             float zoomFactor) {
         fillColor.apply(graphics);
+        graphics.fill = true;
         graphics.rectMode(PGraphics.CORNERS);
         graphics.rect(locationOnScreen.getX1(), locationOnScreen.getY1(),
                 locationOnScreen.getX2(), locationOnScreen.getY2());

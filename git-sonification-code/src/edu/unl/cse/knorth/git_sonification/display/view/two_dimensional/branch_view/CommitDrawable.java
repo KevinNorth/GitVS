@@ -23,6 +23,7 @@ public class CommitDrawable extends Drawable {
     public void draw(PGraphics graphics, Rectangle locationOnScreen,
             float zoomFactor) {
         color.apply(graphics);
+        graphics.fill = true;
         graphics.ellipseMode(PGraphics.CORNERS);
         graphics.ellipse(locationOnScreen.getX1(), locationOnScreen.getY1(),
                 locationOnScreen.getX2(), locationOnScreen.getY2());

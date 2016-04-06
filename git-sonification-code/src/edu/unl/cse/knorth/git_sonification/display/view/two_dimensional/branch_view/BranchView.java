@@ -180,18 +180,18 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
         }
         
         DrawablesProducer drawablesProducer =  new DrawablesProducer();
-        DrawablesProducer.CommitsAndLines commitsAndLines =
+        DrawablesProducer.CommitsConflictsAndLines commitsConflictsAndLines =
                 drawablesProducer.produceCommitDrawables(viewModel);
-        commits = commitsAndLines.getCommits();
-        lines = commitsAndLines.getLines();
+        commits = commitsConflictsAndLines.getCommits();
+        lines = commitsConflictsAndLines.getLines();
+        conflicts = commitsConflictsAndLines.getConflicts();
         
-        DrawablesProducer.DaySeparatorsTimestampsAndConflicts
-                daySeparatorsTimestampsAndConflicts
+        DrawablesProducer.DaySeparatorsAndTimestamps
+                daySeparatorsAndTimestamps
                = drawablesProducer.produceDaySeparatorsAndTimestamps(viewModel,
                        this);
-        daySeparators = daySeparatorsTimestampsAndConflicts.getDaySeparators();
-        timestamps = daySeparatorsTimestampsAndConflicts.getTimestamps();
-        conflicts = daySeparatorsTimestampsAndConflicts.getConflicts();
+        daySeparators = daySeparatorsAndTimestamps.getDaySeparators();
+        timestamps = daySeparatorsAndTimestamps.getTimestamps();
         
         sonificationCursor =
                 drawablesProducer.produceSonificationCursor(viewModel);

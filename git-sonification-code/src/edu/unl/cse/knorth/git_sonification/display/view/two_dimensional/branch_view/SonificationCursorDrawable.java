@@ -18,6 +18,7 @@ public class SonificationCursorDrawable extends Drawable {
     public void draw(PGraphics graphics, Rectangle locationOnScreen,
             float zoomFactor) {
         color.apply(graphics);
+        graphics.fill = true;
         graphics.rectMode(PGraphics.CORNERS);
         graphics.rect(locationOnScreen.getX1(), locationOnScreen.getY1(),
                 locationOnScreen.getX2(), locationOnScreen.getY2());
