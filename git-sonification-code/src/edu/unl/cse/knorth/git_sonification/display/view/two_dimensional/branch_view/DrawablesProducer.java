@@ -38,7 +38,7 @@ public class DrawablesProducer {
     private final float maxCommitSize = sizeOfCommits * 2f;
     private final float commitSizeIncrement = (maxCommitSize - minCommitSize)
             / 20f;
-    private final float conflictSize = maxCommitSize * 1.25f;
+    private final float conflictSize = maxCommitSize;
     
     private final float lineWeight = 8;
         
@@ -48,21 +48,23 @@ public class DrawablesProducer {
     private final float playButtonsHeight = 105f;
     private final float playButtonsWidth = playButtonsHeight;
     
-    public CommitsConflictsAndLines produceCommitDrawables(ViewModel viewModel) {
+    public CommitsConflictsAndLines produceCommitDrawables(ViewModel viewModel,
+            PApplet context) {
         VisualizationData visualData = viewModel.getVisualizationData();
 
         int rowNum = 1;
                 
         Color commitColor = Color.BLUE;
-        Color conflictColor = // bright red to contrast with commits' deep blue
-                Color.createHSBColor((char)0, (char)127, (char)255);
+        Color conflictColor = // orange to contrast with commits' deep blue
+                Color.createHSBColor((char)(255/12), (char)195, (char)255);
+        PFont conflictFont = context.createFont("Arial", 24);
         Map<Integer, Color> lineColors = determineLineColors(visualData);
         
         Layer combinedLayer = visualData.getCombinedLayer();
         
         ArrayList<CommitDrawable> commits = new ArrayList<>();
         ArrayList<BranchLineDrawable> lines = new ArrayList<>();
-        ArrayList<ConflictDrawable> conflicts = new ArrayList<>();
+        ArrayList<ConflictAnnotationDrawable> conflicts = new ArrayList<>();
         
         for(Row row : combinedLayer.getRows()) {
             float topOfRow = topMargin + (distanceBetweenRows * rowNum);
@@ -87,8 +89,8 @@ public class DrawablesProducer {
                         row.getNumConflicts(), commitRect, commitsZOrdering));
                 Rectangle conflictRect = new Rectangle(commitRect.center(),
                         conflictSize, conflictSize);
-                conflicts.add(new ConflictDrawable(numConflicts, conflictColor,
-                        conflictRect, commitsZOrdering + 1));
+                conflicts.add(new ConflictAnnotationDrawable(numConflicts, conflictFont,
+                        conflictColor, conflictRect, commitsZOrdering + 1));
             }
             
             float topOfPreviousRow = topOfRow - distanceBetweenRows;
@@ -313,10 +315,10 @@ public class DrawablesProducer {
     public static class CommitsConflictsAndLines {
         private final ArrayList<CommitDrawable> commits;
         private final ArrayList<BranchLineDrawable> lines;
-        private final ArrayList<ConflictDrawable> conflicts;
+        private final ArrayList<ConflictAnnotationDrawable> conflicts;
 
         public CommitsConflictsAndLines(ArrayList<CommitDrawable> commits,
-                ArrayList<ConflictDrawable> conflicts,
+                ArrayList<ConflictAnnotationDrawable> conflicts,
                 ArrayList<BranchLineDrawable> lines) {
             this.commits = commits;
             this.lines = lines;
@@ -331,7 +333,7 @@ public class DrawablesProducer {
             return lines;
         }
 
-        public ArrayList<ConflictDrawable> getConflicts() {
+        public ArrayList<ConflictAnnotationDrawable> getConflicts() {
             return conflicts;
         }
     }

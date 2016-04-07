@@ -37,7 +37,7 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     private ArrayList<CommitDrawable> commits;
     private ArrayList<BranchLineDrawable> lines;
     private ArrayList<DaySeparatorDrawable> daySeparators;
-    private ArrayList<ConflictDrawable> conflicts;
+    private ArrayList<ConflictAnnotationDrawable> conflicts;
     private ArrayList<TextDrawable> timestamps;
     private SonificationCursorDrawable sonificationCursor;
     private SelectionRectangleDrawable patchSelection;
@@ -181,7 +181,7 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
         
         DrawablesProducer drawablesProducer =  new DrawablesProducer();
         DrawablesProducer.CommitsConflictsAndLines commitsConflictsAndLines =
-                drawablesProducer.produceCommitDrawables(viewModel);
+                drawablesProducer.produceCommitDrawables(viewModel, this);
         commits = commitsConflictsAndLines.getCommits();
         lines = commitsConflictsAndLines.getLines();
         conflicts = commitsConflictsAndLines.getConflicts();
