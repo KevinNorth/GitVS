@@ -137,7 +137,7 @@ public class DrawablesProducer {
         return new CommitsConflictsAndLines(commits, conflicts, lines);
     }
     
-    public DaySeparatorsAndTimestamps
+    public DaySeparatorsTimestampsAndConflicts
         produceDaySeparatorsAndTimestamps(ViewModel viewModel, PApplet
                 context) {
         VisualizationData visualData = viewModel.getVisualizationData();
@@ -158,6 +158,7 @@ public class DrawablesProducer {
         
         ArrayList<DaySeparatorDrawable> daySeparators = new ArrayList<>();
         ArrayList<TextDrawable> timestamps = new ArrayList<>();
+        ArrayList<ConflictMarginDrawable> conflicts = new ArrayList<>();
         
         final PFont daySeparatorFont = context.createFont("Arial", 16);
         final PFont timestampFont = context.createFont("Arial", 14);
@@ -171,6 +172,9 @@ public class DrawablesProducer {
         
         final float daySeparatorWidth = (leftMargin * 2)
                 + (distanceBetweenLines * maxNumBranches);
+
+        final float conflictLeftEdge = daySeparatorWidth + 10;
+        final float conflictWidth = 60;
         
         final DateTimeFormatter timestampFormatter =
             DateTimeFormat.forPattern("h:mm a");
@@ -200,6 +204,11 @@ public class DrawablesProducer {
                         timestampString, timestampFont, timestampTextColor));
             }
             
+            conflicts.add(new ConflictMarginDrawable(row.getNumConflicts(),
+                    conflictColor, new Rectangle(conflictLeftEdge, topOfRow,
+                    conflictLeftEdge + conflictWidth,
+                    topOfRow + distanceBetweenRows - 10), 0));
+
             rowNum++;
         }
 
@@ -214,8 +223,8 @@ public class DrawablesProducer {
                     daySeparatorRect, 3));
         }
         
-        return new DaySeparatorsAndTimestamps(daySeparators,
-                timestamps);
+        return new DaySeparatorsTimestampsAndConflicts(daySeparators,
+                timestamps, conflicts);
     }
     
     public SonificationCursorDrawable produceSonificationCursor(
@@ -338,15 +347,18 @@ public class DrawablesProducer {
         }
     }
     
-    public static class DaySeparatorsAndTimestamps {
+    public static class DaySeparatorsTimestampsAndConflicts {
         private final ArrayList<DaySeparatorDrawable> daySeparators;
         private final ArrayList<TextDrawable> timestamps;
+        private final ArrayList<ConflictMarginDrawable> conflicts;
 
-        public DaySeparatorsAndTimestamps(
+        public DaySeparatorsTimestampsAndConflicts(
                 ArrayList<DaySeparatorDrawable> daySeparators,
-                ArrayList<TextDrawable> timestamps) {
+                ArrayList<TextDrawable> timestamps,
+                ArrayList<ConflictMarginDrawable> conflicts) {
             this.daySeparators = daySeparators;
             this.timestamps = timestamps;
+            this.conflicts = conflicts;
         }
 
         public ArrayList<DaySeparatorDrawable> getDaySeparators() {
@@ -355,6 +367,10 @@ public class DrawablesProducer {
 
         public ArrayList<TextDrawable> getTimestamps() {
             return timestamps;
+        }
+
+        public ArrayList<ConflictMarginDrawable> getConflicts() {
+            return conflicts;
         }
     }
 }

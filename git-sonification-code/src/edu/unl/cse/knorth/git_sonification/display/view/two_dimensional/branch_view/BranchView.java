@@ -37,7 +37,8 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     private ArrayList<CommitDrawable> commits;
     private ArrayList<BranchLineDrawable> lines;
     private ArrayList<DaySeparatorDrawable> daySeparators;
-    private ArrayList<ConflictAnnotationDrawable> conflicts;
+    private ArrayList<ConflictAnnotationDrawable> conflictAnnotations;
+    private ArrayList<ConflictMarginDrawable> conflictMargins;
     private ArrayList<TextDrawable> timestamps;
     private SonificationCursorDrawable sonificationCursor;
     private SelectionRectangleDrawable patchSelection;
@@ -184,14 +185,15 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
                 drawablesProducer.produceCommitDrawables(viewModel, this);
         commits = commitsConflictsAndLines.getCommits();
         lines = commitsConflictsAndLines.getLines();
-        conflicts = commitsConflictsAndLines.getConflicts();
+        conflictAnnotations = commitsConflictsAndLines.getConflicts();
         
-        DrawablesProducer.DaySeparatorsAndTimestamps
-                daySeparatorsAndTimestamps
+        DrawablesProducer.DaySeparatorsTimestampsAndConflicts
+                daySeparatorsTimestampsAndConflicts
                = drawablesProducer.produceDaySeparatorsAndTimestamps(viewModel,
                        this);
-        daySeparators = daySeparatorsAndTimestamps.getDaySeparators();
-        timestamps = daySeparatorsAndTimestamps.getTimestamps();
+        daySeparators = daySeparatorsTimestampsAndConflicts.getDaySeparators();
+        timestamps = daySeparatorsTimestampsAndConflicts.getTimestamps();
+        conflictMargins = daySeparatorsTimestampsAndConflicts.getConflicts();
         
         sonificationCursor =
                 drawablesProducer.produceSonificationCursor(viewModel);
@@ -205,7 +207,8 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
         drawables.addAll(lines);
         drawables.addAll(timestamps);
         drawables.addAll(daySeparators);
-        drawables.addAll(conflicts);
+        drawables.addAll(conflictAnnotations);
+        drawables.addAll(conflictMargins);
         drawables.add(sonificationCursor);
         drawables.addAll(playButtons);
         return drawables;
