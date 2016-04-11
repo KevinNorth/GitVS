@@ -78,12 +78,15 @@ public class CommitAnnotator {
         List<GitGraphLine> rowLines = row.getIncomingLines();
         List<AnnotatedCommitLine> lines = new ArrayList<>(rowLines.size());
         for(GitGraphLine rowLine : rowLines) {
-            int color = 1;
+            Integer color = 1;
             final int toBranch = rowLine.getToBranch();
             final int fromBranch = rowLine.getFromBranch();
             
             if(toBranch == fromBranch) {
                 color = branchColors.get(toBranch);
+                if(color == null) {
+                    color = newColor(branchColors, newBranchColors);
+                }
                 newBranchColors.put(toBranch, color);
             } else if(toBranch > fromBranch) /* going to the right */ {
                GitGraphLine closestLeftLine = getClosestLineGoingToLeft(toBranch,
