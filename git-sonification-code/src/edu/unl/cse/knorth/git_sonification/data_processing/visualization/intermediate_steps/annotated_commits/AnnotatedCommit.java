@@ -1,6 +1,5 @@
 package edu.unl.cse.knorth.git_sonification.data_processing.visualization.intermediate_steps.annotated_commits;
 
-import edu.unl.cse.knorth.git_sonification.data_collection.components.Component;
 import java.util.ArrayList;
 import java.util.List;
 import org.joda.time.DateTime;
@@ -11,7 +10,7 @@ public class AnnotatedCommit {
     private String author;
     private int branch;
     private List<AnnotatedCommitLine> incomingBranches;
-    private List<Component> components;
+    private List<String> components;
 
     public AnnotatedCommit() {
         incomingBranches = new ArrayList<>();
@@ -20,7 +19,7 @@ public class AnnotatedCommit {
 
     public AnnotatedCommit(DateTime timestamp, String hash, String author,
             int branch, List<AnnotatedCommitLine> incomingBranches,
-            List<Component> components) {
+            List<String> components) {
         this.timestamp = timestamp;
         this.hash = hash;
         this.author = author;
@@ -69,11 +68,11 @@ public class AnnotatedCommit {
         this.incomingBranches = incomingBranches;
     }
 
-    public List<Component> getComponents() {
+    public List<String> getComponents() {
         return components;
     }
 
-    public void setComponents(List<Component> components) {
+    public void setComponents(List<String> components) {
         this.components = components;
     }
 

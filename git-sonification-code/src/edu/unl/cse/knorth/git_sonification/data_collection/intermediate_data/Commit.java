@@ -1,6 +1,5 @@
 package edu.unl.cse.knorth.git_sonification.data_collection.intermediate_data;
 
-import edu.unl.cse.knorth.git_sonification.data_collection.components.Component;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -18,7 +17,7 @@ public class Commit {
     private String hash;
     private final List<String> parentHashes;
     private String resolvedConflictHash;
-    private final List<Component> componentsModified;
+    private final List<String> componentsModified;
     
     /**
      * Creates an empty <code>Commit</code>.
@@ -138,10 +137,10 @@ public class Commit {
     
     /**
      * Gets a list containing all of the Components modified by this commit.
-     * @return A <code>List</code> of <code>Components</code>s containing all of
-     * the Components modified by this commit.
+     * @return A <code>List</code> of filepaths containing all of
+     * the files modified by this commit.
      */
-    public List<Component> getComponentsModified() {
+    public List<String> getComponentsModified() {
         return componentsModified;
     }
 
@@ -150,16 +149,16 @@ public class Commit {
      * @param componentModified  The Component to add to the list of Components
      * changed by this commit.
      */
-    public void addComponentModified(Component componentModified) {
+    public void addComponentModified(String componentModified) {
         this.componentsModified.add(componentModified);
     }
     
     /**
-     * Adds multiple Components to the list of omponents changed by this commit.
+     * Adds multiple Components to the list of files changed by this commit.
      * @param componentsModified The components to add to the list of components
      * changed by this commit.
      */
-    public void addComponentsModified(Component... componentsModified) {
+    public void addComponentsModified(String... componentsModified) {
         this.componentsModified.addAll(Arrays.asList(componentsModified));
     }
     
@@ -168,7 +167,7 @@ public class Commit {
      * @param componentsModified The components to add to the list of components
      * changed by this commit.
      */
-    public void addComponentsModified(Collection<Component> componentsModified) {
+    public void addComponentsModified(Collection<String> componentsModified) {
         this.componentsModified.addAll(componentsModified);
     }
 

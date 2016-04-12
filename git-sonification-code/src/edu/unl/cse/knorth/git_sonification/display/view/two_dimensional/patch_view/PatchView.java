@@ -1,6 +1,5 @@
 package edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.patch_view;
 
-import edu.unl.cse.knorth.git_sonification.data_collection.components.Component;
 import edu.unl.cse.knorth.git_sonification.display.model.ViewModel;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.Commit;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Color;
@@ -22,11 +21,11 @@ import processing.event.MouseEvent;
 public class PatchView extends TwoDimensionalView<PatchViewState> {
     private static List<Commit> holdCommits;
     private static ViewModel holdViewModel;
-    private static List<Component> holdComponents;
+    private static List<String> holdComponents;
     
     private List<Commit> commits;
     private ViewModel viewModel;
-    private List<Component> allComponents;
+    private List<String> allComponents;
     private List<CheckmarkDrawable> checkmarks;
     
     public void run(List<Commit> commits, ViewModel viewModel) {

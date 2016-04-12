@@ -1,6 +1,5 @@
 package edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.patch_view;
 
-import edu.unl.cse.knorth.git_sonification.data_collection.components.Component;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.Commit;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Color;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Drawable;
@@ -10,9 +9,10 @@ import processing.core.PGraphics;
 public class CheckmarkDrawable extends Drawable {
     private Color color;
     private Commit commit;
-    private Component component;
+    private String component;
 
-    public CheckmarkDrawable(Color color, Commit commit, Component component, Rectangle boundingRectangle, int zOrdering) {
+    public CheckmarkDrawable(Color color, Commit commit, String component,
+            Rectangle boundingRectangle, int zOrdering) {
         super(boundingRectangle, zOrdering);
         this.color = color;
         this.commit = commit;
@@ -49,11 +49,11 @@ public class CheckmarkDrawable extends Drawable {
         this.commit = commit;
     }
 
-    public Component getComponent() {
+    public String getComponent() {
         return component;
     }
 
-    public void setComponent(Component component) {
+    public void setComponent(String component) {
         this.component = component;
     }    
 }

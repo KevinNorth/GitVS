@@ -1,6 +1,5 @@
 package edu.unl.cse.knorth.git_sonification.display.model.visualization;
 
-import edu.unl.cse.knorth.git_sonification.data_collection.components.Component;
 import java.util.List;
 import org.joda.time.DateTime;
 
@@ -8,9 +7,10 @@ public class Commit {
     private final String hash;
     private final String author;
     private final DateTime timestamp;
-    private final List<Component> componentsModified;
+    private final List<String> componentsModified;
 
-    public Commit(String hash, String author, DateTime timestamp, List<Component> componentsModified) {
+    public Commit(String hash, String author, DateTime timestamp,
+            List<String> componentsModified) {
         this.hash = hash;
         this.author = author;
         this.timestamp = timestamp;
@@ -29,7 +29,7 @@ public class Commit {
         return timestamp;
     }
 
-    public List<Component> getComponentsModified() {
+    public List<String> getComponentsModified() {
         return componentsModified;
     }
 }

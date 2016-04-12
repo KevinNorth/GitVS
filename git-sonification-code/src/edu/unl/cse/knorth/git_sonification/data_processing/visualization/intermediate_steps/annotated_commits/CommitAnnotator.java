@@ -1,6 +1,5 @@
 package edu.unl.cse.knorth.git_sonification.data_processing.visualization.intermediate_steps.annotated_commits;
 
-import edu.unl.cse.knorth.git_sonification.data_collection.components.Component;
 import edu.unl.cse.knorth.git_sonification.data_collection.git_graph_caller.GitGraph;
 import edu.unl.cse.knorth.git_sonification.data_collection.git_graph_caller.GitGraphLine;
 import edu.unl.cse.knorth.git_sonification.data_collection.git_graph_caller.GitGraphRow;
@@ -71,7 +70,7 @@ public class CommitAnnotator {
         DateTime timestamp = commit.getTimestamp();
         String hash = commit.getHash();
         String author = commit.getAuthor();
-        List<Component> components = commit.getComponentsModified();
+        List<String> components = commit.getComponentsModified();
         
         int branch = row.getCommitBranchPosition();
 

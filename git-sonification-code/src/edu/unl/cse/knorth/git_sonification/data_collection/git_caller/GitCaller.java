@@ -194,9 +194,13 @@ public class GitCaller implements AutoCloseable, Closeable {
                         // deletion.
                         df.setDetectRenames(false);
                         List<DiffEntry> diffs = df.scan(parent.getTree(), commit.getTree());
+                        
+                        Set<String> changedFiles = new HashSet<>();
                         for (DiffEntry diff : diffs) {
-                            list.add(diff.getNewPath());
+                            changedFiles.add(diff.getNewPath());
+                            changedFiles.add(diff.getOldPath());
                         }
+                        list.addAll(changedFiles);
                     } else {
                         // For merge commits, we iterate over all of the merge's
                         // parents and include any files that changed between
@@ -212,6 +216,7 @@ public class GitCaller implements AutoCloseable, Closeable {
                             List<DiffEntry> diffs = df.scan(parent.getTree(), commit.getTree());
                             for (DiffEntry diff : diffs) {
                                 set.add(diff.getNewPath());
+                                set.add(diff.getOldPath());
                             }
                         }
                         

@@ -1,6 +1,5 @@
 package edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.patch_view;
 
-import edu.unl.cse.knorth.git_sonification.data_collection.components.Component;
 import edu.unl.cse.knorth.git_sonification.display.model.ViewModel;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.Commit;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Color;
@@ -10,7 +9,6 @@ import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.common_d
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.common_drawables.java.TextDrawable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -25,7 +23,7 @@ public class DrawablesProducer {
     private static final DateTimeFormatter DATE_FORMATTER =
             DateTimeFormat.forPattern("E, M/d/YY h:mm a");
 
-    private float tableLineWidth = 1.0f;
+    private final float tableLineWidth = 1.0f;
     
     private final int bodyTextSize = 14;
     private final int headerTextSize = 16;
@@ -42,29 +40,24 @@ public class DrawablesProducer {
     private final Color lineColor = Color.BLACK;
     
     public PatchViewDrawables produceDrawables(ViewModel viewModel,
-            List<Commit> selectedCommits, List<Component> allComponents,
+            List<Commit> selectedCommits, List<String> allComponents,
             PApplet context) {
         ArrayList<Drawable> noninteractiveDrawables = new ArrayList<>();
         ArrayList<CheckmarkDrawable> checkmarks = new ArrayList<>();
         
-        Map<Component, Color> componentColors =
+        Map<String, Color> componentColors =
                 createComponentColors(allComponents);
         
-        Set<Component> selectedComponentsSet = new HashSet<>();
+        Set<String> selectedComponentsSet = new HashSet<>();
         for(Commit commit : selectedCommits) {
-            for(Component component : commit.getComponentsModified()) {
+            for(String component : commit.getComponentsModified()) {
                 selectedComponentsSet.add(component);
             }
         }
         
-        List<Component> selectedComponents =
+        List<String> selectedComponents =
                 new ArrayList<>(selectedComponentsSet);
-        Collections.sort(selectedComponents, new Comparator<Component>() {
-            @Override
-            public int compare(Component c1, Component c2) {
-                return c1.getName().compareTo(c2.getName());
-            }
-        });
+        Collections.sort(selectedComponents);
         
         final int numBodyColumns = selectedComponentsSet.size();
         final int numBodyRows = selectedCommits.size();
@@ -83,14 +76,18 @@ public class DrawablesProducer {
             timestamps.put(commit, DATE_FORMATTER.print(commit.getTimestamp()));
             numsFilesModified.put(commit, numFilesModified);
 
-            if(numFilesModified > numFilesModified) { 
+            if(numFilesModified > maxFilesModified) { 
                 maxFilesModified = numFilesModified;
             }
             
-            for(Component component : commit.getComponentsModified()) {
-                componentNames.add(component.getName());
+            for(String component : commit.getComponentsModified()) {
+                componentNames.add(component);
             }
+            
+            System.out.println(commit.getHash() + " " + numFilesModified);
         }
+        
+        System.out.println(maxFilesModified);
                 
         int lengthOfLongestAuthor = getNumCharsInLongestString(authors);
         int lengthOfLongestTimestamp =
@@ -140,7 +137,7 @@ public class DrawablesProducer {
                         0, checkmarksLeftMargin, headerTextSize), 0, "# of Files",
                         headerFontName, headerTextSize, headerColor, context));
         for(int i = 0; i < selectedComponents.size(); i++) {
-            Component component = selectedComponents.get(i);
+            String component = selectedComponents.get(i);
             float x1 = checkmarksLeftMargin + (bodyTextSize * i)
                 + (cellMargin * (2 * (i + 1)));
             float x2 = x1 + bodyTextSize;
@@ -148,7 +145,7 @@ public class DrawablesProducer {
             noninteractiveDrawables.add(
                 new VerticalTextDrawable(new Rectangle(
                         x1, -heightOfHeader + headerTextSize, x2, headerTextSize), 0,
-                        component.getName(), headerFontName, headerTextSize,
+                        component, headerFontName, headerTextSize,
                         headerColor, context));
         }
         
@@ -224,7 +221,7 @@ public class DrawablesProducer {
                             Integer.toString(numsFilesModified.get(commit)), bodyFontName, bodyTextSize,
                             bodyColor, context));
             for(int i = 0; i < selectedComponents.size(); i++) {
-                Component component = selectedComponents.get(i);
+                String component = selectedComponents.get(i);
                 
                 if(!commit.getComponentsModified().contains(component)) {
                     continue;
@@ -277,15 +274,15 @@ public class DrawablesProducer {
         return maxLength;
     }
     
-    private Map<Component, Color> createComponentColors(List<Component>
+    private Map<String, Color> createComponentColors(List<String>
             allComponents) {
         final int numComponents = allComponents.size();
 
-        Map<Component, Color> componentColors =
+        Map<String, Color> componentColors =
                 new HashMap<>(numComponents);
         
         for(int i = 0; i < numComponents; i++) {
-            Component component = allComponents.get(i);
+            String component = allComponents.get(i);
             
             char hue = (char) (((float) i / numComponents) * 255);
             Color color = Color.createHSBColor(hue, Character.MAX_VALUE,

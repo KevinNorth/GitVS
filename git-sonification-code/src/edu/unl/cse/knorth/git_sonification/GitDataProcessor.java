@@ -1,9 +1,6 @@
 package edu.unl.cse.knorth.git_sonification;
 
 import edu.unl.cse.knorth.git_sonification.data_collection.commit_processor.CommitProcessor;
-import edu.unl.cse.knorth.git_sonification.data_collection.components.Component;
-import edu.unl.cse.knorth.git_sonification.data_collection.components.ComponentFactory;
-import edu.unl.cse.knorth.git_sonification.data_collection.components.CreateComponentTechniques;
 import edu.unl.cse.knorth.git_sonification.data_collection.conflict_data.Conflict;
 import edu.unl.cse.knorth.git_sonification.data_collection.conflict_data.ConflictDataParser;
 import edu.unl.cse.knorth.git_sonification.data_collection.git_caller.GitCaller;
@@ -25,7 +22,6 @@ import java.util.Map;
 public class GitDataProcessor {
     public ViewModel processGitData(String targetGitRepoLocation,
             String firstHash, String lastHash,
-            CreateComponentTechniques componentTechnique,
             String conflictsLocation, String componentsLocation)
             throws IOException {
         List<PartialCommit> partialCommits;
@@ -41,16 +37,13 @@ public class GitDataProcessor {
                 .parseConflictData(conflictsLocation);
         
         File gitRepoRoot = new File(targetGitRepoLocation).getParentFile();
-        List<Component> components = new ComponentFactory()
-                .createComponents(componentTechnique,
-                        gitRepoRoot, componentsLocation);
         
         GitGraph gitGraph = new GitGraphProducer()
                 .produceGitGraph(targetGitRepoLocation);
         
         List<Commit> commits = new CommitProcessor()
-                .processCommits(partialCommits, conflicts, components,
-                        firstHash, lastHash, gitGraph);
+                .processCommits(partialCommits, conflicts, firstHash, lastHash,
+                        gitGraph);
                 
         SonificationProcessor sonificationProcessor = new SonificationProcessor();
         SonificationData sonificationData =
@@ -58,7 +51,7 @@ public class GitDataProcessor {
                 
         VisualizationData visualizationData =
                 new VisualizationProcessor().produceVisualizationData(commits,
-                        components, sonificationData, conflicts, gitGraph);
+                        sonificationData, conflicts, gitGraph);
         
         return new ViewModel(visualizationData, sonificationData);
     }

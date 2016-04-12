@@ -2,7 +2,6 @@ package edu.unl.cse.knorth.git_sonification.data_collection.commit_processor;
 
 import edu.unl.cse.knorth.git_sonification.data_collection.commit_processor.commit_filter.BetweenHashesCommitFilter;
 import edu.unl.cse.knorth.git_sonification.data_collection.commit_processor.commit_filter.CommitFilter;
-import edu.unl.cse.knorth.git_sonification.data_collection.components.Component;
 import edu.unl.cse.knorth.git_sonification.data_collection.conflict_data.Conflict;
 import edu.unl.cse.knorth.git_sonification.data_collection.git_caller.PartialCommit;
 import edu.unl.cse.knorth.git_sonification.data_collection.git_graph_caller.GitGraph;
@@ -24,7 +23,6 @@ public class CommitProcessor {
      * sonified.
      * @param conflicts A list of <code>Conflict</code>s which will be used to
      * add conflict metadata to the <code>Commit</code>s this method returns.
-     * @param components A list of all components that appear in the commits.
      * @param firstHash The hash of the first commit in the
      * <code>gitGraph</code> that will also appear in the list of fully
      * processed <code>Commit</code>s that this method returns.
@@ -38,9 +36,9 @@ public class CommitProcessor {
      * <code>until</code> and sorted in ascending order of commit timestamp.
      */
     public List<Commit> processCommits(List<PartialCommit> partialCommits,
-            List<Conflict> conflicts, List<Component> components,
-            String firstHash, String lastHash, GitGraph gitGraph) {
-        return processCommits(partialCommits, conflicts, components,
+            List<Conflict> conflicts, String firstHash, String lastHash,
+            GitGraph gitGraph) {
+        return processCommits(partialCommits, conflicts,
                 new BetweenHashesCommitFilter(firstHash, lastHash, gitGraph),
                 gitGraph);
     }
@@ -52,7 +50,6 @@ public class CommitProcessor {
      * sonified.
      * @param conflicts A list of <code>Conflict</code>s which will be used to
      * add conflict metadata to the <code>Commit</code>s this method returns.
-     * @param components A list of all components that appear in the commits.
      * @param commitFilter A <code>CommitFilter</code> that will determine which
      * particular commits will be sonified.
      * @param gitGraph A <code>GitGraph</code> object representing the data from
@@ -62,10 +59,10 @@ public class CommitProcessor {
      * in ascending order of commit timestamp.
      */
     public List<Commit> processCommits(List<PartialCommit> partialCommits,
-            List<Conflict> conflicts, List<Component> components,
-            CommitFilter commitFilter, GitGraph gitGraph) {
-        return processCommits(partialCommits, conflicts, components,
-                commitFilter, gitGraph.getCommitComparator(), gitGraph);
+            List<Conflict> conflicts, CommitFilter commitFilter,
+            GitGraph gitGraph) {
+        return processCommits(partialCommits, conflicts, commitFilter,
+                gitGraph.getCommitComparator(), gitGraph);
     }
     
     /**
@@ -74,7 +71,6 @@ public class CommitProcessor {
      * sonified.
      * @param conflicts A list of <code>Conflict</code>s which will be used to
      * add conflict metadata to the <code>Commit</code>s this method returns.
-     * @param components A list of all components that appear in the commits.
      * @param commitFilter A <code>CommitFilter</code> that will determine which
      * particular commits will be sonified.
      * @param commitComparator A <code>Comparator</code> that will be used to
@@ -88,9 +84,8 @@ public class CommitProcessor {
      * according to <code>commitComparator</code>.
      */
     public List<Commit> processCommits(List<PartialCommit> partialCommits,
-            List<Conflict> conflicts, List<Component> components,
-            CommitFilter commitFilter, Comparator<Commit> commitComparator,
-            GitGraph gitGraph) {
+            List<Conflict> conflicts, CommitFilter commitFilter,
+            Comparator<Commit> commitComparator, GitGraph gitGraph) {
         List<PartialCommit> filteredCommits =
                 commitFilter.filterCommits(partialCommits);
 
@@ -100,13 +95,12 @@ public class CommitProcessor {
         
         for(PartialCommit filteredCommit : filteredCommits) {
             processedCommits.add(
-                    processPartialCommit(filteredCommit, conflicts,
-                            components));
+                    processPartialCommit(filteredCommit, conflicts));
         }
         
         List<Commit> commitsCaughtInGraph =
                 findCommitsCaughtInGraph(partialCommits, processedCommits,
-                        conflicts, components, gitGraph);
+                        conflicts, gitGraph);
         
         processedCommits.addAll(commitsCaughtInGraph);
         
@@ -132,7 +126,7 @@ public class CommitProcessor {
      * </ul>
      */
     private Commit processPartialCommit(PartialCommit partialCommit,
-        List<Conflict> conflicts, List<Component> components) {
+        List<Conflict> conflicts) {
                 String hash = partialCommit.getHash();
         String resolvedCommit = null;
         boolean introducesConflict = false;
@@ -147,9 +141,7 @@ public class CommitProcessor {
         
         Commit commit = new Commit();
         commit.addParentHashes(partialCommit.getParentHashes());
-        commit.addComponentsModified(
-                matchFilesModifiedToComponents(partialCommit.getFilesModified(),
-                        components));
+        commit.addComponentsModified(partialCommit.getFilesModified());
         commit.setAuthor(partialCommit.getAuthor());
         commit.setHash(hash);
         commit.setIntroducesConflict(introducesConflict);
@@ -157,27 +149,6 @@ public class CommitProcessor {
         commit.setTimestamp(partialCommit.getDatetime());
                 
         return commit;
-    }
-    
-    /**
-     * Gets a list of all of the Components that include at least one of a list
-     * of files.
-     * @param filesModified The list of files to check.
-     * @param components A List of Components where each Component includes at
-     * least one of the files in <code>filesModified</code>.
-     * @return 
-     */
-    private List<Component> matchFilesModifiedToComponents(
-            List<String> filesModified, List<Component> components) {
-        List<Component> matchedComponents = new LinkedList<>();
-        
-        for(Component component : components) {
-            if(component.includesAnyFile(filesModified)) {
-                matchedComponents.add(component);
-            }
-        }
-        
-        return matchedComponents;
     }
 
     /**
@@ -206,9 +177,6 @@ public class CommitProcessor {
      * processed to be included in the history so far.
      * @param conflicts A list of all of the conflicts in the history. Used to
      * convert <code>PartialCommit</code>s into <code>Commit</code>s.
-     * @param components A list of all of the <code>Component</code>s in the
-     * history. Used to convert <code>PartialCommit</code>s into
-     * <code>Commit</code>s.
      * @param gitGraph The <code>GitGraph</code> representing the full graph
      * output by <code>git log --graph</code>.
      * @return A list of commits that need to be added to
@@ -219,7 +187,7 @@ public class CommitProcessor {
     private List<Commit>
         findCommitsCaughtInGraph(List<PartialCommit> partialCommits,
                 List<Commit> processedCommits, List<Conflict> conflicts,
-                List<Component> components, GitGraph gitGraph) {
+                GitGraph gitGraph) {
             /*
              * This function runs in O(n) time with respect to the number of
              * commits. (If the number of conflicts or components is large, it's
@@ -285,7 +253,7 @@ public class CommitProcessor {
                     PartialCommit partialCommit =
                             partialCommitsByHashes.get(hashFromGraph);
                     Commit commit = processPartialCommit(partialCommit,
-                            conflicts, components);
+                            conflicts);
                     commitsCaughtInGraph.add(commit);
                 }
             }

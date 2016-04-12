@@ -1,6 +1,5 @@
 package edu.unl.cse.knorth.git_sonification.data_processing.visualization.intermediate_steps.layer_producer;
 
-import edu.unl.cse.knorth.git_sonification.data_collection.components.Component;
 import edu.unl.cse.knorth.git_sonification.data_collection.conflict_data.Conflict;
 import edu.unl.cse.knorth.git_sonification.data_processing.visualization.intermediate_steps.annotated_commits.AnnotatedCommit;
 import edu.unl.cse.knorth.git_sonification.data_processing.visualization.intermediate_steps.annotated_commits.AnnotatedCommitLine;
@@ -11,19 +10,21 @@ import edu.unl.cse.knorth.git_sonification.display.model.visualization.Line;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.Row;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.VisualizationData;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeComparator;
 
 public class LayerProducer {
     public VisualizationData produceLayers(List<AnnotatedCommit> commits,
-            SonificationData sonificationData, List<Component> components,
-            List<Conflict> conflicts) {
+            SonificationData sonificationData, List<Conflict> conflicts) {
         final int numStartBranches = commits.get(0).getMaxFromBranchNumber();
         final int numEndBranches =
                 commits.get(commits.size() - 1).getMaxToBranchNumber();
 
+        Set<String> components = new HashSet<>();
         List<Conflict> currentConflicts = new LinkedList<>();
         
         Layer combinedLayer = new Layer();
@@ -46,10 +47,12 @@ public class LayerProducer {
             
             addRow(combinedLayer, commit, currentConflicts.size());
             
+            components.addAll(commit.getComponents());
+            
             previousCommit = commit;
         }
         
-        return new VisualizationData(combinedLayer, components,
+        return new VisualizationData(combinedLayer, new ArrayList<>(components),
                 numStartBranches, numEndBranches);
     }
         

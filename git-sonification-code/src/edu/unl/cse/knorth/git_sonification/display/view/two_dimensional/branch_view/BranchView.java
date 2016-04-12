@@ -1,7 +1,6 @@
 package edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.branch_view;
 
 import edu.unl.cse.knorth.git_sonification.GitDataProcessor;
-import edu.unl.cse.knorth.git_sonification.data_collection.components.CreateComponentTechniques;
 import edu.unl.cse.knorth.git_sonification.display.model.ViewModel;
 import edu.unl.cse.knorth.git_sonification.display.model.visualization.Commit;
 import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Color;
@@ -217,7 +216,6 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     private ViewModel calculateViewModel() throws IOException {
         return new GitDataProcessor().processGitData(
                         locationOfGitRepo, firstHash, lastHash,
-                        CreateComponentTechniques.EACH_INDIVIDUAL_FILE,
                         locationOfConflicts, locationOfComponents);
     }
 
