@@ -54,7 +54,7 @@ public class TextDrawable extends Drawable {
             float zoomFactor) {
         float zoomedFontSize = fontSize * zoomFactor;
         
-        graphics.textAlign(PGraphics.LEFT, PGraphics.TOP);
+        graphics.textAlign(PGraphics.LEFT, PGraphics.CENTER);
         color.apply(graphics);
         graphics.textFont(font,
                 zoomedFontSize);

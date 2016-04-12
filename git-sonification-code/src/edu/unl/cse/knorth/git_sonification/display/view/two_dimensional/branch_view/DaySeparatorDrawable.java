@@ -38,6 +38,7 @@ public class DaySeparatorDrawable extends Drawable {
         
         float zoomedTextSize = textSize * zoomFactor;
         textColor.apply(graphics);
+        graphics.textAlign(PGraphics.LEFT, PGraphics.CENTER);
         graphics.textFont(font, zoomedTextSize);
         graphics.text(string, locationOnScreen.getX1(),
                 locationOnScreen.getY1() + zoomedTextSize);

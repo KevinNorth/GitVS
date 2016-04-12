@@ -27,7 +27,7 @@ public class ConflictMarginDrawable extends Drawable {
         graphics.strokeWeight = 1.0f;
         
         for(int conflict = 0; conflict < numConflicts
-                && conflict < 4; // same limitation as the conflict sonificaiton
+                ;//&& conflict < 4; // same limitation as the conflict sonificaiton
                 conflict++) {
             float x1 = locationOnScreen.getX1() +
                     (widthOfRectangle * conflict * 2);
