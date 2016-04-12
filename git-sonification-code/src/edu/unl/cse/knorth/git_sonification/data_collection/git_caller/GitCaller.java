@@ -187,18 +187,17 @@ public class GitCaller implements AutoCloseable, Closeable {
                         DiffFormatter df = new DiffFormatter(DisabledOutputStream.INSTANCE);
                         df.setRepository(repo);
                         df.setDiffComparator(RawTextComparator.DEFAULT);
-                        // Moving a file can affect two different components:
-                        // the component the file was moved from, and the
-                        // component the file moved to. To find both components,
-                        // treat file movement as a seperate addition and
-                        // deletion.
-                        df.setDetectRenames(false);
+                        df.setDetectRenames(true);
                         List<DiffEntry> diffs = df.scan(parent.getTree(), commit.getTree());
                         
                         Set<String> changedFiles = new HashSet<>();
                         for (DiffEntry diff : diffs) {
-                            changedFiles.add(diff.getNewPath());
-                            changedFiles.add(diff.getOldPath());
+                            String newPath = diff.getNewPath();
+                            if(newPath.equals("/dev/null")) {
+                                changedFiles.add(diff.getOldPath());
+                            } else {
+                                changedFiles.add(newPath);
+                            }
                         }
                         list.addAll(changedFiles);
                     } else {
@@ -209,14 +208,18 @@ public class GitCaller implements AutoCloseable, Closeable {
                         DiffFormatter df = new DiffFormatter(DisabledOutputStream.INSTANCE);
                         df.setRepository(repo);
                         df.setDiffComparator(RawTextComparator.DEFAULT);
-                        df.setDetectRenames(false);
+                        df.setDetectRenames(true);
 
                         for(RevCommit parent : commit.getParents()) {
                             parent = rw.parseCommit(parent.getId());
                             List<DiffEntry> diffs = df.scan(parent.getTree(), commit.getTree());
                             for (DiffEntry diff : diffs) {
-                                set.add(diff.getNewPath());
-                                set.add(diff.getOldPath());
+                                String newPath = diff.getNewPath();
+                                if(newPath.equals("/dev/null")) {
+                                    set.add(diff.getOldPath());
+                                } else {
+                                    set.add(newPath);
+                                }
                             }
                         }
                         
