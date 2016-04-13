@@ -22,22 +22,26 @@ public class PatchView extends TwoDimensionalView<PatchViewState> {
     private static List<Commit> holdCommits;
     private static ViewModel holdViewModel;
     private static List<String> holdComponents;
+    private static boolean holdVisualConflictsFlag;
     
     private List<Commit> commits;
     private ViewModel viewModel;
     private List<String> allComponents;
+    private boolean visualConflictsFlag;
     private List<CheckmarkDrawable> checkmarks;
     
-    public void run(List<Commit> commits, ViewModel viewModel) {
+    public void run(List<Commit> commits, ViewModel viewModel,
+            boolean visualConflictsFlag) {
         String[] emptyArgs = {};
-        run(commits, viewModel, emptyArgs);
+        run(commits, viewModel, visualConflictsFlag, emptyArgs);
     }
     
     public void run(List<Commit> commits, ViewModel viewModel,
-            String args[]) {
+            boolean visualConflictsFlag, String args[]) {
         holdCommits = commits;
         holdViewModel = viewModel;
         holdComponents = viewModel.getVisualizationData().getComponents();
+        holdVisualConflictsFlag = visualConflictsFlag;
 
         String[] newArgs = new String[args.length + 1];
         newArgs[0] = PatchView.class.getCanonicalName();
@@ -56,6 +60,7 @@ public class PatchView extends TwoDimensionalView<PatchViewState> {
         this.commits = holdCommits;
         this.viewModel = holdViewModel;
         this.allComponents = holdComponents;
+        this.visualConflictsFlag = holdVisualConflictsFlag;
     }
 
     @Override
@@ -75,9 +80,18 @@ public class PatchView extends TwoDimensionalView<PatchViewState> {
 
     @Override
     public ArrayList<Drawable> getInitialDrawables() {
-        DrawablesProducer.PatchViewDrawables patchViewDrawables =
-                new DrawablesProducer().produceDrawables(viewModel, commits,
+        
+        DrawablesProducer.PatchViewDrawables patchViewDrawables;
+        
+        if(visualConflictsFlag) {
+            patchViewDrawables = new DrawablesProducer()
+                    .produceDrawablesWithConflicts(viewModel, commits,
                         allComponents, this);
+        } else {
+            patchViewDrawables = new DrawablesProducer()
+                    .produceDrawablesWithoutConflicts(viewModel, commits,
+                        allComponents, this);
+        }
         
         checkmarks = patchViewDrawables.getCheckmarks();
         

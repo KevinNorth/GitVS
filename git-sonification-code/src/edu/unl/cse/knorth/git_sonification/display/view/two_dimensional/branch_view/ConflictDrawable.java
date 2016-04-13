@@ -10,13 +10,13 @@ import processing.core.PGraphics;
 /**
  * Visually represents conflicts in a project.
  */
-public class ConflictAnnotationDrawable extends Drawable {
+public class ConflictDrawable extends Drawable {
     private int numConflicts;
     private PFont font;
     private Color color;
     private float fontSize;
 
-    public ConflictAnnotationDrawable(int numConflicts, PFont font, Color color,
+    public ConflictDrawable(int numConflicts, PFont font, Color color,
             Rectangle boundingRectangle, int zOrdering) {
         super(boundingRectangle, zOrdering);
         this.numConflicts = numConflicts;
