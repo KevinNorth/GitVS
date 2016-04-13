@@ -54,9 +54,7 @@ public class DrawablesProducer {
         int rowNum = 1;
                 
         Color commitColor = Color.BLUE;
-        Color conflictColor = // orange to contrast with commits' deep blue
-                Color.createHSBColor((char)(255/12), (char)195, (char)255);
-        PFont conflictFont = context.createFont("Arial", 24);
+        Color conflictColor = Color.RED;
         Map<Integer, Color> lineColors = determineLineColors(visualData);
         
         Layer combinedLayer = visualData.getCombinedLayer();
@@ -86,10 +84,8 @@ public class DrawablesProducer {
                     topOfRow + commitSize + commitOffset);
                 commits.add(new CommitDrawable(commitColor, row.getCommit(),
                         row.getNumConflicts(), commitRect, commitsZOrdering));
-                Rectangle conflictRect = new Rectangle(commitRect.center(),
-                        conflictSize, conflictSize);
-                conflicts.add(new ConflictDrawable(numConflicts, conflictFont,
-                        conflictColor, conflictRect, commitsZOrdering + 1));
+                conflicts.add(new ConflictDrawable(conflictColor, commitRect,
+                        commitsZOrdering + 1));
             }
             
             float topOfPreviousRow = topOfRow - distanceBetweenRows;
