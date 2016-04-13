@@ -84,8 +84,10 @@ public class DrawablesProducer {
                     topOfRow + commitSize + commitOffset);
                 commits.add(new CommitDrawable(commitColor, row.getCommit(),
                         row.getNumConflicts(), commitRect, commitsZOrdering));
-                conflicts.add(new ConflictDrawable(conflictColor, commitRect,
-                        commitsZOrdering + 1));
+                if(row.getNumConflicts() > 0) {
+                    conflicts.add(new ConflictDrawable(conflictColor, commitRect,
+                            commitsZOrdering + 1));
+                }
             }
             
             float topOfPreviousRow = topOfRow - distanceBetweenRows;
