@@ -30,7 +30,6 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     private String lastHash;
     private String locationOfGitRepo;
     private String locationOfConflicts;
-    private String locationOfComponents;
 
     private ViewModel viewModel;
     private ArrayList<CommitDrawable> commits;
@@ -53,13 +52,15 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     private Clip[] conflictClips;
     private Clip[] conflictClipCopies;
 
+    private boolean visualConflictsFlag;
+    
     /* To hold onto the date values obtained from the command line arguments
      * until we're in a non-static context (i.e. not main()) */
     private static String firstHashFromArgs;
     private static String lastHashFromArgs;
     private static String locationOfGitRepoFromArgs;
     private static String locationOfConflictsFromArgs;
-    private static String locationOfComponentsFromArgs;
+    private static boolean visualConflictsFlagFromArgs;
         
     public static void main(String args[]) {
         if(args.length == 2) {
@@ -67,25 +68,25 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
             lastHashFromArgs = args[1];
             locationOfGitRepoFromArgs = "../../voldemort/.git";
             locationOfConflictsFromArgs = "data/conflict_data.dat";
-            locationOfComponentsFromArgs = "data/components.txt";
+            visualConflictsFlagFromArgs = false;
         } else if(args.length == 3) {
             firstHashFromArgs = args[0];
             lastHashFromArgs = args[1];
             locationOfGitRepoFromArgs = args[2];
             locationOfConflictsFromArgs = "data/conflict_data.dat";
-            locationOfComponentsFromArgs = "data/components.txt";
+            visualConflictsFlagFromArgs = false;
         } else if(args.length == 4) {
             firstHashFromArgs = args[0];
             lastHashFromArgs = args[1];
             locationOfGitRepoFromArgs = args[2];
             locationOfConflictsFromArgs = args[3];
-            locationOfComponentsFromArgs = "data/components.txt";
-        } else if(args.length == 5) {
+            visualConflictsFlagFromArgs = false;
+        } else if(args.length >= 5) {
             firstHashFromArgs = args[0];
             lastHashFromArgs = args[1];
             locationOfGitRepoFromArgs = args[2];
             locationOfConflictsFromArgs = args[3];
-            locationOfComponentsFromArgs = args[4];
+            visualConflictsFlagFromArgs = args[4].equals("--no-sound");
         } else {
             // Default date range is the first 10 days of November 2009
 //            sinceFromArgs = new DateTime(2015, 1, 1, 0, 0);
@@ -94,7 +95,7 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
             lastHashFromArgs = null;
             locationOfGitRepoFromArgs = "../../voldemort/.git";
             locationOfConflictsFromArgs = "data/conflict_data.dat";
-            locationOfComponentsFromArgs = "data/components.txt";
+            visualConflictsFlagFromArgs = true;
         }
         
         String[] newArgs = new String[args.length + 1];
@@ -115,33 +116,40 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
         lastHash = lastHashFromArgs;
         locationOfGitRepo = locationOfGitRepoFromArgs;
         locationOfConflicts = locationOfConflictsFromArgs;
-        locationOfComponents = locationOfComponentsFromArgs;
+        visualConflictsFlag = visualConflictsFlagFromArgs;
         
-        try {
-            developerClips = new Clip[14];
-            developerClipCopies = new Clip[14];
-            conflictClips = new Clip[4];
-            conflictClipCopies = new Clip[4];
-            
-            for (int i = 0; i < 14; i++) {
-                developerClips[i] = AudioSystem.getClip();
-                developerClips[i].open(AudioSystem.getAudioInputStream(
-                        new File("audio/dev" + (i + 1) + ".wav")));
-                developerClipCopies[i] = AudioSystem.getClip();
-                developerClipCopies[i].open(AudioSystem.getAudioInputStream(
-                        new File("audio/dev" + (i + 1) + ".wav")));
+        if(visualConflictsFlag) {
+            developerClips = null;
+            developerClipCopies = null;
+            conflictClips = null;
+            conflictClipCopies = null;
+        } else {
+            try {
+                developerClips = new Clip[14];
+                developerClipCopies = new Clip[14];
+                conflictClips = new Clip[4];
+                conflictClipCopies = new Clip[4];
+
+                for (int i = 0; i < 14; i++) {
+                    developerClips[i] = AudioSystem.getClip();
+                    developerClips[i].open(AudioSystem.getAudioInputStream(
+                            new File("audio/dev" + (i + 1) + ".wav")));
+                    developerClipCopies[i] = AudioSystem.getClip();
+                    developerClipCopies[i].open(AudioSystem.getAudioInputStream(
+                            new File("audio/dev" + (i + 1) + ".wav")));
+                }
+                daySeperatorClip = AudioSystem.getClip();
+                daySeperatorClip.open(AudioSystem.getAudioInputStream(
+                        new File("audio/day_separator.wav")));
+                for (int i = 0; i < 4; i++) {
+                    conflictClips[i] = AudioSystem.getClip();
+                    conflictClips[i].open(AudioSystem.getAudioInputStream(new File("audio/conflict_drums_" + (i + 1) + ".wav")));
+                    conflictClipCopies[i] = AudioSystem.getClip();
+                    conflictClipCopies[i].open(AudioSystem.getAudioInputStream(new File("audio/conflict_drums_" + (i + 1) + ".wav")));
+                }
+            } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
+                Logger.getLogger(BranchView.class.getName()).log(Level.SEVERE, null, ex);
             }
-            daySeperatorClip = AudioSystem.getClip();
-            daySeperatorClip.open(AudioSystem.getAudioInputStream(
-                    new File("audio/day_separator.wav")));
-            for (int i = 0; i < 4; i++) {
-                conflictClips[i] = AudioSystem.getClip();
-                conflictClips[i].open(AudioSystem.getAudioInputStream(new File("audio/conflict_drums_" + (i + 1) + ".wav")));
-                conflictClipCopies[i] = AudioSystem.getClip();
-                conflictClipCopies[i].open(AudioSystem.getAudioInputStream(new File("audio/conflict_drums_" + (i + 1) + ".wav")));
-            }
-        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
-            Logger.getLogger(BranchView.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -194,29 +202,34 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
         timestamps = daySeparatorsTimestampsAndConflicts.getTimestamps();
         conflictMargins = daySeparatorsTimestampsAndConflicts.getConflicts();
         
-        sonificationCursor =
-                drawablesProducer.produceSonificationCursor(viewModel);
-        
         patchSelection = null;
-        
-        playButtons = drawablesProducer.producePlayButtons(this);
         
         ArrayList<Drawable> drawables = new ArrayList<>(1);
         drawables.addAll(commits);
         drawables.addAll(lines);
         drawables.addAll(timestamps);
         drawables.addAll(daySeparators);
-        drawables.addAll(conflictAnnotations);
-        drawables.addAll(conflictMargins);
-        drawables.add(sonificationCursor);
-        drawables.addAll(playButtons);
+        
+        if(visualConflictsFlag) {
+            drawables.addAll(conflictAnnotations);
+            drawables.addAll(conflictMargins);
+            sonificationCursor = null;
+            playButtons = null;
+        } else {
+            sonificationCursor =
+                drawablesProducer.produceSonificationCursor(viewModel);
+            playButtons = drawablesProducer.producePlayButtons(this);
+            drawables.add(sonificationCursor);
+            drawables.addAll(playButtons);
+        }
+
         return drawables;
     }
     
     private ViewModel calculateViewModel() throws IOException {
         return new GitDataProcessor().processGitData(
                         locationOfGitRepo, firstHash, lastHash,
-                        locationOfConflicts, locationOfComponents);
+                        locationOfConflicts);
     }
 
     @Override
@@ -226,28 +239,34 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
 
     @Override
     public void update(long delta) {
-        if(mousePressed) {
-            Point mouseLocation = new Point(mouseX, mouseY);
-            
-            for(PlayButton playButton : playButtons) {
-                if(playButton.isClicked(mouseLocation, camera)) {                
-                    BranchViewState state = getWindowState();
-                    playButton.onClick(state, delta);
+        if(!visualConflictsFlag) {
+            if(mousePressed) {
+                Point mouseLocation = new Point(mouseX, mouseY);
+
+                for(PlayButton playButton : playButtons) {
+                    if(playButton.isClicked(mouseLocation, camera)) {                
+                        BranchViewState state = getWindowState();
+                        playButton.onClick(state, delta);
+                    }
                 }
             }
-        }
-        
-        CommitDrawable highlightedCommit =
-                sonificationCursor.findCollidingCommit(commits);
-        
-        if(highlightedCommit != null
-                && highlightedCommit != previouslyHighlightedCommit) {
-            playSoundForCommit(highlightedCommit);
-            previouslyHighlightedCommit = highlightedCommit;
+
+            CommitDrawable highlightedCommit =
+                    sonificationCursor.findCollidingCommit(commits);
+
+            if(highlightedCommit != null
+                    && highlightedCommit != previouslyHighlightedCommit) {
+                playSoundForCommit(highlightedCommit);
+                previouslyHighlightedCommit = highlightedCommit;
+            }
         }
     }
 
     private void playSoundForCommit(CommitDrawable commit) {
+        if(visualConflictsFlag) {
+            return;
+        }
+        
         /*
          * Developer sound
          */
@@ -360,21 +379,22 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
                 ScrollWindowKeyboardEvent.ScrollDirection.RIGHT, scrollSpeed,
                 null, keyCodes));
 
-        float cursorSpeed = 150.0f;
-        
-        List<Character> keys = new LinkedList<>();
-        keys.add('w');
-        keys.add('W');
-        keyboardEvents.add(new MoveSonificationCursorKeyboardEvent(
-                MoveSonificationCursorKeyboardEvent.MoveDirection.UP,
-                cursorSpeed, keys, null));
-        keys = new LinkedList<>();
-        keys.add('s');
-        keys.add('S');
-        keyboardEvents.add(new MoveSonificationCursorKeyboardEvent(
-                MoveSonificationCursorKeyboardEvent.MoveDirection.DOWN,
-                cursorSpeed, keys, null));
-        
+        if(!visualConflictsFlag) {
+            float cursorSpeed = 150.0f;
+
+            List<Character> keys = new LinkedList<>();
+            keys.add('w');
+            keys.add('W');
+            keyboardEvents.add(new MoveSonificationCursorKeyboardEvent(
+                    MoveSonificationCursorKeyboardEvent.MoveDirection.UP,
+                    cursorSpeed, keys, null));
+            keys = new LinkedList<>();
+            keys.add('s');
+            keys.add('S');
+            keyboardEvents.add(new MoveSonificationCursorKeyboardEvent(
+                    MoveSonificationCursorKeyboardEvent.MoveDirection.DOWN,
+                    cursorSpeed, keys, null));
+        }
         return keyboardEvents;
     }
 
@@ -386,6 +406,10 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     @Override
     public void handleRightMouseButton(Point mouseLocationOnGridViewport,
             MouseEvent rawMouseEvent) {
+        if(visualConflictsFlag) {
+            return;
+        }
+        
         sonificationCursor.setVerticalLocation(
                 mouseLocationOnGridViewport.getY());
     }

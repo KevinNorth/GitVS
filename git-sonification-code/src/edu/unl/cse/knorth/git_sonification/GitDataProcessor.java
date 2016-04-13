@@ -22,7 +22,7 @@ import java.util.Map;
 public class GitDataProcessor {
     public ViewModel processGitData(String targetGitRepoLocation,
             String firstHash, String lastHash,
-            String conflictsLocation, String componentsLocation)
+            String conflictsLocation)
             throws IOException {
         List<PartialCommit> partialCommits;
         Map<String, Integer> authorCommitCounts;

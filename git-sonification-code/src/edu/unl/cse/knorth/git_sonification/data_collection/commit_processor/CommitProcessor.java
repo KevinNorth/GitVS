@@ -127,7 +127,7 @@ public class CommitProcessor {
      */
     private Commit processPartialCommit(PartialCommit partialCommit,
         List<Conflict> conflicts) {
-                String hash = partialCommit.getHash();
+        String hash = partialCommit.getHash();
         String resolvedCommit = null;
         boolean introducesConflict = false;
 
