@@ -17,5 +17,5 @@ hs_err_pid*
 # Some of the data we're using in this program comes from another person's
 # research, so we're not committing that data into a public repo before that
 # person's research is published
-data/
+/git-sonification-code/data/old/
 /git-sonification-code/dist/

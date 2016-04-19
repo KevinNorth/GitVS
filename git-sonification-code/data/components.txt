@@ -1,0 +1,7 @@
+^[^/]$
+^contrib/ec2-testing
+^src/java/voldemort/client
+^src/java/voldemort/server
+^src/java/voldemort/store
+^src/proto
+^test/
