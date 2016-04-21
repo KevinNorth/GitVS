@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeComparator;
+import org.joda.time.Days;
 
 public class LayerProducer {
     public VisualizationData produceLayers(List<AnnotatedCommit> commits,
@@ -86,8 +87,12 @@ public class LayerProducer {
                     oldLine.getToBranch(), oldLine.getColor()));
         }
 
+        int numDaysPassed = Days.daysBetween(
+                previousCommit.getTimestamp().toLocalDate(),
+                commit.getTimestamp().toLocalDate()).getDays();
+        
         Row row = new Row(commit.getTimestamp().withTimeAtStartOfDay(),
-                numConflicts, lines);
+                numConflicts, numDaysPassed, lines);
         combinedLayer.getRows().add(row);
     }
 

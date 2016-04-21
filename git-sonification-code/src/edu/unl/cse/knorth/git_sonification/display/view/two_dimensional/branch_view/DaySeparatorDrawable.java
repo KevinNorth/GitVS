@@ -18,9 +18,10 @@ public class DaySeparatorDrawable extends Drawable {
     private Color textColor;
     private float dividerWeight;
     private Color dividerColor;
+    private int numDaysPassed;
 
     public DaySeparatorDrawable(DateTime day, PFont font, Color textColor,
-            float dividerWeight, Color dividerColor,
+            float dividerWeight, Color dividerColor, int numDaysPassed,
             Rectangle boundingRectangle, int zOrdering) {
         super(boundingRectangle, zOrdering);
         this.day = day;
@@ -29,6 +30,7 @@ public class DaySeparatorDrawable extends Drawable {
         this.textColor = textColor;
         this.dividerWeight = dividerWeight;
         this.dividerColor = dividerColor;
+        this.numDaysPassed = numDaysPassed;
     }
     
     @Override
@@ -93,5 +95,13 @@ public class DaySeparatorDrawable extends Drawable {
 
     public void setDividerColor(Color dividerColor) {
         this.dividerColor = dividerColor;
+    }
+
+    public int getNumDaysPassed() {
+        return numDaysPassed;
+    }
+
+    public void setNumDaysPassed(int numDaysPassed) {
+        this.numDaysPassed = numDaysPassed;
     }
 }

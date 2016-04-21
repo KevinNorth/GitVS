@@ -6,7 +6,7 @@ import edu.unl.cse.knorth.git_sonification.display.view.two_dimensional.Rectangl
 import processing.core.PGraphics;
 
 public class SonificationCursorDrawable extends Drawable {
-    private Color color;
+    private final Color color;
 
     public SonificationCursorDrawable(Color color, Rectangle boundingRectangle,
             int zOrdering) {
@@ -55,8 +55,25 @@ public class SonificationCursorDrawable extends Drawable {
         
         return null;
     }
-    
+
+    public DaySeparatorDrawable
+        findCollidingDaySeparator(Iterable<DaySeparatorDrawable> daySeparators) {
+        for(DaySeparatorDrawable daySeparator : daySeparators) {
+            if(doesCollidesWithDaySeparator(daySeparator)) {
+                return daySeparator;
+            }
+        }
+        
+        return null;
+    }
+        
     public boolean doesCollidesWithCommit(CommitDrawable commit) {
         return getBoundingRectangle().intersects(commit.getBoundingRectangle());
+    }
+    
+    public boolean doesCollidesWithDaySeparator(DaySeparatorDrawable
+            daySeparator) {
+        return getBoundingRectangle().intersects(
+                daySeparator.getBoundingRectangle());
     }
 }

@@ -42,15 +42,20 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     private ArrayList<PlayButton> playButtons;
     
     private CommitDrawable previouslyHighlightedCommit;
+    private DaySeparatorDrawable previouslyHighlightedDaySeparator;
     
     private Clip currentCommitClip;
     private Clip[] developerClips;
     private Clip[] developerClipCopies;
-    private Clip daySeperatorClip;
+    private Clip currentDaySeparatorClip;
+    private Clip daySeparatorClip;
+    private Clip daySeparatorClipCopy;
     private Clip currentConflictClip;
     private Clip[] conflictClips;
     private Clip[] conflictClipCopies;
 
+    private DaySeparatorEntity daySeparatorEntity;
+    
     private boolean visualConflictsFlag;
     
     /* To hold onto the date values obtained from the command line arguments
@@ -122,6 +127,8 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
             developerClipCopies = null;
             conflictClips = null;
             conflictClipCopies = null;
+            daySeparatorClip = null;
+            daySeparatorClipCopy = null;
         } else {
             try {
                 developerClips = new Clip[14];
@@ -137,9 +144,16 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
                     developerClipCopies[i].open(AudioSystem.getAudioInputStream(
                             new File("audio/dev" + (i + 1) + ".wav")));
                 }
-                daySeperatorClip = AudioSystem.getClip();
-                daySeperatorClip.open(AudioSystem.getAudioInputStream(
+
+                daySeparatorClip = AudioSystem.getClip();
+                daySeparatorClip.open(AudioSystem.getAudioInputStream(
                         new File("audio/day_separator.wav")));
+                daySeparatorClipCopy = AudioSystem.getClip();
+                daySeparatorClipCopy.open(AudioSystem.getAudioInputStream(
+                        new File("audio/day_separator.wav")));
+                currentDaySeparatorClip = daySeparatorClip;
+
+                
                 for (int i = 0; i < 4; i++) {
                     conflictClips[i] = AudioSystem.getClip();
                     conflictClips[i].open(AudioSystem.getAudioInputStream(new File("audio/conflict_drums_" + (i + 1) + ".wav")));
@@ -150,6 +164,8 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
                 Logger.getLogger(BranchView.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        
+        daySeparatorEntity = null;
     }
     
     @Override
@@ -251,11 +267,38 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
 
             CommitDrawable highlightedCommit =
                     sonificationCursor.findCollidingCommit(commits);
+            DaySeparatorDrawable highlightedDaySeparator =
+                    sonificationCursor.findCollidingDaySeparator(daySeparators);
 
             if(highlightedCommit != null
                     && highlightedCommit != previouslyHighlightedCommit) {
                 playSoundForCommit(highlightedCommit);
                 previouslyHighlightedCommit = highlightedCommit;
+            } else if(highlightedDaySeparator != null
+                && highlightedDaySeparator != previouslyHighlightedDaySeparator)
+            {
+                previouslyHighlightedDaySeparator = highlightedDaySeparator;
+                beginDaySeparatorSound(highlightedDaySeparator);
+            }
+            
+            if(highlightedCommit == null) {
+                previouslyHighlightedCommit = null;
+            }
+            if(highlightedDaySeparator == null) {
+                previouslyHighlightedDaySeparator = null;
+            }
+            
+            if(daySeparatorEntity != null &&
+                    !daySeparatorEntity.isDaySeparatorFinishedPlaying()) {
+                if(currentDaySeparatorClip == daySeparatorClip) {
+                    currentDaySeparatorClip =
+                        daySeparatorEntity.updateDaySeparatorSounds(
+                            daySeparatorClip, daySeparatorClipCopy);
+                } else {
+                    currentDaySeparatorClip =
+                        daySeparatorEntity.updateDaySeparatorSounds(
+                            daySeparatorClipCopy, daySeparatorClip);
+                }
             }
         }
     }
@@ -263,6 +306,15 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     private void playSoundForCommit(CommitDrawable commit) {
         if(visualConflictsFlag) {
             return;
+        }
+        
+        // Stop the day separator
+        daySeparatorEntity = null;
+        currentDaySeparatorClip.stop();
+        if(currentDaySeparatorClip == daySeparatorClip) {
+            currentDaySeparatorClip = daySeparatorClipCopy;
+        } else {
+            currentDaySeparatorClip = daySeparatorClip;
         }
         
         /*
@@ -466,5 +518,20 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
         
         drawables.remove(patchSelection);
         patchSelection = null;
+    }
+
+    private void beginDaySeparatorSound(DaySeparatorDrawable highlightedDaySeparator) {
+        if(currentCommitClip != null) {
+            currentCommitClip.stop();
+        }
+        if(currentConflictClip != null) {
+            currentConflictClip.stop();
+        }
+        
+        int numDaySeparators = highlightedDaySeparator.getNumDaysPassed();
+        System.out.println(numDaySeparators);
+        daySeparatorEntity = new DaySeparatorEntity(
+                numDaySeparators);
+        
     }
 }

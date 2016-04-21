@@ -15,6 +15,7 @@ public class Row {
   private RowType type;
   private int branchLocation;
   private int numConflicts;
+  private int numDaysPassed;
   private Commit commit;
 
   /**
@@ -43,11 +44,13 @@ public class Row {
   /**
    * Creates a new Row that represents a day separator.
    */
-  public Row(DateTime startOfNewDay, int numConflicts, Collection<Line> incomingLines) {
+  public Row(DateTime startOfNewDay, int numConflicts, int numDaysPassed,
+          Collection<Line> incomingLines) {
     this.author = null;
     this.commitDate = startOfNewDay;
     this.incomingLines = new ArrayList<>(incomingLines);
     this.type = RowType.DAY_SEPARATOR;
+    this.numDaysPassed = numDaysPassed;
     this.branchLocation = NO_BRANCH_LOCATION;
     this.numConflicts = numConflicts;
     this.commit = null;
@@ -56,8 +59,10 @@ public class Row {
     /**
    * Creates a new Row that represents a day separator.
    */
-  public Row(DateTime startOfNewDay, int numConflicts, Line... incomingLines) {
-      this(startOfNewDay, numConflicts, Arrays.asList(incomingLines));
+  public Row(DateTime startOfNewDay, int numConflicts, int numDaysPassed,
+          Line... incomingLines) {
+      this(startOfNewDay, numConflicts, numDaysPassed,
+              Arrays.asList(incomingLines));
   }
 
   
@@ -80,7 +85,10 @@ public class Row {
   public int getBranchLocation() {
     return branchLocation;
   }
-  
+
+  public int getNumDaysPassed() {
+      return numDaysPassed;
+  }
   
   public int getNumConflicts() {
     return numConflicts;

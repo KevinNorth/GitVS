@@ -183,7 +183,7 @@ public class DrawablesProducer {
                 daySeparators.add(new DaySeparatorDrawable(row.getCommitDate(),
                         daySeparatorFont, daySeparatorTextColor,
                         daySeparatorDividerThickness, daySeparatorDividerColor,
-                        daySeparatorRect, 3));
+                        row.getNumDaysPassed(), daySeparatorRect, 3));
             } else {
                 float bottomOfTimestamp = topOfRow + timestampFont.getSize();
                 
@@ -207,7 +207,7 @@ public class DrawablesProducer {
             daySeparators.add(new DaySeparatorDrawable(firstRow.getCommitDate(),
                     daySeparatorFont, daySeparatorTextColor,
                     daySeparatorDividerThickness, daySeparatorDividerColor,
-                    daySeparatorRect, 3));
+                    0, daySeparatorRect, 3));
         }
         
         return new DaySeparatorsAndTimestamps(daySeparators,
