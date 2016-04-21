@@ -19,8 +19,17 @@ public abstract class TwoDimensionalView<WindowState> extends PApplet {
     private Set<KeyboardEvent<WindowState>> activeKeyboardEvents;
     private long oldTime;
     private boolean isMouseBeingDragged;
+    private Rectangle initialGridViewport;
     Point startOfMouseDragOnGrid;
        
+    /**
+     * @return A copy of the initial grid viewport. Returns a copy so that the
+     * original value cannot be modified.
+     */
+    public Rectangle rememberInitialGridViewport() {
+        return initialGridViewport.copy();
+    }
+    
     /**
      * @return <code>true</code> if the whole program should terminate when this
      * TwoDimensionalView is closed. <code>false</code> if the window should
@@ -145,9 +154,9 @@ public abstract class TwoDimensionalView<WindowState> extends PApplet {
                 
         size(getSetupWidth(), getSetupHeight(), P2D);
         
-        Rectangle grid = getInitialGridViewport();
+        initialGridViewport = getInitialGridViewport();
         Rectangle screen = new Rectangle(0, 0, width, height);
-        camera = new Camera(grid, screen);
+        camera = new Camera(initialGridViewport, screen);
         
         drawables = getInitialDrawables();
         backgroundColor = getInitialBackgroundColor();
@@ -160,7 +169,9 @@ public abstract class TwoDimensionalView<WindowState> extends PApplet {
         isMouseBeingDragged = false;
         startOfMouseDragOnGrid = null;
     }
-        
+    
+    
+    
     @Override
     public final void draw() {
         long time = System.currentTimeMillis();

@@ -30,7 +30,7 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     private String lastHash;
     private String locationOfGitRepo;
     private String locationOfConflicts;
-
+    
     private ViewModel viewModel;
     private ArrayList<CommitDrawable> commits;
     private ArrayList<BranchLineDrawable> lines;
@@ -180,6 +180,7 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
 
     @Override
     public Rectangle getInitialGridViewport() {
+        
         return new Rectangle(0, 0, width, height);
     }
 
@@ -405,6 +406,13 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     public ArrayList<KeyboardEvent<BranchViewState>> getInitialKeybaordEvents() {
         ArrayList<KeyboardEvent<BranchViewState>> keyboardEvents =
                 new ArrayList<>(4);
+
+        List<Character> keys;
+        keys = new LinkedList<>();
+        keys.add('r');
+        keys.add('R');
+        keyboardEvents.add(new ResetCameraKeyboardEvent(
+                super.rememberInitialGridViewport(), keys, null));
         
         float scrollSpeed = 1.5f;
         
@@ -433,7 +441,7 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
         if(!visualConflictsFlag) {
             float cursorSpeed = 150.0f;
 
-            List<Character> keys = new LinkedList<>();
+            keys = new LinkedList<>();
             keys.add('w');
             keys.add('W');
             keyboardEvents.add(new MoveSonificationCursorKeyboardEvent(
