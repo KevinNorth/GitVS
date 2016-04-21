@@ -302,12 +302,8 @@ public class DrawablesProducer {
             for(String component : commit.getComponentsModified()) {
                 componentNames.add(component);
             }
-            
-            System.out.println(commit.getHash() + " " + numFilesModified);
         }
         
-        System.out.println(maxFilesModified);
-                
         int lengthOfLongestAuthor = getNumCharsInLongestString(authors);
         int lengthOfLongestTimestamp =
                 getNumCharsInLongestString(timestamps.values());

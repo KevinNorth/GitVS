@@ -529,10 +529,7 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
             currentConflictClip.stop();
         }
         
-        int numDaySeparators = highlightedDaySeparator.getNumDaysPassed();
-        System.out.println(numDaySeparators);
         daySeparatorEntity = new DaySeparatorEntity(
-                numDaySeparators);
-        
+                highlightedDaySeparator.getNumDaysPassed());
     }
 }
