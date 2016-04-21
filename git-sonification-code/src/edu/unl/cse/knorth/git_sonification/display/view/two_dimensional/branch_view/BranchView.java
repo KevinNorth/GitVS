@@ -310,6 +310,7 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
         
         // Stop the day separator
         daySeparatorEntity = null;
+        currentDaySeparatorClip.setFramePosition(0);
         currentDaySeparatorClip.stop();
         if(currentDaySeparatorClip == daySeparatorClip) {
             currentDaySeparatorClip = daySeparatorClipCopy;

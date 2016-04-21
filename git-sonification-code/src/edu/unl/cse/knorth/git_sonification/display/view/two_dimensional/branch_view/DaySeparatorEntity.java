@@ -30,6 +30,7 @@ public class DaySeparatorEntity {
      */
     public Clip updateDaySeparatorSounds(Clip currentDaySeparator, Clip daySeparatorClone) {
         if(!currentDaySeparator.isRunning()) {
+            currentDaySeparator.setFramePosition(0);
             if(!isDaySeparatorFinishedPlaying()) {
                 System.out.println("Playing for the "
                         + (numTimesDaySeparatorHasBeenPlayed + 1)
