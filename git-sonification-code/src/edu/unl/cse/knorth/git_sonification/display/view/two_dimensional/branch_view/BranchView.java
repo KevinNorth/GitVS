@@ -22,6 +22,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.DataLine;
 import processing.core.PApplet;
 import processing.event.MouseEvent;
 
@@ -137,28 +140,18 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
                 conflictClipCopies = new Clip[4];
 
                 for (int i = 0; i < 14; i++) {
-                    developerClips[i] = AudioSystem.getClip();
-                    developerClips[i].open(AudioSystem.getAudioInputStream(
-                            new File("audio/dev" + (i + 1) + ".wav")));
-                    developerClipCopies[i] = AudioSystem.getClip();
-                    developerClipCopies[i].open(AudioSystem.getAudioInputStream(
-                            new File("audio/dev" + (i + 1) + ".wav")));
+                    developerClips[i] = openClip(new File("audio/dev" + (i + 1) + ".wav"));
+                    developerClipCopies[i] = openClip(new File("audio/dev" + (i + 1) + ".wav"));
                 }
 
-                daySeparatorClip = AudioSystem.getClip();
-                daySeparatorClip.open(AudioSystem.getAudioInputStream(
-                        new File("audio/day_separator.wav")));
-                daySeparatorClipCopy = AudioSystem.getClip();
-                daySeparatorClipCopy.open(AudioSystem.getAudioInputStream(
-                        new File("audio/day_separator.wav")));
+                daySeparatorClip = openClip(new File("audio/day_separator.wav"));
+                daySeparatorClipCopy = openClip(new File("audio/day_separator.wav"));
                 currentDaySeparatorClip = daySeparatorClip;
 
                 
                 for (int i = 0; i < 4; i++) {
-                    conflictClips[i] = AudioSystem.getClip();
-                    conflictClips[i].open(AudioSystem.getAudioInputStream(new File("audio/conflict_drums_" + (i + 1) + ".wav")));
-                    conflictClipCopies[i] = AudioSystem.getClip();
-                    conflictClipCopies[i].open(AudioSystem.getAudioInputStream(new File("audio/conflict_drums_" + (i + 1) + ".wav")));
+                    conflictClips[i] = openClip(new File("audio/conflict_drums_" + (i + 1) + ".wav"));
+                    conflictClipCopies[i] = openClip(new File("audio/conflict_drums_" + (i + 1) + ".wav"));
                 }
             } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
                 Logger.getLogger(BranchView.class.getName()).log(Level.SEVERE, null, ex);
@@ -531,5 +524,14 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
         
         daySeparatorEntity = new DaySeparatorEntity(
                 highlightedDaySeparator.getNumDaysPassed());
+    }
+    
+    private Clip openClip(File file) throws LineUnavailableException, UnsupportedAudioFileException, IOException {
+        AudioInputStream inputStream = AudioSystem.getAudioInputStream(file);
+        AudioFormat format = inputStream.getFormat();
+        DataLine.Info info = new DataLine.Info(Clip.class, format);
+        Clip clip = (Clip)AudioSystem.getLine(info);
+        clip.open(inputStream);
+        return clip;
     }
 }
