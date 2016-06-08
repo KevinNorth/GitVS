@@ -64,6 +64,13 @@ public class PatchView extends TwoDimensionalView<PatchViewState> {
     }
 
     @Override
+    public String getWindowTitle() {
+        return "Details View (" + commits.get(0).getHash().substring(0, 7) +
+                "..." + commits.get(commits.size()-1).getHash().substring(0, 7)
+                + ")";
+    }
+
+    @Override
     public int getSetupWidth() {
         return displayWidth / 2;
     }
