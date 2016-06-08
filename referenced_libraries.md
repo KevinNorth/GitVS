@@ -26,4 +26,24 @@ Beads Project
 =============
 *The Beads Project library is included in our project as lib/beads.jar and can be obtained from either http://www.beadsproject.net/ or https://github.com/orsjb/beads*
 
-The Beads Project does not have a license.
+The Beads Project is under the GPL v3 license.
+
+Apache Commons
+=============
+The Apache Commons project is under the Apache license.
+
+Hamcrest
+=============
+The Hamcrest project is under the BSD License.
+
+Joda Time
+=============
+The Joda Time library is under the Apache 2 License.
+
+JUnit
+=============
+Under the Eclipse Public License - v 1.0
+
+Processing
+=============
+Under a combination of GPL v2 and LGPL.
