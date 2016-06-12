@@ -118,7 +118,13 @@ public abstract class TwoDimensionalView<WindowState> extends PApplet {
     
     @Override
     public final void setup() {
+        System.out.println("C-1");
+        System.out.flush();
+        
         initialize();
+
+        System.out.println("C-2");
+        System.out.flush();
         
         if(!shouldProgramCloseWhenWindowIsClosed()) {
             /*
@@ -135,69 +141,168 @@ public abstract class TwoDimensionalView<WindowState> extends PApplet {
             * But there be dragons - if the window starts misbehaving, I might
             * have removed a WindowListener that did something important.
             */
+            System.out.println("C-3");
+            System.out.flush();
+            
            final PApplet thisPApplet = this;
 
+           System.out.println("C-4");
+           System.out.flush();
+           
+           int iteration = 1;
            for(WindowListener windowListener : this.frame.getWindowListeners()) {
+               System.out.println("C-5-" + iteration);
+               System.out.flush();
                this.frame.removeWindowListener(windowListener);
+
+               iteration++;
            }
 
            this.frame.addWindowListener(new WindowAdapter() {
                @Override
                public void windowClosed(WindowEvent e) {
+                   System.out.println("C-6");
+                   System.out.flush();
                    thisPApplet.destroy();
                    e.getWindow().dispose();
+                    System.out.println("C-7");
+                   System.out.flush();
                }
            });
+           
+           System.out.println("C-8");
+           System.out.flush();
         }
-            
+
+        System.out.println("C-9");
+        System.out.flush();
+        
         this.frame.setTitle(getWindowTitle());
         
+        System.out.println("C-10");
+        System.out.flush();
+        
         size(getSetupWidth(), getSetupHeight(), P2D);
+        
+        System.out.println("C-11");
+        System.out.flush();
         
         Rectangle grid = getInitialGridViewport();
         Rectangle screen = new Rectangle(0, 0, width, height);
         camera = new Camera(grid, screen);
         
+        System.out.println("C-12");
+        System.out.flush();
+        
         drawables = getInitialDrawables();
+
+        System.out.println("C-13");
+        System.out.flush();
+
         backgroundColor = getInitialBackgroundColor();
         
+        System.out.println("C-14");
+        System.out.flush();
+        
         keyboardEvents = getInitialKeybaordEvents();
+        
+        System.out.println("C-15");
+        System.out.flush();
+        
         activeKeyboardEvents = new HashSet<>();
+        
+        System.out.println("C-16");
+        System.out.flush();
         
         oldTime = System.currentTimeMillis();
         
+        System.out.println("C-17");
+        System.out.flush();
+        
         isMouseBeingDragged = false;
         startOfMouseDragOnGrid = null;
+        
+        System.out.println("C-18");
+        System.out.flush();
     }
         
     @Override
     public final void draw() {
+        System.out.println("C-19");
+        System.out.flush();
+
         long time = System.currentTimeMillis();
         long delta = time - oldTime;
         oldTime = time;
+
+        System.out.println("C-20");
+        System.out.flush();
+        
+        int iteration = 1;
         
         for(KeyboardEvent<WindowState> keyboardEvent : activeKeyboardEvents) {
+            System.out.println("C-21");
+            System.out.flush();
+            
             keyboardEvent.whileKeyHeld(getWindowState(), delta);
+            iteration++;
         }
         
+        System.out.println("C-22");
+        System.out.flush();
+
         update(delta);
-  
+
+        System.out.println("C-23");
+        System.out.flush();
+
         backgroundColor.applyToBackground(g);
         Collections.sort(drawables);
         
+        System.out.println("C-24");
+        System.out.flush();
+        
+        iteration++;
         for(Drawable drawable : drawables) {
+            System.out.println("C-25-" + iteration);
+            System.out.flush();
+
             Rectangle screenBoundingRectangle = drawable.getBoundingRectangle();
+
+            System.out.println("C-26-" + iteration);
+            System.out.flush();
             
             if(!drawable.attachedToCamera()) {
+                System.out.println("C-27-" + iteration);
+                System.out.flush();
+
                 screenBoundingRectangle = camera.convertFromGridToScreen(
                     screenBoundingRectangle);
+
+                System.out.println("C-28-" + iteration);
+                System.out.flush();
             }
             
+            System.out.println("C-29-" + iteration);
+            System.out.flush();
+            
             if(screenBoundingRectangle.intersects(camera.getScreenViewport())) {
+                System.out.println("C-30-" + iteration);
+                System.out.flush();
+
                 drawable.draw(g, screenBoundingRectangle,
                         camera.calculateZoomFactor());
+
+                System.out.println("C-31-" + iteration);
+                System.out.flush();
             }
+
+            System.out.println("C-32-" + iteration);
+            System.out.flush();
         }
+
+        System.out.println("C-33-" + iteration);
+        System.out.flush();
     }
     
     @Override

@@ -500,23 +500,45 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     public void whenMouseDragReleased(Point mouseLocationOnGridViewport,
             Point startOfDragOnGridViewport, Rectangle dragArea,
             MouseEvent rawEvent) {
+        System.out.println("A-1");
+        System.out.flush();
+        
         List<CommitDrawable> selectedCommitDrawables =
                 patchSelection.findIntersectedCommits(commits);
+
+        System.out.println("A-2");
+        System.out.flush();
         
         List<Commit> selectedCommits = new ArrayList<Commit>(
                 selectedCommitDrawables.size());
+
+        System.out.println("A-3");
+        System.out.flush();
         
+        int iteration = 1;
         for(CommitDrawable commitDrawable : selectedCommitDrawables) {
+            System.out.println("A-4-" + iteration);
+            System.out.flush();
+
             selectedCommits.add(commitDrawable.getCommit());
+            iteration++;
         }
+        
+        System.out.println("A-5");
+        System.out.flush();
         
         if(!selectedCommits.isEmpty()) {
             new PatchView().run(selectedCommits, viewModel,
                     visualConflictsFlag);
+            System.out.println("A-6");
+            System.out.flush();
         }
         
         drawables.remove(patchSelection);
         patchSelection = null;
+
+        System.out.println("A-7");
+        System.out.flush();
     }
 
     private void beginDaySeparatorSound(DaySeparatorDrawable highlightedDaySeparator) {
