@@ -162,11 +162,6 @@ public class BranchView extends TwoDimensionalView<BranchViewState> {
     }
     
     @Override
-    public String getWindowTitle() {
-        return "GitVS Main View (" + locationOfGitRepo + ")";
-    }    
-    
-    @Override
     public int getSetupWidth() {
         return displayWidth / 2;
     }

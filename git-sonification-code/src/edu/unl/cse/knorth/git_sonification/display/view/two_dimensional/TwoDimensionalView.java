@@ -39,13 +39,6 @@ public abstract class TwoDimensionalView<WindowState> extends PApplet {
     public abstract void initialize();
     
     /**
-     * Gets the String that should appear at the top of the window showing
-     * the TwoDimensionalView's contents.
-     * @return The text that should be in the window's title bar.
-     */
-    public abstract String getWindowTitle();
-    
-    /**
      * Gets what the width of the window should be when it's initially set up.
      * @return What the width of the window should be.
      */
@@ -149,9 +142,7 @@ public abstract class TwoDimensionalView<WindowState> extends PApplet {
                }
            });
         }
-            
-        this.frame.setTitle(getWindowTitle());
-        
+                
         size(getSetupWidth(), getSetupHeight(), P2D);
         
         Rectangle grid = getInitialGridViewport();
