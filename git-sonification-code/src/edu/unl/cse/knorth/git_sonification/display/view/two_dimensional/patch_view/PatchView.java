@@ -38,28 +38,16 @@ public class PatchView extends TwoDimensionalView<PatchViewState> {
     
     public void run(List<Commit> commits, ViewModel viewModel,
             boolean visualConflictsFlag, String args[]) {
-        System.out.println("B-1");
-        System.out.flush();
-
         holdCommits = commits;
         holdViewModel = viewModel;
         holdComponents = viewModel.getVisualizationData().getComponents();
         holdVisualConflictsFlag = visualConflictsFlag;
 
-        System.out.println("B-2");
-        System.out.flush();
-        
         String[] newArgs = new String[args.length + 1];
         newArgs[0] = PatchView.class.getCanonicalName();
         System.arraycopy(args, 0, newArgs, 1, args.length);
 
-        System.out.println("B-3");
-        System.out.flush();
-        
         PApplet.main(newArgs);
-        
-        System.out.println("B-4");
-        System.out.flush();
     }
 
     @Override
@@ -69,23 +57,14 @@ public class PatchView extends TwoDimensionalView<PatchViewState> {
     
     @Override
     public void initialize() {
-        System.out.println("B-5");
-        System.out.flush();
-
         this.commits = holdCommits;
         this.viewModel = holdViewModel;
         this.allComponents = holdComponents;
         this.visualConflictsFlag = holdVisualConflictsFlag;
-
-        System.out.println("B-6");
-        System.out.flush();
     }
 
     @Override
     public String getWindowTitle() {
-        System.out.println("B-7");
-        System.out.flush();
-
         return "Details View (" + commits.get(0).getHash().substring(0, 7) +
                 "..." + commits.get(commits.size()-1).getHash().substring(0, 7)
                 + ")";
@@ -108,8 +87,6 @@ public class PatchView extends TwoDimensionalView<PatchViewState> {
 
     @Override
     public ArrayList<Drawable> getInitialDrawables() {
-        System.out.println("B-8");
-        System.out.flush();
         
         DrawablesProducer.PatchViewDrawables patchViewDrawables;
         
@@ -123,20 +100,10 @@ public class PatchView extends TwoDimensionalView<PatchViewState> {
                         allComponents, this);
         }
         
-        System.out.println("B-9");
-        System.out.flush();
-        
         checkmarks = patchViewDrawables.getCheckmarks();
-        
-        System.out.println("B-10");
-        System.out.flush();
         
         ArrayList<Drawable> drawables = new ArrayList<Drawable>(checkmarks);
         drawables.addAll(patchViewDrawables.getNoninteractiveDrawables());
-        
-        System.out.println("B-11");
-        System.out.flush();
-        
         return drawables;
     }
 
@@ -147,9 +114,6 @@ public class PatchView extends TwoDimensionalView<PatchViewState> {
 
     @Override
     public ArrayList<KeyboardEvent<PatchViewState>> getInitialKeybaordEvents() {
-        System.out.println("B-12");
-        System.out.flush();
-
         ArrayList<KeyboardEvent<PatchViewState>> keyboardEvents =
                 new ArrayList<>(4);
         
@@ -177,16 +141,11 @@ public class PatchView extends TwoDimensionalView<PatchViewState> {
                 ScrollWindowKeyboardEvent.ScrollDirection.RIGHT, scrollSpeed,
                 null, keyCodes));
         
-        System.out.println("B-13");
-        System.out.flush();
-        
         return keyboardEvents;
     }
 
     @Override
     public void update(long delta) {
-        System.out.println("B-14");
-        System.out.flush();
     }
 
     @Override
