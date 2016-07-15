@@ -44,7 +44,7 @@ public class GitDataProcessor {
         List<Commit> commits = new CommitProcessor()
                 .processCommits(partialCommits, conflicts, firstHash, lastHash,
                         gitGraph);
-                
+
         SonificationProcessor sonificationProcessor = new SonificationProcessor();
         SonificationData sonificationData =
             sonificationProcessor.processSonificationData(authorCommitCounts);

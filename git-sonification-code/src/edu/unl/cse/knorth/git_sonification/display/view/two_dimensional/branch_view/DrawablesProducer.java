@@ -54,7 +54,7 @@ public class DrawablesProducer {
         int rowNum = 1;
                 
         Color commitColor = Color.BLUE;
-        Color conflictColor = Color.RED;
+        Color conflictColor = Color.createRGBColor((char) 192, (char) 0, (char) 0);
         Map<Integer, Color> lineColors = determineLineColors(visualData);
         
         Layer combinedLayer = visualData.getCombinedLayer();

@@ -40,10 +40,6 @@ Joda Time
 =============
 The Joda Time library is under the Apache 2 License.
 
-JUnit
-=============
-Under the Eclipse Public License - v 1.0
-
 Processing
 =============
 Under a combination of GPL v2 and LGPL.

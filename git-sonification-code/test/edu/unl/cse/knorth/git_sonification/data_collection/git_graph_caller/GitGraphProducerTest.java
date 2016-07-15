@@ -3,16 +3,19 @@ package edu.unl.cse.knorth.git_sonification.data_collection.git_graph_caller;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
 
 public class GitGraphProducerTest {
     
-    public GitGraphProducerTest() {
+    // If this file runs without throwing any exceptions,
+    // the tests pass.
+    // This doesn't use JUnit because JUnit's license is incompatible
+    // with the GPL license several other libraries in this project use.
+    public static void main(String[] args) {
+        testProduceGitGraph();
+        stormTest();
     }
-
-    @Test
-    public void testProduceGitGraph() {
+    
+    public static void testProduceGitGraph() {
         List<String> rawGraphData = new LinkedList<String>();
         rawGraphData.add("*-----.   a010bc783d595b65a3a2ac16834b09ed18c4f0c4");
         rawGraphData.add("|\\ \\ \\ \\ ");
@@ -238,8 +241,7 @@ public class GitGraphProducerTest {
                 expectedPosition, expectedLines));
     }
     
-    @Test
-    public void stormTest() {
+    public static void stormTest() {
         List<String> rawGraphData = new LinkedList<String>();
         rawGraphData.add("| | | * | | | | | | | | | | b5efe2c");
         rawGraphData.add("| | | * | | | | | | | | | | b60712f");
@@ -1717,7 +1719,7 @@ public class GitGraphProducerTest {
 
     }
     
-    private boolean printAndValidateRowContents(GitGraphRow row,
+    private static boolean printAndValidateRowContents(GitGraphRow row,
             String expectedHash, int expectedPosition,
             List<GitGraphLine> expectedLines) {
         boolean rowValidates = validateRowContents(row, expectedHash,
@@ -1728,7 +1730,7 @@ public class GitGraphProducerTest {
         return rowValidates;
     }
     
-    private boolean validateRowContents(GitGraphRow row, String expectedHash,
+    private static boolean validateRowContents(GitGraphRow row, String expectedHash,
             int expectedPosition, List<GitGraphLine> expectedLines) {
         if(!row.getCommitHash().equals(expectedHash)) {
             return false;
@@ -1762,5 +1764,19 @@ public class GitGraphProducerTest {
         }
         
         return true;
+    }
+    
+    public static class Assert {
+        public static void assertTrue(boolean validateRowContents) {
+            if(!validateRowContents) {
+                throw new RuntimeException("Test failed");
+            }
+        }
+
+        public static void assertEquals(int n, int m) {
+            if(n != m) {
+                throw new RuntimeException("Test failed");
+            }
+        }
     }
 }
